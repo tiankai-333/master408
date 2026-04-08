@@ -6,6 +6,6 @@ import java.util.Set;
 
 public interface FileUpload {
 
-    String uploadFile(InputStream inputStream, long size, String extName);
+    String uploadFile(InputStream inputStream, long size, String fileName);
 
 }

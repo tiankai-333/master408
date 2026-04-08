@@ -70,7 +70,7 @@
         "babel-eslint": "^10.1.0",
         "eslint": "^5.16.0",
         "eslint-plugin-vue": "^5.2.3",
-        "node-sass": "^6.0.1",
+        "sass": "^1.32.13",
         "sass-loader": "^10.5.2",
         "svg-sprite-loader": "4.1.6",
         "vue-template-compiler": "^2.7.16"

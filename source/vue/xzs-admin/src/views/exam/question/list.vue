@@ -24,15 +24,36 @@
           <el-option v-for="item in questionType" :key="item.key" :value="item.key" :label="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitForm">查询</el-button>
-        <el-popover placement="bottom" trigger="click">
-          <el-button type="warning" size="mini" v-for="item in editUrlEnum" :key="item.key"
-                     @click="$router.push({path:item.value})">{{item.name}}
-          </el-button>
-          <el-button slot="reference" type="primary" class="link-left">添加</el-button>
-        </el-popover>
-      </el-form-item>
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 10px;">
+        <div style="display: flex; align-items: center;">
+          <el-button type="primary" @click="submitForm">查询</el-button>
+          <el-popover placement="bottom" width="500" trigger="click" style="margin-left: 10px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <el-button type="warning" size="mini" v-for="item in editUrlEnum" :key="item.key"
+                         @click="$router.push({path:item.value})">{{item.name}}
+              </el-button>
+            </div>
+            <el-button slot="reference" type="primary">添加</el-button>
+          </el-popover>
+        </div>
+        <div>
+          <el-upload
+            class="upload-demo"
+            :action="uploadUrl"
+            :on-success="handleUploadSuccess"
+            :on-error="handleUploadError"
+            accept=".txt"
+            :limit="1"
+            method="post"
+            :auto-upload="true"
+            :headers="uploadHeaders"
+            name="file"
+          >
+            <el-button type="primary">上传题目</el-button>
+            <div slot="tip" class="el-upload__tip">请上传txt格式的题目文件</div>
+          </el-upload>
+        </div>
+      </div>
     </el-form>
     <el-table v-loading="listLoading" :data="tableData" border fit highlight-current-row style="width: 100%">
       <el-table-column prop="id" label="Id" width="90px"/>
@@ -68,6 +89,7 @@ export default {
   components: { Pagination, QuestionShow },
   data () {
     return {
+      uploadUrl: '/api/admin/question/upload/txt',
       queryParam: {
         id: null,
         questionType: null,
@@ -85,6 +107,10 @@ export default {
         dialog: false,
         question: null,
         loading: false
+      },
+      uploadFile: null,
+      uploadHeaders: {
+        'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
       }
     }
   },
@@ -138,6 +164,25 @@ export default {
           _this.$message.error(re.message)
         }
       })
+    },
+    handleFileChange (file, fileList) {
+      // 当选择文件时触发
+      this.uploadFile = file.raw
+    },
+    handleUploadSuccess (response) {
+      if (response.code === 1) {
+        this.$message.success('题目上传成功，共处理 ' + response.response + ' 道题目')
+        this.search() // 刷新题目列表
+      } else {
+        this.$message.error('上传失败：' + response.message)
+      }
+    },
+    handleUploadError (error) {
+      console.error('上传错误:', error)
+      this.$message.error('上传失败，请稍后重试: ' + (error.message || '未知错误'))
+    },
+    getToken () {
+      return localStorage.getItem('token') || ''
     },
     questionTypeFormatter (row, column, cellValue, index) {
       return this.enumFormat(this.questionType, cellValue)
