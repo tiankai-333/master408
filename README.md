@@ -1,144 +1,115 @@
-<p></p>
-<p></p>
+好的，基于学之思项目基础和新增的408刷题需求，我为你设计一个结构化的开发流程。这个流程适合小组协作，分阶段推进，并与之前设计的接口文档、数据库方案无缝衔接。
 
-<p align="center">
-<a href="https://www.mindskip.net" target="_blank">
- <img src="https://www.mindskip.net/style/git/images/logo/1.png" height="80" style="height:80px;" />
-<a/>
-</p>
+---
 
-<div align="center">
+## 408刷题系统开发流程（基于学之思扩展）
 
-[![Gitee star](https://gitee.com/mindskip/xzs-mysql/badge/star.svg?theme=gitee)](https://gitee.com/mindskip/xzs-mysql)
-[![Gitee fork](https://gitee.com/mindskip/xzs-mysql/badge/fork.svg?theme=gitee)](https://gitee.com/mindskip/xzs-mysql)
-[![Github stars](https://img.shields.io/github/stars/mindskip/xzs-mysql?logo=github)](https://github.com/mindskip/xzs-mysql)
-[![Github forks](https://img.shields.io/github/forks/mindskip/xzs-mysql?logo=github)](https://github.com/mindskip/xzs-mysql)
-![star](https://gitcode.com/mindskip/xzs-mysql/star/badge.svg)
-[![Github license](https://img.shields.io/badge/license-AGPL-yellow)](https://gitee.com/mindskip/xzs-mysql/blob/master/LICENSE)
+### 一、项目准备与环境搭建（1天）
 
-</div>
+| 任务 | 负责人 | 产出物 | 备注 |
+|------|--------|--------|------|
+| 克隆基础项目 `xzs-mysql` 到本地 | 全员 | 本地仓库 | 使用你已推送的 `master408` 仓库 |
+| 导入完整数据库脚本 | 后端 | 数据库 `xzs_408` | 包含学之思原有表 + 8张408扩展表 + 初始数据 |
+| 修改后端配置文件（数据库连接、端口等） | 后端 | `application.yml` | 确保能正常启动后端服务 |
+| 启动前端项目（`student` / `admin`）并验证基础功能 | 前端 | 运行中的前端页面 | 登录、首页等学之思原有功能正常 |
+| 安装并配置本地 Ollama (qwen:7b) | 后端/AI | 可调用的 AI 服务 | 用于第二阶段AI辅助功能 |
 
-# 学之思开源考试系统 - Mysql版 
+---
 
-## 项目介绍
+### 二、第一阶段：核心功能开发（1-2周，必须完成）
 
-学之思开源考试系统是一款 java + vue 的前后端分离的考试系统。主要优点是开发、部署简单快捷、界面设计友好、代码结构清晰。支持web端和微信小程序，能覆盖到pc机和手机等设备。
-支持多种部署方式：集成部署、前后端分离部署、docker部署。
+> **目标**：跑通408刷题最小闭环——题库管理、在线答题、错题本、用户基础功能。
 
-### 演示地址
+#### 第1周：后端接口开发
 
-* 官网：[https://www.mindskip.net](https://www.mindskip.net)
-* 学之思开源考试系统：[https://www.mindskip.net/xzs.html](https://www.mindskip.net/xzs.html)
-* 维多多培训考试系统：[https://www.mindskip.net/wdd.html](https://www.mindskip.net/wdd.html)
-* 思多多智能考试系统：[https://www.mindskip.net/sdd.html](https://www.mindskip.net/sdd.html)
+| 模块 | 接口 | 优先级 | 依赖表 |
+|------|------|--------|--------|
+| **题库分类** | 获取科目章节/考点树 `GET /api/student/subject/knowledge-tree` | P0 | `t_subject`, `t_chapter`, `t_knowledge_point` |
+| **题目查询** | 分页获取题目列表 `POST /api/student/question/page` | P0 | `t_question`, `t_question_category` |
+| **题目详情** | 获取题目详情 `GET /api/student/question/detail/{id}` | P0 | `t_question`, `t_text_content` |
+| **刷题会话** | 开始刷题 `POST /api/student/practice/session/start` | P0 | `t_practice_session`, `t_question` |
+| **提交答案** | 提交单题并获取下一题 `POST /api/student/practice/session/submit` | P0 | `t_practice_answer`, `t_wrong_book`, `t_practice_session` |
+| **错题本** | 加入错题本 `POST /api/student/wrong-book/add` | P0 | `t_wrong_book` |
+| | 获取错题本列表 `POST /api/student/wrong-book/page` | P0 | `t_wrong_book`, `t_question` |
+| | 更新掌握状态 `POST /api/student/wrong-book/status/update` | P1 | `t_wrong_book` |
+| | 删除错题 `DELETE /api/student/wrong-book/delete/{id}` | P1 | `t_wrong_book` |
+| **用户统计** | 获取个人学习统计 `GET /api/student/statistics/overview` | P1 | `t_practice_answer`, `t_wrong_book` |
 
-### 文档视频教程
+**后端开发规范**：
+- 遵循学之思现有代码结构：`controller`、`service`、`mapper`、`domain`、`viewmodel`。
+- 复用现有 `BaseApiController`、`RestResponse` 等基础类。
+- 使用 MyBatis-Plus 简化单表操作。
+- 所有接口均需通过 `@RestController` 和 `@PostMapping`/`@GetMapping` 注解，并配置 Shiro 权限（学生角色可访问）。
 
-* 文档教程：[https://www.mindskip.net:999](https://www.mindskip.net:999)
-* 视频教程：[https://space.bilibili.com/1389892305](https://space.bilibili.com/1389892305)
-* QQ交流群18：`700540955`
-* 商务QQ：`2732007709`
-* 商务微信：`whmindskip`
-* 商务邮箱：`mindskip@qq.com`
+#### 第2周：前端页面开发
 
-### 学之思仓库版本地址
+| 页面 | 功能点 | 负责人 |
+|------|--------|--------|
+| **题库浏览页** | 左侧408科目树，右侧题目列表（支持筛选科目、章节、题型），点击进入答题 | 前端A |
+| **答题页** | 展示题干、选项，提交后立即显示对错与解析，支持“下一题”和“加入错题本” | 前端A |
+| **错题本页** | 按科目/考点筛选，展示错题列表，可查看详情、标记掌握状态、删除 | 前端B |
+| **个人中心-学习报告** | 展示各科正确率、薄弱考点图表（使用 ECharts） | 前端B |
+| **登录/注册页** | 复用学之思现有页面，微调样式 | 前端A |
 
-* gitee - postgresql ：[https://gitee.com/mindskip/uexam](https://gitee.com/mindskip/uexam)
-* gitee - mysql ：[https://gitee.com/mindskip/xzs-mysql](https://gitee.com/mindskip/xzs-mysql)
-* github - postgresql ：[https://github.com/mindskip/xzs](https://github.com/mindskip/xzs)
-* github - mysql ：[https://github.com/mindskip/xzs-mysql](https://github.com/mindskip/xzs-mysql)
-* gitcode - postgresql ：[https://gitcode.com/mindskip/xzs](https://gitcode.com/mindskip/xzs)
-* gitcode - mysql ：[https://gitcode.com/mindskip/xzs-mysql](https://gitcode.com/mindskip/xzs-mysql)
+**前端开发规范**：
+- 基于学之思原有 Vue 2.x + Element UI 技术栈，新增页面放在 `src/views/408` 目录下。
+- API 请求统一封装在 `src/api/408.js`，复用现有 `request` 拦截器。
+- 路由配置在 `src/router/index.js` 中增加408相关路由。
 
+---
 
+### 三、第二阶段：体验优化与AI功能（2-3周）
 
-### 学生系统功能
+> **目标**：提升用户体验，接入AI辅助学习。
 
-|  模块   | 介绍  |
-|  ----  | ----  |
-| 登录  | 用户名、密码  |  
-| 注册  | 年级、用户名、密码  |  
-| 任务中心  | 管理员发布的年级任务，每个学生只能做一次  |  
-| 考试  | 题干支持文本、图片、数学公式、表格等，学生答题支持：文本  |  
-| 固定试卷  | 可重复练习、自行批改的试卷  |  
-| 时段试卷  | 在时间限制内，可重复练习、自行批改的试卷  |  
-| 考试记录  | 查看答卷记录和试卷信息  |  
-| 错题本  | 答错题目会自动进入错题本，显示题目基本信息  |  
-| 个人信息  | 显示学生个人资料  |  
-| 更新信息  | 修改个人资料、头像  |  
-| 个人动态  | 显示用户最近的个人动态  |  
-| 消息中心  | 用于接收管理员发送的消息  |  
+| 任务 | 后端 | 前端 |
+|------|------|------|
+| **AI详细解析** | 实现接口 `POST /api/student/ai/analysis`，调用 Ollama API 生成详细解析 | 答题页增加“AI解析”按钮，展示生成的内容 |
+| **AI对话** | 实现接口 `POST /api/student/ai/chat`，支持上下文题目提问 | 在解析弹窗或侧边栏增加对话输入框 |
+| **题目搜索** | 实现接口 `GET /api/student/question/search?keyword=xxx` | 顶部导航增加搜索入口，结果高亮展示 |
+| **做题数据统计强化** | 完善 `statistics/overview` 接口，增加近一周正确率趋势 | 个人中心增加趋势折线图 |
+| **界面优化** | - | 答题页增加动画过渡、暗色模式适配 |
 
-### 管理系统功能
+---
 
-|  模块   | 介绍  |
-|  ----  | ----  |
-| 登录  | 用户名、密码  |  
-| 主页  | 试卷总数、题目总数、用户活跃度、题目月数量  |  
-| 学生列表  | 显示系统所有的学生，新增、修改、删除、禁用  |  
-| 管理员列表  | 显示系统所有的管理员，新增、修改、删除、禁用  |  
-| 学科列表  | 学科查询、修改、删除  |  
-| 学科创编  | 创建学科  |  
-| 试卷列表  | 试卷查询、修改、删除  |  
-| 试卷创编  | 创建的试卷为时段试卷、固定试卷、任务试卷  |  
-| 题目列表  | 题目查询、修改、删除  |  
-| 题目创建  | 题目支持单选题、多选题、判断题、填空题、简答题，题干支持文本、图片、表格、数学公式  |  
-| 任务列表  | 任务查询、修改、删除  |  
-| 消息列表  | 显示已发送的消息，消息已读人数等信息  |  
-| 消息发送  | 发送消息给多个用户  |  
-| 用户日志  | 显示所有用户日志  |  
-| 个人资料  | 显示管理员用户名、真实姓名  |  
-| 时间线  | 显示管理员创建时间  |  
-| 修改资料  | 修改姓名、手机号  |  
+### 四、第三阶段：拓展功能（可选，按需迭代）
 
-### 小程序功能
+- 高校专区（各大高校真题库）
+- 题目收藏功能
+- 移动端适配（rem + 响应式）
+- AI个性化复习规划
 
-|  模块   | 介绍  |
-|  ----  | ----  |
-| 登录  | 用户登录登出功能，登录会自动绑定微信账号，登出会解绑  |  
-| 注册  | 年级、用户名、密码  |  
-| 任务中心  | 管理员发布的年级任务，每个学生只能做一次  |  
-| 考试  | 题干支持文本、图片、数学公式、表格等，学生答题支持：文本  |  
-| 固定试卷  | 可重复练习、自行批改的试卷  |  
-| 时段试卷  | 在时间限制内，可重复练习、自行批改的试卷  |  
-| 考试记录  | 查看答卷记录和试卷信息  |  
-| 错题本  | 答错题目会自动进入错题本，显示题目基本信息  |  
-| 个人信息  | 显示学生个人资料  |  
-| 更新信息  | 修改个人资料、头像  |  
-| 个人动态  | 显示用户最近的个人动态  |  
-| 消息中心  | 用于接收管理员发送的消息  |  
+---
 
-### 系统展示
+### 五、测试与部署（持续进行）
 
-* 学生考试系统
-<table>
-    <tr>
-        <td><img src="https://www.mindskip.net/style/git/images/student/1.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/student/2.png"/></td>
-    </tr>
-</table>
+| 阶段 | 内容 |
+|------|------|
+| **单元测试** | 后端核心 Service 方法编写 JUnit 测试 |
+| **接口测试** | 使用 Postman 或 Apifox 对新增接口进行冒烟测试 |
+| **联调测试** | 前后端联调，确保数据格式与接口文档一致 |
+| **部署** | 后端打包 jar，前端打包 dist 放入 Nginx，配置反向代理 |
 
-*  小程序考试系统
-<table>
-    <tr>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/1.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/2.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/3.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/4.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/10.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/8.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/6.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/wx/student/7.png"/></td>
-    </tr>
-</table>
+---
 
-* 后台管理系统
+### 六、团队协作建议
 
-<table>
-    <tr>
-        <td><img src="https://www.mindskip.net/style/git/images/admin/1.png"/></td>
-        <td><img src="https://www.mindskip.net/style/git/images/admin/2.png"/></td>
-    </tr>
-</table>
+- **分支管理**：`main` 分支保护，开发在 `dev` 分支，每人按功能创建 `feature/xxx` 分支。
+- **每日站会**：同步进度、阻塞点。
+- **文档维护**：接口变更及时更新接口文档（YApi/Apifox），数据库变更记录在 `sql/migration.sql`。
+- **代码规范**：后端遵循阿里巴巴 Java 规范，前端 ESLint + Prettier 统一格式。
+
+---
+
+### 七、里程碑时间线（建议）
+
+```
+Week 1-2:  完成P0核心接口 + 题库浏览页、答题页
+Week 3:    完成错题本 + 学习报告页面，联调通过
+Week 4:    第一阶段测试、修复 Bug、演示
+Week 5-6:  第二阶段 AI 功能 + 搜索 + 统计图表
+Week 7:    第二阶段测试、优化、准备部署
+Week 8+:   拓展功能选做
+```
+
+这个流程可以直接作为小组开发计划，每个任务都可拆解为具体 issue 分配到人。如果需要我帮你生成详细的接口调试用例或前端组件模板，随时告诉我。
