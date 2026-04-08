@@ -47,7 +47,11 @@ const post = function (url, params) {
     withCredentials: true,
     timeout: 30000,
     data: params,
-    headers: { 'Content-Type': 'application/json', 'request-ajax': true }
+    headers: { 
+      'Content-Type': 'application/json', 
+      'request-ajax': true,
+      'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+    }
   }
   return request(false, query)
 }
@@ -60,7 +64,11 @@ const postWithLoadTip = function (url, params) {
     withCredentials: true,
     timeout: 30000,
     data: params,
-    headers: { 'Content-Type': 'application/json', 'request-ajax': true }
+    headers: { 
+      'Content-Type': 'application/json', 
+      'request-ajax': true,
+      'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+    }
   }
   return request(true, query)
 }
@@ -73,7 +81,11 @@ const postWithOutLoadTip = function (url, params) {
     withCredentials: true,
     timeout: 30000,
     data: params,
-    headers: { 'Content-Type': 'application/json', 'request-ajax': true }
+    headers: { 
+      'Content-Type': 'application/json', 
+      'request-ajax': true,
+      'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+    }
   }
   return request(false, query)
 }
@@ -86,7 +98,10 @@ const get = function (url, params) {
     withCredentials: true,
     timeout: 30000,
     params: params,
-    headers: { 'request-ajax': true }
+    headers: { 
+      'request-ajax': true,
+      'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+    }
   }
   return request(false, query)
 }
@@ -99,7 +114,11 @@ const form = function (url, params) {
     withCredentials: true,
     timeout: 30000,
     data: params,
-    headers: { 'Content-Type': 'multipart/form-data', 'request-ajax': true }
+    headers: { 
+      'Content-Type': 'multipart/form-data', 
+      'request-ajax': true,
+      'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+    }
   }
   return request(false, query)
 }

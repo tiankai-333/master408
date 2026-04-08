@@ -63,3 +63,10 @@ spring:
   #runningtime environment
   profiles:
     active:  dev
+
+# AI API配置
+ai:
+  api:
+    key: c50db4ff4ba74a1cbf7eb091155fa710.EdERlgV5fk1Zv7Ny
+    url: https://open.bigmodel.cn/api/paas/v4/chat/completions
+    type: glm  # 可选值: openai, glm

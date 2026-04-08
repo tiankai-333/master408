@@ -1,4 +1,4 @@
-# 项目部署
+ 项目部署
 
 ### 集成部署
 
@@ -11,7 +11,7 @@ npm run build
  ```
 
 * 打包后的目录为student和admin
-* 将文件放到\source\xzs\src\main\resources\static下，然后将java程序打包成jar包
+* 将文件放到\source\xzs\src\main\resources\static下，然后将java程序打包成jar包    
 * 修改application-prod.yml中的datasource地址
 * 数据库账号密码设置为：root/123456
 * 数据库脚本领取地址：[https://www.mindskip.net:999](https://www.mindskip.net:999)
