@@ -1,3 +1,9 @@
+1.0 下载
+```
+mkdir C:\Dev\Workspaces
+cd C:\Dev\Workspaces
+git clone https://github.com/tiankai-333/master408.git
+```
 1.1 前端运行
 
 1.1.1 解决版本冲突
