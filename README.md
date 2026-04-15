@@ -7,11 +7,13 @@ cd C:\Dev\Workspaces\master408\source\vue\xzs-student
 卸载 node-sass 并安装 sass
 
 npm uninstall node-sass
+
 npm install sass --save-dev
 
 1.1.2 清理并重新安装所有依赖
 
 rm -rf node_modules package-lock.json
+
 npm install
 
 1.1.3 启动项目
@@ -22,6 +24,7 @@ npm run serve
 1.2后端运行
 
 cd c:/Dev/Workspaces/master408/source/xzs
+
 mvn spring-boot:run
 
 
