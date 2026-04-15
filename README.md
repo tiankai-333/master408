@@ -37,7 +37,9 @@ mvn spring-boot:run
 默认数据库名：xzs
 
 数据库密码修改位置：application-dev.yml
+```
 source\xzs\src\main\resources\application-dev.yml
+```
 ---
 
 ## 408刷题系统开发流程（基于学之思扩展）
