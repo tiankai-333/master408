@@ -24,7 +24,7 @@ export default {
   },
   data () {
     return {
-      title: '学之思管理系统'
+      title: '408master'
     }
   }
 }
@@ -45,7 +45,8 @@ export default {
   width: 100%;
   height: 50px;
   line-height: 50px;
-  background: #2b2f3a;
+  background: #fff;
+  border-bottom: 1px solid #e8eaed;
   text-align: center;
   overflow: hidden;
 
@@ -54,26 +55,32 @@ export default {
     width: 100%;
 
     & .sidebar-logo {
-      width: 45px;
+      width: 28px;
       vertical-align: middle;
-      margin-right: 12px;
+      margin-right: 10px;
+      border-radius: 6px;
     }
 
     & .sidebar-title {
       display: inline-block;
       margin: 0;
-      color: #fff;
-      font-weight: 600;
+      color: #1890ff;
+      font-weight: 700;
       line-height: 50px;
-      font-size: 14px;
+      font-size: 16px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
+      letter-spacing: 0.5px;
     }
   }
 
   &.collapse {
     .sidebar-logo {
       margin-right: 0px;
+    }
+
+    .sidebar-title {
+      display: none;
     }
   }
 }
