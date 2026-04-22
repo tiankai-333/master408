@@ -3,8 +3,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
-  background-color: #fff;
+  font-family: 'Segoe UI', system-ui, -apple-system, Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  background-color: #f5f7fb;
 }
 
 html {
@@ -23,8 +23,10 @@ html {
 }
 
 .student-header {
-  border-bottom: solid 1px #e6e6e6 !important;
+  border-bottom: solid 1px #e0e4f0 !important;
   padding: 0px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 12px rgba(91, 110, 245, 0.08);
 
   .el-menu-title {
     border-bottom: 0px !important;
@@ -33,6 +35,18 @@ html {
     .el-menu-item {
       font-size: 15px !important;
       line-height: 62px !important;
+      color: #3a3f5c !important;
+      font-weight: 500;
+
+      &.is-active {
+        color: #5b6ef5 !important;
+        border-bottom: 2px solid #5b6ef5 !important;
+      }
+
+      &:hover {
+        color: #5b6ef5 !important;
+        background-color: transparent !important;
+      }
     }
   }
 
@@ -57,75 +71,6 @@ html {
 .student-main {
   padding: 0px !important;
 }
-
-
-@media only screen and (max-width: 768px) {
-  .student-footer {
-    padding: 40px 20px;
-  }
-}
-
-
-@media only screen and (min-width: 768px) and (max-width: 1200px) {
-  .student-footer {
-    padding: 40px 70px;
-  }
-}
-
-
-@media only screen and (min-width: 1200px) {
-  .student-footer {
-    padding: 40px 150px;
-  }
-}
-
-
-.student-footer {
-  margin-top: 150px;
-  background-color: #f7fbfd;
-  width: 100%;
-  box-sizing: border-box;
-
-  .foot-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 50px;
-    flex-wrap: wrap;
-  }
-
-  .footer-main {
-    display: inline-block;
-    vertical-align: top;
-
-    .footer-main-link {
-      display: block;
-      margin: 0;
-      line-height: 2;
-      font-size: 14px;
-      color: #666;
-      text-decoration: none;
-    }
-  }
-
-  .footer-social {
-    float: right;
-    text-align: right;
-
-    .footer-social-title {
-      color: #666;
-      font-size: 18px;
-      line-height: 1;
-      margin: 0 0 20px;
-      padding: 0;
-      font-weight: 700;
-    }
-
-    a {
-      margin-left: 5px;
-    }
-  }
-}
-
 
 
 @media only screen and (max-width: 768px) {
@@ -338,19 +283,6 @@ html {
   text-align: center;
   transform: translateX(-50%);
 
-  span {
-    line-height: 20px;
-    text-align: center;
-    color: #666;
-    margin: 0px 5px;
-    font-size: 14px;
-  }
-}
-
-
-.foot-copyright {
-  text-align: center;
-  background-color: #f7fbfd;
   span {
     line-height: 20px;
     text-align: center;

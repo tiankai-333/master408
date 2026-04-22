@@ -24,7 +24,7 @@ export default {
   },
   data () {
     return {
-      title: 'stu sys'
+      title: '408master'
     }
   }
 }
@@ -45,7 +45,7 @@ export default {
   width: 100%;
   height: 50px;
   line-height: 50px;
-  background: #2b2f3a;
+  background: #141829;
   text-align: center;
   overflow: hidden;
 
@@ -54,20 +54,24 @@ export default {
     width: 100%;
 
     & .sidebar-logo {
-      width: 45px;
+      width: 32px;
       vertical-align: middle;
-      margin-right: 12px;
+      margin-right: 10px;
+      border-radius: 6px;
     }
 
     & .sidebar-title {
       display: inline-block;
       margin: 0;
-      color: #fff;
-      font-weight: 600;
+      background: linear-gradient(90deg, #6eb5ff, #b56eff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
       line-height: 50px;
-      font-size: 14px;
+      font-size: 15px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
+      letter-spacing: 1px;
     }
   }
 

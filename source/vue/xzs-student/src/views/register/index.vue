@@ -7,7 +7,7 @@
       <div class="lowin-box lowin-register">
         <div class="lowin-box-inner">
           <el-form ref="loginForm" :model="loginForm">
-            <p>学之思开源考试系统</p>
+            <p>408master</p>
             <div class="lowin-group">
               <label>用户名 </label>
               <el-input ref="userName" v-model="loginForm.userName" class="lowin-input" placeholder="用户名"
@@ -36,9 +36,7 @@
         </div>
       </div>
     </div>
-    <div class="account-foot-copyright">
-      <span>Copyright ©2019-2026 武汉思维跳跃科技有限公司 版权所有</span>
-    </div>
+
   </div>
 </template>
 
@@ -91,14 +89,14 @@ export default {
 
   .lowin {
     /* variables */
-    --color-primary: #44a0b3;
-    --color-grey: rgba(68, 160, 179, .06);
-    --color-dark: rgba(68, 160, 179, .5);
-    --color-semidark: rgba(68, 160, 179, .5);
+    --color-primary: #5b6ef5;
+    --color-grey: rgba(91, 110, 245, .06);
+    --color-dark: rgba(91, 110, 245, .6);
+    --color-semidark: rgba(91, 110, 245, .5);
 
     text-align: center;
     margin: 20px 0 0 0;
-    font-family: 'Segoe UI';
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 14px;
   }
 
@@ -110,15 +108,15 @@ export default {
     perspective: 1000px;
     position: relative;
     height: 100%;
-    width: 360px;
+    width: 380px;
     margin: 0 auto;
   }
 
   .lowin.lowin-blue {
-    --color-primary: #0081C6;
-    --color-grey: rgba(0, 129, 198, .05);
-    --color-dark: rgba(0, 129, 198, .7);
-    --color-semidark: rgba(0, 129, 198, .45);
+    --color-primary: #5b6ef5;
+    --color-grey: rgba(91, 110, 245, .06);
+    --color-dark: rgba(91, 110, 245, .7);
+    --color-semidark: rgba(91, 110, 245, .45);
   }
 
   .lowin a {
