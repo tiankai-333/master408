@@ -66,23 +66,30 @@ export default {
   overflow: hidden;
   position: relative;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  border-bottom: 1px solid #e8eaed;
+  box-shadow: 0 1px 6px rgba(0, 21, 41, 0.06);
+  display: flex;
+  align-items: center;
 
   .hamburger-container {
     line-height: 46px;
     height: 100%;
     float: left;
     cursor: pointer;
-    transition: background .3s;
-    -webkit-tap-highlight-color:transparent;
+    transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0 12px;
+    border-radius: 6px;
 
     &:hover {
-      background: rgba(0, 0, 0, .025)
+      background: #f0f7ff;
+      color: #1890ff;
     }
   }
 
   .breadcrumb-container {
     float: left;
+    line-height: 50px;
   }
 
   .errLog-container {
@@ -94,6 +101,7 @@ export default {
     float: right;
     height: 100%;
     line-height: 50px;
+    margin-left: auto;
 
     &:focus {
       outline: none;
@@ -109,34 +117,42 @@ export default {
 
       &.hover-effect {
         cursor: pointer;
-        transition: background .3s;
+        transition: background 0.2s, color 0.2s;
+        border-radius: 6px;
 
         &:hover {
-          background: rgba(0, 0, 0, .025)
+          background: #f0f7ff;
+          color: #1890ff;
         }
       }
     }
 
     .avatar-container {
-      margin-right: 30px;
+      margin-right: 20px;
 
       .avatar-wrapper {
-        margin-top: 5px;
-        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 500;
 
-        .user-avatar {
-          cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+        &:hover {
+          background: #f0f7ff;
+          color: #1890ff;
         }
 
         .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
           font-size: 12px;
+          color: #94a3b8;
+          margin-top: 0;
+          position: static;
+          transform: none;
         }
       }
     }
