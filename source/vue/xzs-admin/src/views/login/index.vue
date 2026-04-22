@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">stu sys</h3>
+        <h3 class="title">408master</h3>
       </div>
 
       <el-form-item prop="userName">
@@ -51,9 +51,7 @@
 
     </el-form>
 
-    <div class="account-foot-copyright">
-      <span>Copyright ©2019-2026 武汉思维跳跃科技有限公司 版权所有</span>
-    </div>
+
   </div>
 </template>
 
@@ -164,7 +162,7 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
+$bg:#1a1f2e;
 $light_gray:#fff;
 $cursor: #fff;
 
@@ -199,45 +197,37 @@ $cursor: #fff;
   }
 
   .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
     color: #454545;
   }
 }
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
+$bg: linear-gradient(135deg, #0f1123 0%, #1a1f3e 50%, #0d1829 100%);
+$dark_gray:#8899b4;
 $light_gray:#eee;
 
 .login-container {
   min-height: 100%;
   width: 100%;
-  background-color: $bg;
+  background: $bg;
   overflow: hidden;
 
   .login-form {
     position: relative;
-    width: 520px;
+    width: 460px;
     max-width: 100%;
-    padding:30px 50px 10px 50px;
-    margin:120px auto auto auto;
+    padding: 40px 50px 20px 50px;
+    margin: 100px auto auto auto;
     overflow: hidden;
-    background: rgba(252, 254, 255, 0.11)
-  }
-
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   }
 
   .svg-container {
@@ -252,11 +242,15 @@ $light_gray:#eee;
     position: relative;
 
     .title {
-      font-size: 26px;
+      font-size: 28px;
       color: $light_gray;
       margin: 0px auto 40px auto;
       text-align: center;
-      font-weight: bold;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #6eb5ff, #b56eff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 
@@ -270,16 +264,12 @@ $light_gray:#eee;
     user-select: none;
   }
 
-  .thirdparty-button {
-    position: absolute;
-    right: 0;
-    bottom: 6px;
-  }
-
   @media only screen and (max-width: 470px) {
-    .thirdparty-button {
-      display: none;
+    .login-form {
+      width: 100%;
+      border-radius: 0;
     }
   }
 }
 </style>
+
