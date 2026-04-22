@@ -10,7 +10,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
 }
 
 label {
@@ -289,35 +289,10 @@ aside {
   display: inline !important;
 }
 
-
 .foot-copyright {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  text-align: center;
-  transform: translateX(-50%);
-
-  span {
-    line-height: 20px;
-    text-align: center;
-    color: #606266;
-    margin: 0px 5px;
-    font-size: 14px;
-  }
+  display: none;
 }
 
 .account-foot-copyright {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  text-align: center;
-  transform: translateX(-50%);
-
-  span {
-    line-height: 20px;
-    text-align: center;
-    color: rgb(179, 185, 192);
-    margin: 0px 5px;
-    font-size: 14px;
-  }
+  display: none;
 }
