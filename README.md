@@ -27,6 +27,10 @@ npm install
 npm run serve
 ```
 
+1.1.4 同样的步骤启动admin前端
+```
+cd C:\Dev\Workspaces\master408\source\vue\xzs-admin
+```
 1.2后端运行
 ```
 cd c:/Dev/Workspaces/master408/source/xzs
@@ -39,6 +43,10 @@ mvn spring-boot:run
 数据库密码修改位置：application-dev.yml
 ```
 source\xzs\src\main\resources\application-dev.yml
+```
+初始化数据库
+```
+mysql> source C:/Dev/Workspaces/master408/sql/master408.sql
 ```
 ---
 
