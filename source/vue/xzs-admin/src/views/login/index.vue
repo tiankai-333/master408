@@ -177,7 +177,7 @@ export default {
                 type: 'error'
               })
             }
-          }).catch(function () {
+          }).catch(function (reason) {
             _this.loading = false
           })
         } else {
