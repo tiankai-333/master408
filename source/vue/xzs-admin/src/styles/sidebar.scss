@@ -11,6 +11,7 @@
     transition: width 0.28s;
     width: $sideBarWidth !important;
     background-color: $menuBg;
+    border-right: 1px solid #e8eaed;
     height: 100%;
     position: fixed;
     font-size: 0px;
@@ -19,6 +20,7 @@
     left: 0;
     z-index: 1001;
     overflow: hidden;
+    box-shadow: 2px 0 8px rgba(0, 21, 41, 0.06);
 
     // reset element-ui css
     .horizontal-collapse-transition {
@@ -61,6 +63,25 @@
       border: none;
       height: 100%;
       width: 100% !important;
+      background-color: $menuBg !important;
+    }
+
+    // menu item styles for light sidebar
+    .el-menu-item,
+    .el-submenu__title {
+      color: $menuText !important;
+      background-color: $menuBg !important;
+
+      &:hover {
+        color: $menuActiveText !important;
+        background-color: $menuHover !important;
+      }
+    }
+
+    .el-menu-item.is-active {
+      color: $menuActiveText !important;
+      background-color: $menuHover !important;
+      border-right: 2px solid $menuActiveText;
     }
 
     // menu hover
@@ -68,20 +89,23 @@
     .el-submenu__title {
       &:hover {
         background-color: $menuHover !important;
+        color: $menuActiveText !important;
       }
     }
 
     .is-active>.el-submenu__title {
-      color: $subMenuActiveText !important;
+      color: $menuActiveText !important;
     }
 
     & .nest-menu .el-submenu>.el-submenu__title,
     & .el-submenu .el-menu-item {
       min-width: $sideBarWidth !important;
       background-color: $subMenuBg !important;
+      color: $menuText !important;
 
       &:hover {
         background-color: $subMenuHover !important;
+        color: $menuActiveText !important;
       }
     }
   }
@@ -183,8 +207,8 @@
   .nest-menu .el-submenu>.el-submenu__title,
   .el-menu-item {
     &:hover {
-      // you can use $subMenuHover
       background-color: $menuHover !important;
+      color: $menuActiveText !important;
     }
   }
 
@@ -192,9 +216,11 @@
   >.el-menu--popup {
     max-height: 100vh;
     overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0, 21, 41, 0.10);
 
     &::-webkit-scrollbar-track-piece {
-      background: #d3dce6;
+      background: #f0f2f5;
     }
 
     &::-webkit-scrollbar {
@@ -202,7 +228,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #99a9bf;
+      background: #c8d0da;
       border-radius: 20px;
     }
   }
