@@ -63,7 +63,15 @@
                 @blur="capsTooltip = false"
                 @keyup.enter.native="handleLogin"
               />
-              <span class="show-pwd" @click="showPwd">
+              <span
+                class="show-pwd"
+                role="button"
+                tabindex="0"
+                :aria-label="passwordType === 'password' ? '显示密码' : '隐藏密码'"
+                @click="showPwd"
+                @keyup.enter="showPwd"
+                @keyup.space.prevent="showPwd"
+              >
                 <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
               </span>
             </el-form-item>
