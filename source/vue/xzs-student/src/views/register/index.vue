@@ -67,6 +67,7 @@
             <el-select
               v-model="loginForm.userLevel"
               placeholder="请选择年级"
+              aria-label="请选择年级"
               class="level-select"
             >
               <el-option
