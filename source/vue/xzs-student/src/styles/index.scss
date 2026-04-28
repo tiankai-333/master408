@@ -4,12 +4,13 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
-  background-color: #fff;
+  background-color: #f5f7fb;
 }
 
 html {
   height: 100%;
   box-sizing: border-box;
+  background: #f5f7fb;
 }
 
 #app {
@@ -22,8 +23,14 @@ html {
   box-sizing: inherit;
 }
 
+/* ===========================
+   Top navigation (student header)
+   =========================== */
+
 .student-header {
-  border-bottom: solid 1px #e6e6e6 !important;
+  background: #ffffff;
+  border-bottom: 1px solid #eaecf0 !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
   padding: 0px !important;
 
   .el-menu-title {
@@ -31,8 +38,23 @@ html {
     float: right;
 
     .el-menu-item {
-      font-size: 15px !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
       line-height: 62px !important;
+      color: #374151 !important;
+      border-bottom: none !important;
+      transition: color 0.15s, border-color 0.15s;
+
+      &.is-active {
+        color: #1890ff !important;
+        border-bottom: 2px solid #1890ff !important;
+        font-weight: 600 !important;
+      }
+
+      &:hover {
+        color: #1890ff !important;
+        background: transparent !important;
+      }
     }
   }
 
@@ -45,6 +67,11 @@ html {
       margin-top: 12px;
       margin-right: 20px;
       cursor: pointer;
+      transition: opacity 0.15s;
+
+      &:hover {
+        opacity: 0.85;
+      }
     }
 
     .is-dot {
@@ -58,6 +85,10 @@ html {
   padding: 0px !important;
 }
 
+
+/* ===========================
+   Footer
+   =========================== */
 
 @media only screen and (max-width: 768px) {
   .student-footer {
@@ -160,6 +191,10 @@ html {
   }
 }
 
+
+/* ===========================
+   Question content helpers
+   =========================== */
 
 .q-title {
   margin: 5px 5px 0px 5px;
@@ -359,3 +394,206 @@ html {
     font-size: 14px;
   }
 }
+
+
+/* ===========================
+   Modern Flat UI – Element UI overrides
+   =========================== */
+
+// Element table
+.el-table {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #eaecf0 !important;
+}
+
+.el-table th.el-table__cell {
+  background: #f8fafc !important;
+  color: #334155;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid #eaecf0 !important;
+}
+
+.el-table td.el-table__cell {
+  border-bottom: 1px solid #f0f2f5 !important;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: #fafbfd !important;
+}
+
+.el-table__body tr:hover > td.el-table__cell {
+  background: #f0f7ff !important;
+}
+
+// Element inputs + selects
+.el-input__inner,
+.el-textarea__inner {
+  border-radius: 8px;
+  border-color: #dde1e8;
+  transition: border-color 0.18s, box-shadow 0.18s;
+
+  &:focus {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.12);
+  }
+}
+
+.el-select .el-input__inner {
+  border-radius: 8px;
+}
+
+// Buttons
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.el-button--primary {
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.20);
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(24, 144, 255, 0.30);
+  }
+}
+
+// Cards
+.el-card {
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+// Dialog
+.el-dialog {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid #f0f2f5;
+  padding: 16px 20px;
+}
+
+.el-dialog__footer {
+  border-top: 1px solid #f0f2f5;
+  padding: 12px 20px;
+}
+
+// Tags
+.el-tag {
+  border-radius: 6px;
+}
+
+// Dropdown
+.el-dropdown-menu {
+  border-radius: 10px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+  padding: 6px;
+
+  .el-dropdown-menu__item {
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #374151;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover,
+    &:focus {
+      background-color: #f0f7ff;
+      color: #1890ff;
+    }
+  }
+
+  .el-dropdown-menu__item--divided {
+    margin-top: 4px;
+    border-top: 1px solid #f0f2f5;
+    padding-top: 8px;
+  }
+}
+
+// Pagination
+.el-pagination {
+  .el-pager li {
+    border-radius: 6px;
+    margin: 0 2px;
+    min-width: 32px;
+    line-height: 32px;
+    height: 32px;
+
+    &.active {
+      background: #1890ff;
+    }
+  }
+
+  button.btn-prev,
+  button.btn-next {
+    border-radius: 6px;
+  }
+}
+
+// Form labels
+.el-form-item__label {
+  color: #374151;
+  font-weight: 500;
+}
+
+// Select dropdown
+.el-select-dropdown {
+  border-radius: 10px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+}
+
+.el-select-dropdown__item {
+  border-radius: 4px;
+  margin: 0 4px;
+
+  &.selected {
+    color: #1890ff;
+    font-weight: 600;
+  }
+
+  &:hover {
+    background-color: #f0f7ff;
+    color: #1890ff;
+  }
+}
+
+// Tabs
+.el-tabs__item {
+  font-weight: 500;
+  color: #606266;
+
+  &.is-active {
+    color: #1890ff;
+    font-weight: 600;
+  }
+
+  &:hover {
+    color: #1890ff;
+  }
+}
+
+.el-tabs__active-bar {
+  background-color: #1890ff;
+  border-radius: 2px 2px 0 0;
+}
+
+.el-tabs__nav-wrap::after {
+  background-color: #f0f2f5;
+  height: 1px;
+}
+
+// Pagination container
+.pagination-container {
+  margin-top: 24px;
+  padding: 4px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+

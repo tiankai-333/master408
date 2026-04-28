@@ -24,8 +24,15 @@
         <el-menu-item index="/record/index">考试记录</el-menu-item>
         <el-menu-item index="/question/index">错题本</el-menu-item>
       </el-menu>
-      <div>
-        <a href="/"><img src="@/assets/logo.png" height="56"/></a>
+      <div class="brand-logo">
+        <a href="/">
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="vertical-align:middle;margin-right:6px;">
+            <rect width="36" height="36" rx="10" fill="#1890ff"/>
+            <path d="M9 18L15 12L21 18L27 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 24L15 18L21 24L27 18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+          </svg>
+          <span class="brand-name">408master</span>
+        </a>
       </div>
     </el-header>
     <el-main class="student-main">
@@ -119,5 +126,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
 
+  a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .brand-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0.2px;
+  }
+}
 </style>
