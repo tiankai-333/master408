@@ -84,6 +84,32 @@ public class QuestionController extends BaseApiController {
         return RestResponse.ok();
     }
 
+    @RequestMapping(value = "/upload/txt", method = RequestMethod.POST)
+    public RestResponse uploadTxt(MultipartFile file, HttpServletRequest request) {
+        try {
+            if (file == null || file.isEmpty()) {
+                return new RestResponse<>(SystemCode.ParameterValidError.getCode(), "请选择要上传的文件");
+            }
+
+            // 检查文件类型
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || !originalFilename.endsWith(".txt")) {
+                return new RestResponse<>(SystemCode.ParameterValidError.getCode(), "请上传txt格式的文件");
+            }
+
+            // 读取文件内容
+            String content = new String(file.getBytes(), "UTF-8");
+
+            // 调用服务进行题目分析和导入
+            int count = questionService.uploadAndAnalyzeTxt(file, getCurrentUser().getId());
+
+            return RestResponse.ok(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return RestResponse.fail(SystemCode.InnerError.getCode(), "上传失败：" + e.getMessage());
+        }
+    }
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public RestResponse uploadQuestion(@RequestBody java.util.List<Question> questions) {
         if (questions == null || questions.isEmpty()) {
@@ -122,18 +148,6 @@ public class QuestionController extends BaseApiController {
         }
 
         return RestResponse.ok();
-    }
-
-    @RequestMapping(value = "/upload/txt", method = RequestMethod.POST)
-    public RestResponse uploadTxt(HttpServletRequest request) {
-        MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
-        MultipartFile multipartFile = multipartHttpServletRequest.getFile("file");
-        try {
-            int count = questionService.uploadAndAnalyzeTxt(multipartFile, getCurrentUser().getId());
-            return RestResponse.ok(count);
-        } catch (Exception e) {
-            return RestResponse.fail(2, e.getMessage());
-        }
     }
 
     private RestResponse validQuestionEditRequestVM(QuestionEditRequestVM model) {
