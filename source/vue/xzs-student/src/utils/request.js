@@ -44,7 +44,7 @@ const post = function (url, params) {
     url: url,
     method: 'post',
     withCredentials: true,
-    timeout: 30000,
+    timeout: 600000,
     data: params,
     headers: { 'Content-Type': 'application/json', 'request-ajax': true }
   }
@@ -56,7 +56,7 @@ const postWithLoadTip = function (url, params) {
     url: url,
     method: 'post',
     withCredentials: true,
-    timeout: 30000,
+    timeout: 600000,
     data: params,
     headers: { 'Content-Type': 'application/json', 'request-ajax': true }
   }
@@ -68,7 +68,7 @@ const postWithOutLoadTip = function (url, params) {
     url: url,
     method: 'post',
     withCredentials: true,
-    timeout: 30000,
+    timeout: 600000,
     data: params,
     headers: { 'Content-Type': 'application/json', 'request-ajax': true }
   }
@@ -80,7 +80,7 @@ const get = function (url, params) {
     url: url,
     method: 'get',
     withCredentials: true,
-    timeout: 30000,
+    timeout: 600000,
     params: params,
     headers: { 'request-ajax': true }
   }
@@ -92,7 +92,7 @@ const form = function (url, params) {
     url: url,
     method: 'post',
     withCredentials: true,
-    timeout: 30000,
+    timeout: 600000,
     data: params,
     headers: { 'Content-Type': 'multipart/form-data', 'request-ajax': true }
   }

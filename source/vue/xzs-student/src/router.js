@@ -53,6 +53,24 @@ const router = new Router({
           component: () => import('@/views/question-error/index'),
           name: 'QuestionErrorIndex',
           meta: { title: '错题本' }
+        },
+        {
+          path: 'ai-analyze',
+          component: () => import('@/views/question/ai-analyze'),
+          name: 'QuestionAiAnalyze',
+          meta: { title: 'AI题目识别' }
+        }
+      ]
+    },
+    {
+      path: '/knowledge-graph',
+      component: Layout,
+      children: [
+        {
+          path: 'index',
+          component: () => import('@/views/knowledge-graph/index'),
+          name: 'KnowledgeGraph',
+          meta: { title: '知识图谱' }
         }
       ]
     },
