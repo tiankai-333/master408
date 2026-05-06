@@ -10,7 +10,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: 'Segoe UI', system-ui, -apple-system, Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+  background: #f5f7fb;
 }
 
 label {
@@ -20,6 +21,7 @@ label {
 html {
   height: 100%;
   box-sizing: border-box;
+  background: #f5f7fb;
 }
 
 #app {
@@ -138,6 +140,11 @@ aside {
 //main-container全局样式
 .app-container {
   padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  margin: 16px;
 }
 
 .components-container {
@@ -146,7 +153,10 @@ aside {
 }
 
 .pagination-container {
-  margin-top: 30px;
+  margin-top: 24px;
+  padding: 4px 0;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .text-center {
@@ -289,10 +299,107 @@ aside {
   display: inline !important;
 }
 
-.foot-copyright {
-  display: none;
+/* ===========================
+   Modern Flat UI – Global
+   =========================== */
+
+// Filter toolbar
+.filter-container {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f2f5;
+  margin-bottom: 16px;
+
+  .filter-item {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    margin-right: 8px;
+  }
 }
 
-.account-foot-copyright {
-  display: none;
+// Element table
+.el-table {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #eaecf0 !important;
+}
+
+.el-table th.el-table__cell {
+  background: #f8fafc !important;
+  color: #334155;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid #eaecf0 !important;
+}
+
+.el-table td.el-table__cell {
+  border-bottom: 1px solid #f0f2f5 !important;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: #fafbfd !important;
+}
+
+.el-table__body tr:hover > td.el-table__cell {
+  background: #f0f7ff !important;
+}
+
+// Element inputs + selects
+.el-input__inner,
+.el-textarea__inner {
+  border-radius: 8px;
+  border-color: #dde1e8;
+  transition: border-color 0.18s, box-shadow 0.18s;
+
+  &:focus {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.12);
+  }
+}
+
+.el-select .el-input__inner {
+  border-radius: 8px;
+}
+
+// Buttons
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.el-button--primary {
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.20);
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(24, 144, 255, 0.30);
+  }
+}
+
+// Cards
+.el-card {
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+// Dialog
+.el-dialog {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid #f0f2f5;
+  padding: 16px 20px;
+}
+
+.el-dialog__footer {
+  border-top: 1px solid #f0f2f5;
+  padding: 12px 20px;
+}
+
+// Tags
+.el-tag {
+  border-radius: 6px;
 }

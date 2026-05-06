@@ -1,36 +1,77 @@
 <template>
-  <div class="lowin  lowin-blue">
-    <div class="lowin-brand">
-      <img src="@/assets/logo2.png" alt="logo" style="margin-top: 12px">
-    </div>
-    <div class="lowin-wrapper">
-      <div class="lowin-box lowin-login">
-        <div class="lowin-box-inner">
-          <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
-            <p>408master</p>
-            <div class="lowin-group">
-              <label>用户名 </label>
-              <el-input ref="userName" v-model="loginForm.userName" class="lowin-input" placeholder="用户名" name="userName" type="text" tabindex="1" auto-complete="on"/>
-            </div>
-            <div class="lowin-group password-group">
-              <label>密码 <a href="#" class="forgot-link">忘记密码?</a></label>
-              <el-input  class="lowin-input" :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
-                placeholder="密码" name="password" tabindex="2" auto-complete="on" @keyup.native="checkCapslock" @blur="capsTooltip = false" @keyup.enter.native="handleLogin"/>
-            </div>
-
-            <el-button :loading="loading" type="text" class="lowin-btn login-btn"  @click.native.prevent="handleLogin">登录</el-button>
-
-            <div class="text-foot">
-              还没有账号?
-              <router-link to="/register" class="register-link">
-                注册
-              </router-link>
-            </div>
-          </el-form>
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-brand">
+          <img src="@/assets/logo2.png" alt="logo">
         </div>
+        <h2 class="system-title">学之思开源考试系统</h2>
+      </div>
+
+      <div class="login-box">
+        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+          <div class="form-title">
+            <h3><i class="el-icon-user"></i> 用户登录</h3>
+          </div>
+
+          <el-form-item prop="userName">
+            <div class="input-wrapper">
+              <i class="el-icon-user"></i>
+              <el-input
+                ref="userName"
+                v-model="loginForm.userName"
+                placeholder="请输入用户名"
+                name="userName"
+                type="text"
+                tabindex="1"
+                auto-complete="on"
+              />
+            </div>
+          </el-form-item>
+
+          <el-form-item prop="password">
+            <div class="input-wrapper">
+              <i class="el-icon-lock"></i>
+              <el-input
+                :key="passwordType"
+                ref="password"
+                v-model="loginForm.password"
+                :type="passwordType"
+                placeholder="请输入密码"
+                name="password"
+                tabindex="2"
+                auto-complete="on"
+                @keyup.native="checkCapslock"
+                @blur="capsTooltip = false"
+                @keyup.enter.native="handleLogin"
+              />
+              <i class="el-icon-view password-toggle" @click="showPwd"></i>
+            </div>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button :loading="loading" type="primary" class="login-btn" @click.native.prevent="handleLogin">
+              <i class="el-icon-arrow-right"></i> 登录
+            </el-button>
+          </el-form-item>
+
+          <div class="form-footer">
+            <span>还没有账号?</span>
+            <router-link to="/register">
+              <i class="el-icon-plus"></i> 立即注册
+            </router-link>
+          </div>
+        </el-form>
+      </div>
+
+      <div class="login-footer">
+        <span>Copyright ©2019-2026 武汉思维跳跃科技有限公司 版权所有</span>
       </div>
     </div>
 
+    <div class="login-background">
+      <div class="bg-gradient"></div>
+    </div>
   </div>
 </template>
 
@@ -72,7 +113,6 @@ export default {
     }
   },
   created () {
-    // window.addEventListener('storage', this.afterQRScan)
   },
   mounted () {
     if (this.loginForm.userName === '') {
@@ -82,13 +122,11 @@ export default {
     }
   },
   destroyed () {
-    // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
     checkCapslock ({ shiftKey, key } = {}) {
       if (key && key.length === 1) {
-        // eslint-disable-next-line no-mixed-operators
-        if (shiftKey && (key >= 'a' && key <= 'z') || !shiftKey && (key >= 'A' && key <= 'Z')) {
+        if ((shiftKey && (key >= 'a' && key <= 'z')) || (!shiftKey && (key >= 'A' && key <= 'Z'))) {
           this.capsTooltip = true
         } else {
           this.capsTooltip = false
@@ -134,283 +172,259 @@ export default {
 }
 </script>
 
-<style lang="scss">
-  .lowin-input{
-    .el-input__inner{
-      background-color: transparent !important;
-      border: 0px !important;
-    }
-  }
-</style>
+<style lang="scss" scoped>
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0c0c1c;
+  position: relative;
+  overflow: hidden;
+}
 
-<style scoped>
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
 
-  .lowin {
-    /* variables */
-    --color-primary: #5b6ef5;
-    --color-grey: rgba(91, 110, 245, .06);
-    --color-dark: rgba(91, 110, 245, .6);
-    --color-semidark: rgba(91, 110, 245, .5);
-
-    text-align: center;
-    margin: 60px 0 0 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    font-size: 14px;
-  }
-
-  .lowin .lowin-wrapper {
-    -webkit-transition: all 1s;
-    -o-transition: all 1s;
-    transition: all 1s;
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
-    position: relative;
-    height: 100%;
-    width: 380px;
-    margin: 0 auto;
-  }
-
-  .lowin.lowin-blue {
-    --color-primary: #5b6ef5;
-    --color-grey: rgba(91, 110, 245, .06);
-    --color-dark: rgba(91, 110, 245, .7);
-    --color-semidark: rgba(91, 110, 245, .45);
-  }
-
-  .lowin a {
-    color: var(--color-primary);
-    text-decoration: none;
-    border-bottom: 1px dashed var(--color-semidark);
-    margin-top: -3px;
-    padding-bottom: 2px;
-  }
-
-  .lowin * {
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-
-  .lowin .lowin-brand {
-    overflow: hidden;
-    width: 100px;
-    height: 100px;
-    margin: 0 auto -50px auto;
-    border-radius: 50%;
-    -webkit-box-shadow: 0 4px 40px rgba(0, 0, 0, .07);
-    box-shadow: 0 4px 40px rgba(0, 0, 0, .07);
-    padding: 10px;
-    background-color: #fff;
-    z-index: 1;
-    position: relative;
-  }
-
-  .lowin .lowin-brand img {
-    width: 100%;
-  }
-
-  .lowin .lowin-box {
-    width: 100%;
+  .bg-gradient {
     position: absolute;
-    left: 0;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+    animation: bgMove 20s ease-in-out infinite;
   }
+}
 
-  .lowin .lowin-box-inner {
-    background-color: #fff;
-    -webkit-box-shadow: 0 7px 25px rgba(0, 0, 0, .08);
-    box-shadow: 0 7px 25px rgba(0, 0, 0, .08);
-    padding: 60px 25px 25px 25px;
-    text-align: left;
-    border-radius: 3px;
+@keyframes bgMove {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
   }
+  50% {
+    transform: translate(-5%, -5%) rotate(180deg);
+  }
+}
 
-  .lowin .lowin-box::after {
-    content: ' ';
-    -webkit-box-shadow: 0 0 25px rgba(0, 0, 0, .1);
-    box-shadow: 0 0 25px rgba(0, 0, 0, .1);
-    -webkit-transform: translate(0, -92.6%) scale(.88);
-    -ms-transform: translate(0, -92.6%) scale(.88);
-    transform: translate(0, -92.6%) scale(.88);
-    border-radius: 3px;
-    position: absolute;
-    top: 100%;
-    left: 0;
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  padding: 40px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-brand {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+  background: #fff;
+  padding: 8px;
+  animation: brandFloat 3s ease-in-out infinite;
+
+  img {
     width: 100%;
     height: 100%;
-    background-color: #fff;
-    z-index: -1;
+    object-fit: contain;
   }
+}
 
-  .lowin .lowin-box.lowin-flip {
-    -webkit-transform: rotate3d(0, 1, 0, -180deg);
-    transform: rotate3d(0, 1, 0, -180deg);
-    display: none;
-    opacity: 0;
+@keyframes brandFloat {
+  0%, 100% {
+    transform: translateY(0);
   }
+  50% {
+    transform: translateY(-10px);
+  }
+}
 
-  .lowin .lowin-box p {
-    color: var(--color-semidark);
-    font-weight: 700;
-    margin-bottom: 20px;
+.system-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+}
+
+.login-box {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 40px 35px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.login-form {
+  .form-title {
     text-align: center;
-  }
-
-  .lowin .lowin-box .lowin-group {
     margin-bottom: 30px;
-  }
 
-  .lowin .lowin-box label {
-    margin-bottom: 5px;
-    display: inline-block;
-    width: 100%;
-    color: var(--color-semidark);
-    font-weight: 700;
-  }
+    h3 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1f2f3d;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  .lowin .lowin-box label a {
-    float: right;
-  }
-
-  .lowin .lowin-box .lowin-input {
-    background-color: var(--color-grey);
-    color: var(--color-dark);
-    border: none;
-    border-radius: 3px;
-    padding: 5px 20px;
-    width: 100%;
-    outline: 0;
-  }
-
-  .lowin .lowin-box .lowin-btn {
-    display: inline-block;
-    width: 100%;
-    border: none;
-    color: #fff;
-    padding: 15px;
-    border-radius: 3px;
-    background-color: var(--color-primary);
-    -webkit-box-shadow: 0 2px 7px var(--color-semidark);
-    box-shadow: 0 2px 7px var(--color-semidark);
-    font-weight: 700;
-    outline: 0;
-    cursor: pointer;
-    -webkit-transition: all .5s;
-    -o-transition: all .5s;
-    transition: all .5s;
-  }
-
-  .lowin .lowin-box .lowin-btn:active {
-    -webkit-box-shadow: none;
-    box-shadow: none;
-  }
-
-  .lowin .lowin-box .lowin-btn:hover {
-    opacity: .9;
-  }
-
-  .lowin .text-foot {
-    text-align: center;
-    padding: 10px;
-    font-weight: 700;
-    margin-top: 20px;
-    color: var(--color-semidark);
-  }
-
-  /* animation */
-  .lowin .lowin-box.lowin-animated {
-    -webkit-animation-name: LowinAnimated;
-    animation-name: LowinAnimated;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-  }
-
-  .lowin .lowin-box.lowin-animatedback {
-    -webkit-animation-name: LowinAnimatedBack;
-    animation-name: LowinAnimatedBack;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-  }
-
-  .lowin .lowin-box.lowin-animated-flip {
-    -webkit-animation-name: LowinAnimatedFlip;
-    animation-name: LowinAnimatedFlip;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-  }
-
-  .lowin .lowin-box.lowin-animated-flipback {
-    -webkit-animation-name: LowinAnimatedFlipBack;
-    animation-name: LowinAnimatedFlipBack;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-  }
-
-  .lowin .lowin-brand.lowin-animated {
-    -webkit-animation-name: LowinBrandAnimated;
-    animation-name: LowinBrandAnimated;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-  }
-
-  .lowin .lowin-group.password-group {
-    -webkit-transition: all 1s;
-    -o-transition: all 1s;
-    transition: all 1s;
-  }
-
-  .lowin .lowin-group.password-group.lowin-animated {
-    -webkit-animation-name: LowinPasswordAnimated;
-    animation-name: LowinPasswordAnimated;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-    -webkit-transform-origin: 0 0;
-    -ms-transform-origin: 0 0;
-    transform-origin: 0 0;
-  }
-
-  .lowin .lowin-group.password-group.lowin-animated-back {
-    -webkit-animation-name: LowinPasswordAnimatedBack;
-    animation-name: LowinPasswordAnimatedBack;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-in-out;
-    animation-timing-function: ease-in-out;
-    -webkit-transform-origin: 0 0;
-    -ms-transform-origin: 0 0;
-    transform-origin: 0 0;
-  }
-
-  @media screen and (max-width: 320px) {
-    .lowin .lowin-wrapper {
-      width: 100%;
-    }
-    .lowin .lowin-box {
-      padding: 0 10px;
+      i {
+        margin-right: 10px;
+        color: #667eea;
+      }
     }
   }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0 15px;
+    transition: all 0.3s;
+
+    &:focus-within {
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    > i {
+      color: #667eea;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .el-input {
+      flex: 1;
+
+      ::v-deep .el-input__inner {
+        border: none;
+        background: transparent;
+        padding: 12px 0;
+        font-size: 15px;
+        color: #1f2f3d;
+
+        &::placeholder {
+          color: #909399;
+        }
+      }
+    }
+
+    .password-toggle {
+      cursor: pointer;
+      color: #909399;
+      transition: color 0.3s;
+      margin-left: 10px;
+
+      &:hover {
+        color: #667eea;
+      }
+    }
+  }
+
+  ::v-deep .el-form-item {
+    margin-bottom: 20px;
+  }
+
+  ::v-deep .el-form-item__error {
+    font-size: 12px;
+    padding-top: 4px;
+  }
+}
+
+.login-btn {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+  i {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &.is-loading {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 14px;
+  color: #909399;
+
+  span {
+    margin-right: 5px;
+  }
+
+  a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+
+    i {
+      margin-right: 5px;
+    }
+
+    &:hover {
+      color: #764ba2;
+    }
+  }
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 40px;
+
+  span {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .login-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .login-box {
+    padding: 30px 25px;
+  }
+
+  .system-title {
+    font-size: 22px;
+  }
+}
 </style>

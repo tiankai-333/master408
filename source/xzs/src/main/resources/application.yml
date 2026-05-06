@@ -59,6 +59,12 @@ spring:
       idle-timeout: 600000  #10 min
       max-lifetime: 1800000 #30 min
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 
   #runningtime environment
   profiles:
@@ -67,6 +73,6 @@ spring:
 # AI API配置
 ai:
   api:
-    key: c50db4ff4ba74a1cbf7eb091155fa710.EdERlgV5fk1Zv7Ny
+    key: e4a645c3ea464385acdafec1f41b2e9b.vJnGYzcGzAESUSBu
     url: https://open.bigmodel.cn/api/paas/v4/chat/completions
     type: glm  # 可选值: openai, glm
