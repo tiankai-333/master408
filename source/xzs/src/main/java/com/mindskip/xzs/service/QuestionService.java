@@ -22,4 +22,6 @@ public interface QuestionService extends BaseService<Question> {
     Integer selectAllCount();
 
     List<Integer> selectMothCount();
+
+    int uploadAndAnalyzeTxt(org.springframework.web.multipart.MultipartFile file, Integer userId) throws Exception;
 }
