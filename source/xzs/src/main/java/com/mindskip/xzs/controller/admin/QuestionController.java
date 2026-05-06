@@ -17,8 +17,12 @@ import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Date;
 
 @RestController("AdminQuestionController")
 @RequestMapping(value = "/api/admin/question")
@@ -78,6 +82,58 @@ public class QuestionController extends BaseApiController {
         question.setDeleted(true);
         questionService.updateByIdFilter(question);
         return RestResponse.ok();
+    }
+
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public RestResponse uploadQuestion(@RequestBody java.util.List<Question> questions) {
+        if (questions == null || questions.isEmpty()) {
+            return new RestResponse<>(SystemCode.ParameterValidError.getCode(), "请提供题目数据");
+        }
+
+        for (Question question : questions) {
+            // 验证题目数据
+            if (question.getQuestionType() == null || question.getSubjectId() == null || question.getScore() == null) {
+                return new RestResponse<>(SystemCode.ParameterValidError.getCode(), "题目数据不完整");
+            }
+            
+            // 确保必填字段
+            if (question.getInfoTextContentId() == null) {
+                return new RestResponse<>(SystemCode.ParameterValidError.getCode(), "题目内容ID不能为空");
+            }
+            
+            if (question.getCreateUser() == null) {
+                question.setCreateUser(getCurrentUser().getId());
+            }
+            
+            if (question.getCreateTime() == null) {
+                question.setCreateTime(new Date());
+            }
+            
+            if (question.getStatus() == null) {
+                question.setStatus(1); // 默认为正常状态
+            }
+            
+            if (question.getDeleted() == null) {
+                question.setDeleted(false);
+            }
+            
+            // 插入题目
+            questionService.insert(question);
+        }
+
+        return RestResponse.ok();
+    }
+
+    @RequestMapping(value = "/upload/txt", method = RequestMethod.POST)
+    public RestResponse uploadTxt(HttpServletRequest request) {
+        MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
+        MultipartFile multipartFile = multipartHttpServletRequest.getFile("file");
+        try {
+            int count = questionService.uploadAndAnalyzeTxt(multipartFile, getCurrentUser().getId());
+            return RestResponse.ok(count);
+        } catch (Exception e) {
+            return RestResponse.fail(2, e.getMessage());
+        }
     }
 
     private RestResponse validQuestionEditRequestVM(QuestionEditRequestVM model) {

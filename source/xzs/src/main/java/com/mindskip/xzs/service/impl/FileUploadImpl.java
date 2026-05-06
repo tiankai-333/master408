@@ -30,8 +30,13 @@ public class FileUploadImpl implements FileUpload {
     }
 
     @Override
-    public String uploadFile(InputStream inputStream, long size, String extName) {
+    public String uploadFile(InputStream inputStream, long size, String fileName) {
         QnConfig qnConfig = systemConfig.getQn();
+        if (qnConfig == null || qnConfig.getAccessKey() == null || qnConfig.getSecretKey() == null || qnConfig.getBucket() == null) {
+            logger.error("七牛云配置缺失");
+            return null;
+        }
+        
         Configuration cfg = new Configuration(Region.region2());
         UploadManager uploadManager = new UploadManager(cfg);
         Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
@@ -39,9 +44,17 @@ public class FileUploadImpl implements FileUpload {
         try {
             Response response = uploadManager.put(inputStream, null, upToken, null, null);
             DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+            logger.info("文件上传成功: {}", putRet.key);
             return qnConfig.getUrl() + "/" + putRet.key;
         } catch (QiniuException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error("文件上传失败: {}", ex.getMessage(), ex);
+            try {
+                logger.error("七牛云响应: {}", ex.response.bodyString());
+            } catch (Exception e) {
+                logger.error("获取七牛云响应失败", e);
+            }
+        } catch (Exception ex) {
+            logger.error("文件上传异常: {}", ex.getMessage(), ex);
         }
         return null;
     }
