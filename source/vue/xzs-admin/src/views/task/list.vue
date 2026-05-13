@@ -1,91 +1,113 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParam" ref="queryForm" :inline="true">
+      <el-form-item label="任务名称：">
+        <el-input v-model="queryParam.name" clearable></el-input>
+      </el-form-item>
       <el-form-item label="年级：">
-        <el-select v-model="queryParam.gradeLevel" placeholder="年级" clearable>
+        <el-select v-model="queryParam.level" placeholder="年级"  @change="levelChange" clearable>
           <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="学科：">
+        <el-select v-model="queryParam.subjectId" clearable>
+          <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
+                     :label="item.name+' ( '+item.levelName+' )'"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">查询</el-button>
+        <router-link :to="{path:'/task/edit'}" class="link-left">
+          <el-button type="primary">添加</el-button>
+        </router-link>
       </el-form-item>
     </el-form>
-
     <el-table v-loading="listLoading" :data="tableData" border fit highlight-current-row style="width: 100%">
-      <el-table-column prop="id" label="Id"  width="100" />
-      <el-table-column prop="title" label="标题" />
-      <el-table-column prop="gradeLevel" label="学级"  :formatter="levelFormatter"/>
-      <el-table-column prop="createUserName" label="发送人"  width="100" />
+      <el-table-column prop="id" label="Id" width="80px"/>
+      <el-table-column prop="subjectId" label="学科" :formatter="subjectFormatter" width="120px"/>
+      <el-table-column prop="name" label="名称"/>
+      <el-table-column prop="startTime" label="开始时间" width="160px"/>
+      <el-table-column prop="endTime" label="结束时间" width="160px"/>
       <el-table-column prop="createTime" label="创建时间" width="160px"/>
-      <el-table-column  label="操作" align="center"  width="160px">
-        <template slot-scope="{row}">
-          <el-button size="mini" @click="$router.push({path:'/task/edit',query:{id:row.id}})" >编辑</el-button>
-          <el-button size="mini"  type="danger" @click="deleteTask(row)" class="link-left">删除</el-button>
+      <el-table-column label="操作" align="center" width="200px">
+        <template #default="{row}">
+          <el-button size="mini" @click="router.push({path:'/task/edit',query:{id:row.id}})">编辑</el-button>
+          <el-button size="mini" type="danger" @click="deleteTask(row)" class="link-left">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParam.pageIndex" :limit.sync="queryParam.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParam.pageIndex" v-model:limit="queryParam.pageSize"
                 @pagination="search"/>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import Pagination from '@/components/Pagination'
 import taskApi from '@/api/task'
+import { useEnumItemStore } from '@/stores/enumItem'
+import { useExamStore } from '@/stores/exam'
 
-export default {
-  components: { Pagination },
-  data () {
-    return {
-      queryParam: {
-        gradeLevel: null,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      listLoading: true,
-      tableData: [],
-      total: 0
-    }
-  },
-  created () {
-    this.search()
-  },
-  methods: {
-    search () {
-      this.listLoading = true
-      taskApi.pageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    submitForm () {
-      this.queryParam.pageIndex = 1
-      this.search()
-    },
-    deleteTask (row) {
-      let _this = this
-      taskApi.deleteTask(row.id).then(re => {
-        if (re.code === 1) {
-          _this.search()
-          _this.$message.success(re.message)
-        } else {
-          _this.$message.error(re.message)
-        }
-      })
-    },
-    levelFormatter  (row, column, cellValue, index) {
-      return this.enumFormat(this.levelEnum, cellValue)
-    }
-  },
-  computed: {
-    ...mapGetters('enumItem', ['enumFormat']),
-    ...mapState('enumItem', {
-      levelEnum: state => state.user.levelEnum
-    })
-  }
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+const examStore = useExamStore()
+
+const queryParam = reactive({
+  name: null,
+  level: null,
+  subjectId: null,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const subjectFilter = ref(null)
+const listLoading = ref(true)
+const tableData = ref([])
+const total = ref(0)
+
+const levelEnum = computed(() => enumItemStore.user.levelEnum)
+
+const search = () => {
+  listLoading.value = true
+  taskApi.pageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+const deleteTask = (row) => {
+  taskApi.deleteTask(row.id).then(re => {
+    if (re.code === 1) {
+      search()
+      ElMessage.success(re.message)
+    } else {
+      ElMessage.error(re.message)
+    }
+  })
+}
+
+const levelChange = () => {
+  queryParam.subjectId = null
+  subjectFilter.value = examStore.subjects.filter(data => data.level === queryParam.level)
+}
+
+const subjectFormatter = (row, column, cellValue) => {
+  return examStore.subjectEnumFormat(cellValue)
+}
+
+const submitForm = () => {
+  queryParam.pageIndex = 1
+  search()
+}
+
+onMounted(() => {
+  examStore.initSubject()
+  subjectFilter.value = examStore.subjects
+  search()
+})
 </script>

@@ -20,14 +20,14 @@
       <el-table-column prop="phone" label="手机号"/>
       <el-table-column prop="createTime" label="创建时间" width="160px"/>
       <el-table-column label="状态" prop="status" width="70px">
-        <template slot-scope="{row}">
+        <template #default="{row}">
           <el-tag :type="statusTagFormatter(row.status)">
             {{ statusFormatter(row.status) }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column width="220px" label="操作" align="center">
-        <template slot-scope="{row}">
+        <template #default="{row}">
           <el-button size="mini"   @click="changeStatus(row)" class="link-left">
             {{ statusBtnFormatter(row.status) }}
           </el-button>
@@ -38,94 +38,91 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParam.pageIndex" :limit.sync="queryParam.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParam.pageIndex" v-model:limit="queryParam.pageSize"
                 @pagination="search"/>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed } from 'vue'
 import Pagination from '@/components/Pagination'
 import userApi from '@/api/user'
+import { useEnumItemStore } from '@/stores/enumItem'
 
-export default {
-  components: { Pagination },
-  data () {
-    return {
-      queryParam: {
-        userName: '',
-        role: 3,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      listLoading: true,
-      tableData: [],
-      total: 0
-    }
-  },
-  created () {
-    this.search()
-  },
-  methods: {
-    search () {
-      this.listLoading = true
-      userApi.getUserPageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    changeStatus (row) {
-      let _this = this
-      userApi.changeStatus(row.id).then(re => {
-        if (re.code === 1) {
-          row.status = re.response
-          _this.$message.success(re.message)
-        } else {
-          _this.$message.error(re.message)
-        }
-      })
-    },
-    deleteUser (row) {
-      let _this = this
-      userApi.deleteUser(row.id).then(re => {
-        if (re.code === 1) {
-          _this.search()
-          _this.$message.success(re.message)
-        } else {
-          _this.$message.error(re.message)
-        }
-      })
-    },
-    submitForm () {
-      this.queryParam.pageIndex = 1
-      this.search()
-    },
-    sexFormatter  (row, column, cellValue, index) {
-      return this.enumFormat(this.sexEnum, cellValue)
-    },
-    statusFormatter (status) {
-      return this.enumFormat(this.statusEnum, status)
-    },
-    statusTagFormatter (status) {
-      return this.enumFormat(this.statusTag, status)
-    },
-    statusBtnFormatter (status) {
-      return this.enumFormat(this.statusBtn, status)
-    }
-  },
-  computed: {
-    ...mapGetters('enumItem', [
-      'enumFormat'
-    ]),
-    ...mapState('enumItem', {
-      sexEnum: state => state.user.sexEnum,
-      statusEnum: state => state.user.statusEnum,
-      statusTag: state => state.user.statusTag,
-      statusBtn: state => state.user.statusBtn
-    })
-  }
+const enumItemStore = useEnumItemStore()
+
+const queryParam = reactive({
+  userName: '',
+  role: 3,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const listLoading = ref(true)
+const tableData = ref([])
+const total = ref(0)
+
+const sexEnum = computed(() => enumItemStore.user.sexEnum)
+const statusEnum = computed(() => enumItemStore.user.statusEnum)
+const statusTag = computed(() => enumItemStore.user.statusTag)
+const statusBtn = computed(() => enumItemStore.user.statusBtn)
+
+const search = () => {
+  listLoading.value = true
+  userApi.getUserPageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+const changeStatus = (row) => {
+  userApi.changeStatus(row.id).then(re => {
+    if (re.code === 1) {
+      row.status = re.response
+      ElMessage.success(re.message)
+    } else {
+      ElMessage.error(re.message)
+    }
+  })
+}
+
+const deleteUser = (row) => {
+  userApi.deleteUser(row.id).then(re => {
+    if (re.code === 1) {
+      search()
+      ElMessage.success(re.message)
+    } else {
+      ElMessage.error(re.message)
+    }
+  })
+}
+
+const submitForm = () => {
+  queryParam.pageIndex = 1
+  search()
+}
+
+const sexFormatter = (row, column, cellValue) => {
+  return enumItemStore.enumFormat(sexEnum.value, cellValue)
+}
+
+const statusFormatter = (status) => {
+  return enumItemStore.enumFormat(statusEnum.value, status)
+}
+
+const statusTagFormatter = (status) => {
+  return enumItemStore.enumFormat(statusTag.value, status)
+}
+
+const statusBtnFormatter = (status) => {
+  return enumItemStore.enumFormat(statusBtn.value, status)
+}
+
+onMounted(() => {
+  search()
+})
 </script>

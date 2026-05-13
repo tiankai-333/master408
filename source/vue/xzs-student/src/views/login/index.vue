@@ -5,20 +5,20 @@
         <div class="login-brand">
           <img src="@/assets/logo2.png" alt="logo">
         </div>
-        <h2 class="system-title">学之思开源考试系统</h2>
+        <h2 class="system-title">408刷题系统</h2>
       </div>
 
       <div class="login-box">
-        <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+        <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" class="login-form">
           <div class="form-title">
-            <h3><i class="el-icon-user"></i> 用户登录</h3>
+            <h3><el-icon><User /></el-icon> 用户登录</h3>
           </div>
 
           <el-form-item prop="userName">
             <div class="input-wrapper">
-              <i class="el-icon-user"></i>
+              <el-icon><User /></el-icon>
               <el-input
-                ref="userName"
+                ref="userNameRef"
                 v-model="loginForm.userName"
                 placeholder="请输入用户名"
                 name="userName"
@@ -31,34 +31,33 @@
 
           <el-form-item prop="password">
             <div class="input-wrapper">
-              <i class="el-icon-lock"></i>
+              <el-icon><Lock /></el-icon>
               <el-input
-                :key="passwordType"
-                ref="password"
+                ref="passwordRef"
                 v-model="loginForm.password"
                 :type="passwordType"
                 placeholder="请输入密码"
                 name="password"
                 tabindex="2"
                 auto-complete="on"
-                @keyup.native="checkCapslock"
+                @keyup="checkCapslock"
                 @blur="capsTooltip = false"
-                @keyup.enter.native="handleLogin"
+                @keyup.enter="handleLogin"
               />
-              <i class="el-icon-view password-toggle" @click="showPwd"></i>
+              <el-icon class="password-toggle" @click="showPwd"><View v-if="passwordType === 'password'" /><Hide v-else /></el-icon>
             </div>
           </el-form-item>
 
           <el-form-item>
-            <el-button :loading="loading" type="primary" class="login-btn" @click.native.prevent="handleLogin">
-              <i class="el-icon-arrow-right"></i> 登录
+            <el-button :loading="loading" type="primary" class="login-btn" @click="handleLogin">
+              <el-icon><ArrowRight /></el-icon> 登录
             </el-button>
           </el-form-item>
 
           <div class="form-footer">
             <span>还没有账号?</span>
             <router-link to="/register">
-              <i class="el-icon-plus"></i> 立即注册
+              <el-icon><Plus /></el-icon> 立即注册
             </router-link>
           </div>
         </el-form>
@@ -75,101 +74,103 @@
   </div>
 </template>
 
-<script>
-import { mapMutations } from 'vuex'
+<script setup>
+import { ref, reactive, onMounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { User, Lock, View, Hide, ArrowRight, Plus } from '@element-plus/icons-vue'
 import loginApi from '@/api/login'
+import { useUserStore } from '@/store/modules/user'
 
-export default {
-  name: 'Login',
-  data () {
-    const validateUsername = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('用户名不能少于5个字符'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('密码不能少于5个字符'))
-      } else {
-        callback()
-      }
-    }
-    return {
-      loginForm: {
-        userName: '',
-        password: '',
-        remember: false
-      },
-      loginRules: {
-        userName: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
-      },
-      passwordType: 'password',
-      capsTooltip: false,
-      loading: false,
-      showDialog: false
-    }
-  },
-  created () {
-  },
-  mounted () {
-    if (this.loginForm.userName === '') {
-      this.$refs.userName.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
-    }
-  },
-  destroyed () {
-  },
-  methods: {
-    checkCapslock ({ shiftKey, key } = {}) {
-      if (key && key.length === 1) {
-        if ((shiftKey && (key >= 'a' && key <= 'z')) || (!shiftKey && (key >= 'A' && key <= 'Z'))) {
-          this.capsTooltip = true
-        } else {
-          this.capsTooltip = false
-        }
-      }
-      if (key === 'CapsLock' && this.capsTooltip === true) {
-        this.capsTooltip = false
-      }
-    },
-    showPwd () {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin () {
-      let _this = this
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          loginApi.login(this.loginForm).then(function (result) {
-            if (result && result.code === 1) {
-              _this.setUserName(_this.loginForm.userName)
-              _this.$router.push({ path: '/' })
-            } else {
-              _this.loading = false
-              _this.$message.error(result.message)
-            }
-          }).catch(function (reason) {
-            _this.loading = false
-          })
-        } else {
-          return false
-        }
-      })
-    },
-    ...mapMutations('user', ['setUserName'])
+const router = useRouter()
+const userStore = useUserStore()
+
+const loginFormRef = ref(null)
+const userNameRef = ref(null)
+const passwordRef = ref(null)
+
+const loginForm = reactive({
+  userName: '',
+  password: ''
+})
+
+const passwordType = ref('password')
+const capsTooltip = ref(false)
+const loading = ref(false)
+
+const validateUsername = (rule, value, callback) => {
+  if (value.length < 5) {
+    callback(new Error('用户名不能少于5个字符'))
+  } else {
+    callback()
   }
 }
+
+const validatePassword = (rule, value, callback) => {
+  if (value.length < 5) {
+    callback(new Error('密码不能少于5个字符'))
+  } else {
+    callback()
+  }
+}
+
+const loginRules = {
+  userName: [{ required: true, trigger: 'blur', validator: validateUsername }],
+  password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+}
+
+const checkCapslock = ({ shiftKey, key } = {}) => {
+  if (key && key.length === 1) {
+    if ((shiftKey && (key >= 'a' && key <= 'z')) || (!shiftKey && (key >= 'A' && key <= 'Z'))) {
+      capsTooltip.value = true
+    } else {
+      capsTooltip.value = false
+    }
+  }
+  if (key === 'CapsLock' && capsTooltip.value === true) {
+    capsTooltip.value = false
+  }
+}
+
+const showPwd = () => {
+  if (passwordType.value === 'password') {
+    passwordType.value = ''
+  } else {
+    passwordType.value = 'password'
+  }
+  nextTick(() => {
+    passwordRef.value?.focus()
+  })
+}
+
+const handleLogin = () => {
+  loginFormRef.value.validate(valid => {
+    if (valid) {
+      loading.value = true
+      loginApi.login(loginForm).then(function (result) {
+        if (result && result.code === 1) {
+          userStore.setUserName(loginForm.userName)
+          router.push({ path: '/' })
+        } else {
+          loading.value = false
+          ElMessage.error(result.message)
+        }
+      }).catch(function () {
+        loading.value = false
+      })
+    } else {
+      return false
+    }
+  })
+}
+
+onMounted(() => {
+  if (loginForm.userName === '') {
+    userNameRef.value?.focus()
+  } else if (loginForm.password === '') {
+    passwordRef.value?.focus()
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -204,12 +205,8 @@ export default {
 }
 
 @keyframes bgMove {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(-5%, -5%) rotate(180deg);
-  }
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-5%, -5%) rotate(180deg); }
 }
 
 .login-container {
@@ -243,12 +240,8 @@ export default {
 }
 
 @keyframes brandFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .system-title {
@@ -281,7 +274,7 @@ export default {
       align-items: center;
       justify-content: center;
 
-      i {
+      .el-icon {
         margin-right: 10px;
         color: #667eea;
       }
@@ -302,7 +295,7 @@ export default {
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     }
 
-    > i {
+    > .el-icon {
       color: #667eea;
       font-size: 18px;
       margin-right: 10px;
@@ -311,16 +304,11 @@ export default {
     .el-input {
       flex: 1;
 
-      ::v-deep .el-input__inner {
+      :deep(.el-input__wrapper) {
         border: none;
         background: transparent;
-        padding: 12px 0;
-        font-size: 15px;
-        color: #1f2f3d;
-
-        &::placeholder {
-          color: #909399;
-        }
+        box-shadow: none;
+        padding: 8px 0;
       }
     }
 
@@ -336,11 +324,11 @@ export default {
     }
   }
 
-  ::v-deep .el-form-item {
+  :deep(.el-form-item) {
     margin-bottom: 20px;
   }
 
-  ::v-deep .el-form-item__error {
+  :deep(.el-form-item__error) {
     font-size: 12px;
     padding-top: 4px;
   }
@@ -359,7 +347,7 @@ export default {
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 
-  i {
+  .el-icon {
     margin-right: 8px;
   }
 
@@ -393,7 +381,7 @@ export default {
     font-weight: 500;
     transition: color 0.3s;
 
-    i {
+    .el-icon {
       margin-right: 5px;
     }
 

@@ -1,9 +1,13 @@
-import Vue from 'vue'
-import SvgIcon from '@/components/SvgIcon'// svg component
+import SvgIcon from '@/components/SvgIcon'
 
-// register globally
-Vue.component('svg-icon', SvgIcon)
+const svgFiles = import.meta.glob('./svg/*.svg', { query: '?inline', import: 'default', eager: true })
+Object.keys(svgFiles).forEach(key => {
+  const content = svgFiles[key]
+  const name = key.replace('./svg/', '').replace('.svg', '')
+  const symbol = document.createElementNS('http://www.w3.org/2000/svg', 'symbol')
+  symbol.id = 'icon-' + name
+  symbol.innerHTML = content
+  document.body.appendChild(symbol)
+})
 
-const req = require.context('./svg', false, /\.svg$/)
-const requireAll = requireContext => requireContext.keys().map(requireContext)
-requireAll(req)
+export { SvgIcon }

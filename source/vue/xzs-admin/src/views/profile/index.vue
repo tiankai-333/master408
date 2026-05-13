@@ -1,56 +1,28 @@
 <template>
   <div class="app-container">
-    <div>
-      <el-row :gutter="20">
-
-        <el-col :span="6" :xs="24">
-          <user-card  :userInfo="userInfo" />
-        </el-col>
-
-        <el-col :span="18" :xs="24">
-          <el-card>
-            <el-tabs active-name="timeline">
-              <el-tab-pane label="时间线" name="timeline">
-                <timeline :userInfo="userInfo" />
-              </el-tab-pane>
-              <el-tab-pane label="账号" name="account">
-                <account :userInfo="userInfo"  />
-              </el-tab-pane>
-            </el-tabs>
-          </el-card>
-        </el-col>
-
-      </el-row>
-    </div>
+    <el-row :gutter="20">
+      <el-col :span="6">
+        <UserCard :user="user"/>
+      </el-col>
+      <el-col :span="18">
+        <Account />
+      </el-col>
+    </el-row>
+    <Timeline />
   </div>
 </template>
 
-<script>
-import UserCard from './components/UserCard'
-import Timeline from './components/Timeline'
-import Account from './components/Account'
-import userApi from '@/api/user'
+<script setup>
+import { ref, onMounted } from 'vue'
+import UserCard from './components/UserCard.vue'
+import Account from './components/Account.vue'
+import Timeline from './components/Timeline.vue'
+import { useUserStore } from '@/stores/user'
 
-export default {
-  name: 'Profile',
-  data () {
-    return {
-      userInfo: {
-        realName: '',
-        phone: '',
-        lastActiveTime: '',
-        createTime: '',
-        role: '1',
-        imagePath: null
-      }
-    }
-  },
-  components: { UserCard, Timeline, Account },
-  created () {
-    let _this = this
-    userApi.getCurrentUser().then(re => {
-      _this.userInfo = re.response
-    })
-  }
-}
+const userStore = useUserStore()
+const user = ref({})
+
+onMounted(() => {
+  user.value = userStore.userInfo
+})
 </script>

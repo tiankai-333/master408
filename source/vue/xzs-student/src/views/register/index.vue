@@ -5,20 +5,19 @@
         <div class="register-brand">
           <img src="@/assets/logo2.png" alt="logo">
         </div>
-        <h2 class="system-title">学之思开源考试系统</h2>
+        <h2 class="system-title">408刷题系统</h2>
       </div>
 
       <div class="register-box">
-        <el-form ref="loginForm" :model="loginForm" class="register-form">
+        <el-form ref="loginFormRef" :model="loginForm" class="register-form">
           <div class="form-title">
-            <h3><i class="el-icon-user-plus"></i> 用户注册</h3>
+            <h3><el-icon><UserFilled /></el-icon> 用户注册</h3>
           </div>
 
           <el-form-item>
             <div class="input-wrapper">
-              <i class="el-icon-user"></i>
+              <el-icon><User /></el-icon>
               <el-input
-                ref="userName"
                 v-model="loginForm.userName"
                 placeholder="请输入用户名"
                 name="userName"
@@ -31,23 +30,22 @@
 
           <el-form-item>
             <div class="input-wrapper">
-              <i class="el-icon-lock"></i>
+              <el-icon><Lock /></el-icon>
               <el-input
-                ref="password"
                 v-model="loginForm.password"
                 type="password"
                 placeholder="请输入密码"
                 name="password"
                 tabindex="2"
                 auto-complete="on"
-                @keyup.enter.native="handleRegister"
+                @keyup.enter="handleRegister"
               />
             </div>
           </el-form-item>
 
           <el-form-item>
             <div class="input-wrapper">
-              <i class="el-icon-s-order"></i>
+              <el-icon><List /></el-icon>
               <el-select v-model="loginForm.userLevel" placeholder="请选择年级" class="level-select">
                 <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
               </el-select>
@@ -55,15 +53,15 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" class="register-btn" @click.native.prevent="handleRegister">
-              <i class="el-icon-check"></i> 注册
+            <el-button type="primary" class="register-btn" @click="handleRegister">
+              <el-icon><Check /></el-icon> 注册
             </el-button>
           </el-form-item>
 
           <div class="form-footer">
             <span>已有账号?</span>
             <router-link to="/login">
-              <i class="el-icon-arrow-left"></i> 返回登录
+              <el-icon><ArrowLeft /></el-icon> 返回登录
             </router-link>
           </div>
         </el-form>
@@ -80,40 +78,34 @@
   </div>
 </template>
 
-<script>
-import { mapMutations, mapState } from 'vuex'
+<script setup>
+import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { UserFilled, User, Lock, List, Check, ArrowLeft } from '@element-plus/icons-vue'
 import registerApi from '@/api/register'
+import { useEnumItemStore } from '@/store/modules/enumItem'
 
-export default {
-  name: 'Login',
-  data () {
-    return {
-      loginForm: {
-        userName: '',
-        password: '',
-        userLevel: 1
-      }
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+
+const levelEnum = enumItemStore.user.levelEnum
+
+const loginForm = reactive({
+  userName: '',
+  password: '',
+  userLevel: 1
+})
+
+const handleRegister = () => {
+  registerApi.register(loginForm).then(function (result) {
+    if (result && result.code === 1) {
+      ElMessage.success('注册成功，请登录')
+      router.push({ path: '/login' })
+    } else {
+      ElMessage.error(result.message)
     }
-  },
-  methods: {
-    handleRegister () {
-      let _this = this
-      registerApi.register(this.loginForm).then(function (result) {
-        if (result && result.code === 1) {
-          _this.$message.success('注册成功，请登录')
-          _this.$router.push({ path: '/login' })
-        } else {
-          _this.$message.error(result.message)
-        }
-      })
-    },
-    ...mapMutations('user', ['setUserName'])
-  },
-  computed: {
-    ...mapState('enumItem', {
-      levelEnum: state => state.user.levelEnum
-    })
-  }
+  })
 }
 </script>
 
@@ -149,12 +141,8 @@ export default {
 }
 
 @keyframes bgMove {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(-5%, -5%) rotate(180deg);
-  }
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-5%, -5%) rotate(180deg); }
 }
 
 .register-container {
@@ -188,12 +176,8 @@ export default {
 }
 
 @keyframes brandFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .system-title {
@@ -226,7 +210,7 @@ export default {
       align-items: center;
       justify-content: center;
 
-      i {
+      .el-icon {
         margin-right: 10px;
         color: #667eea;
       }
@@ -247,7 +231,7 @@ export default {
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     }
 
-    > i {
+    > .el-icon {
       color: #667eea;
       font-size: 18px;
       margin-right: 10px;
@@ -256,33 +240,27 @@ export default {
     .el-input {
       flex: 1;
 
-      ::v-deep .el-input__inner {
+      :deep(.el-input__wrapper) {
         border: none;
         background: transparent;
-        padding: 12px 0;
-        font-size: 15px;
-        color: #1f2f3d;
-
-        &::placeholder {
-          color: #909399;
-        }
+        box-shadow: none;
+        padding: 8px 0;
       }
     }
 
     .level-select {
       flex: 1;
 
-      ::v-deep .el-input__inner {
+      :deep(.el-input__wrapper) {
         border: none;
         background: transparent;
-        padding: 12px 0;
-        font-size: 15px;
-        color: #1f2f3d;
+        box-shadow: none;
+        padding: 8px 0;
       }
     }
   }
 
-  ::v-deep .el-form-item {
+  :deep(.el-form-item) {
     margin-bottom: 20px;
   }
 }
@@ -300,7 +278,7 @@ export default {
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 
-  i {
+  .el-icon {
     margin-right: 8px;
   }
 
@@ -330,7 +308,7 @@ export default {
     font-weight: 500;
     transition: color 0.3s;
 
-    i {
+    .el-icon {
       margin-right: 5px;
     }
 

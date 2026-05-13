@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
 
-    <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading" :rules="rules">
+    <el-form :model="form" ref="formRef" label-width="100px" v-loading="formLoading" :rules="rules">
       <el-form-item label="用户名："  prop="userName" required>
         <el-input v-model="form.userName"></el-input>
       </el-form-item>
@@ -43,105 +43,101 @@
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState, mapActions } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import userApi from '@/api/user'
+import { useEnumItemStore } from '@/stores/enumItem'
+import { useTagsViewStore } from '@/stores/tagsView'
 
-export default {
-  data () {
-    return {
-      form: {
-        id: null,
-        userName: '',
-        password: '',
-        realName: '',
-        role: 1,
-        status: 1,
-        age: '',
-        sex: '',
-        birthDay: null,
-        phone: null,
-        userLevel: null
-      },
-      formLoading: false,
-      rules: {
-        userName: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
-        ],
-        realName: [
-          { required: true, message: '请输入真实姓名', trigger: 'blur' }
-        ],
-        userLevel: [
-          { required: true, message: '请选择年级', trigger: 'change' }
-        ]
-      }
-    }
-  },
-  created () {
-    let id = this.$route.query.id
-    let _this = this
-    if (id && parseInt(id) !== 0) {
-      _this.formLoading = true
-      userApi.selectUser(id).then(re => {
-        _this.form = re.response
-        _this.formLoading = false
-      })
-    }
-  },
-  methods: {
-    submitForm () {
-      let _this = this
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.formLoading = true
-          userApi.createUser(this.form).then(data => {
-            if (data.code === 1) {
-              _this.$message.success(data.message)
-              _this.delCurrentView(_this).then(() => {
-                _this.$router.push('/user/student/list')
-              })
-            } else {
-              _this.$message.error(data.message)
-              _this.formLoading = false
-            }
-          }).catch(e => {
-            _this.formLoading = false
+const route = useRoute()
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+const tagsViewStore = useTagsViewStore()
+
+const form = reactive({
+  id: null,
+  userName: '',
+  password: '',
+  realName: '',
+  role: 1,
+  status: 1,
+  age: '',
+  sex: '',
+  birthDay: null,
+  phone: null,
+  userLevel: null
+})
+
+const formLoading = ref(false)
+const formRef = ref(null)
+
+const sexEnum = computed(() => enumItemStore.user.sexEnum)
+const roleEnum = computed(() => enumItemStore.user.roleEnum)
+const statusEnum = computed(() => enumItemStore.user.statusEnum)
+const levelEnum = computed(() => enumItemStore.user.levelEnum)
+
+const rules = {
+  userName: [
+    { required: true, message: '请输入用户名', trigger: 'blur' }
+  ],
+  realName: [
+    { required: true, message: '请输入真实姓名', trigger: 'blur' }
+  ],
+  userLevel: [
+    { required: true, message: '请选择年级', trigger: 'change' }
+  ]
+}
+
+const submitForm = () => {
+  formRef.value.validate((valid) => {
+    if (valid) {
+      formLoading.value = true
+      userApi.createUser(form).then(data => {
+        if (data.code === 1) {
+          ElMessage.success(data.message)
+          tagsViewStore.delVisitedView({ path: route.path }).then(() => {
+            router.push('/user/student/list')
           })
         } else {
-          return false
+          ElMessage.error(data.message)
+          formLoading.value = false
         }
+      }).catch(() => {
+        formLoading.value = false
       })
-    },
-    resetForm () {
-      let lastId = this.form.id
-      this.$refs['form'].resetFields()
-      this.form = {
-        id: null,
-        userName: '',
-        password: '',
-        realName: '',
-        role: 1,
-        status: 1,
-        age: '',
-        sex: '',
-        birthDay: null,
-        phone: null,
-        userLevel: null
-      }
-      this.form.id = lastId
-    },
-    ...mapActions('tagsView', { delCurrentView: 'delCurrentView' })
-  },
-  computed: {
-    ...mapGetters('enumItem', [
-      'enumFormat'
-    ]),
-    ...mapState('enumItem', {
-      sexEnum: state => state.user.sexEnum,
-      roleEnum: state => state.user.roleEnum,
-      statusEnum: state => state.user.statusEnum,
-      levelEnum: state => state.user.levelEnum
+    }
+  })
+}
+
+const resetForm = () => {
+  const lastId = form.id
+  formRef.value.resetFields()
+  Object.assign(form, {
+    id: null,
+    userName: '',
+    password: '',
+    realName: '',
+    role: 1,
+    status: 1,
+    age: '',
+    sex: '',
+    birthDay: null,
+    phone: null,
+    userLevel: null
+  })
+  form.id = lastId
+}
+
+onMounted(() => {
+  const id = route.query.id
+  if (id && parseInt(id) !== 0) {
+    formLoading.value = true
+    userApi.selectUser(id).then(re => {
+      Object.assign(form, re.response)
+      formLoading.value = false
     })
   }
-}
+})
 </script>

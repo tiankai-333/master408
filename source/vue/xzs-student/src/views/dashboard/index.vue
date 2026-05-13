@@ -2,32 +2,11 @@
   <div class="dashboard-container">
     <el-row class="banner-row">
       <el-carousel :interval="5000" arrow="always" height="350px" indicator-position="bottom">
-        <el-carousel-item>
-          <img src="@/assets/carousel/1.png" class="carousel-img">
+        <el-carousel-item v-for="(img, index) in carouselImages" :key="index">
+          <img :src="img.src" class="carousel-img">
           <div class="carousel-overlay">
-            <h2>智能考试系统</h2>
-            <p>AI驱动的智能测评平台</p>
-          </div>
-        </el-carousel-item>
-        <el-carousel-item>
-          <img src="@/assets/carousel/2.png" class="carousel-img">
-          <div class="carousel-overlay">
-            <h2>个性化学习路径</h2>
-            <p>定制专属学习方案</p>
-          </div>
-        </el-carousel-item>
-        <el-carousel-item>
-          <img src="@/assets/carousel/3.png" class="carousel-img">
-          <div class="carousel-overlay">
-            <h2>数据分析报告</h2>
-            <p>详细掌握学习进度</p>
-          </div>
-        </el-carousel-item>
-        <el-carousel-item>
-          <img src="@/assets/carousel/4.png" class="carousel-img">
-          <div class="carousel-overlay">
-            <h2>限时挑战模式</h2>
-            <p>提升应试能力</p>
+            <h2>{{ img.title }}</h2>
+            <p>{{ img.desc }}</p>
           </div>
         </el-carousel-item>
       </el-carousel>
@@ -36,45 +15,45 @@
     <div class="content-wrapper">
       <el-row class="section-row">
         <div class="section-header">
-          <i class="el-icon-tickets"></i>
+          <el-icon><Tickets /></el-icon>
           <h3>任务中心</h3>
         </div>
         <div class="task-content" v-loading="taskLoading">
-          <el-collapse accordion v-if="taskList.length!==0" class="task-collapse">
+          <el-collapse accordion v-if="taskList.length !== 0" class="task-collapse">
             <el-collapse-item :title="taskItem.title" :name="taskItem.id" :key="taskItem.id" v-for="taskItem in taskList">
               <table class="index-task-table">
                 <tr v-for="paperItem in taskItem.paperItems" :key="paperItem.examPaperId">
                   <td class="index-task-table-paper">
-                    <i class="el-icon-document"></i>
-                    {{paperItem.examPaperName}}
+                    <el-icon><Document /></el-icon>
+                    {{ paperItem.examPaperName }}
                   </td>
                   <td width="70px">
-                    <el-tag :type="statusTagFormatter(paperItem.status)" v-if="paperItem.status !== null" size="mini">
+                    <el-tag :type="statusTagFormatter(paperItem.status)" v-if="paperItem.status !== null" size="small">
                       {{ statusTextFormatter(paperItem.status) }}
                     </el-tag>
                   </td>
                   <td width="120px">
-                    <router-link target="_blank" :to="{path:'/do',query:{id:paperItem.examPaperId}}" v-if="paperItem.status === null">
-                      <el-button type="primary" size="small" icon="el-icon-video-play">开始答题</el-button>
+                    <router-link target="_blank" :to="{ path: '/do', query: { id: paperItem.examPaperId } }" v-if="paperItem.status === null">
+                      <el-button type="primary" size="small"><el-icon><VideoPlay /></el-icon>开始答题</el-button>
                     </router-link>
-                    <router-link target="_blank" :to="{path:'/edit',query:{id:paperItem.examPaperAnswerId}}" v-else-if="paperItem.status === 1">
-                      <el-button type="warning" size="small" icon="el-icon-edit">批改试卷</el-button>
+                    <router-link target="_blank" :to="{ path: '/edit', query: { id: paperItem.examPaperAnswerId } }" v-else-if="paperItem.status === 1">
+                      <el-button type="warning" size="small"><el-icon><Edit /></el-icon>批改试卷</el-button>
                     </router-link>
-                    <router-link target="_blank" :to="{path:'/read',query:{id:paperItem.examPaperAnswerId}}" v-else-if="paperItem.status === 2">
-                      <el-button type="success" size="small" icon="el-icon-view">查看试卷</el-button>
+                    <router-link target="_blank" :to="{ path: '/read', query: { id: paperItem.examPaperAnswerId } }" v-else-if="paperItem.status === 2">
+                      <el-button type="success" size="small"><el-icon><View /></el-icon>查看试卷</el-button>
                     </router-link>
                   </td>
                 </tr>
               </table>
             </el-collapse-item>
           </el-collapse>
-          <el-empty v-else description="暂无任务"></el-empty>
+          <el-empty v-else description="暂无任务" />
         </div>
       </el-row>
 
       <el-row class="section-row">
         <div class="section-header">
-          <i class="el-icon-collection"></i>
+          <el-icon><Collection /></el-icon>
           <h3>固定试卷</h3>
         </div>
         <div class="paper-grid" v-loading="loading">
@@ -84,10 +63,10 @@
                 <img src="@/assets/exam-paper/show1.png" class="paper-image">
               </div>
               <div class="paper-info">
-                <h4 class="paper-title">{{item.name}}</h4>
+                <h4 class="paper-title">{{ item.name }}</h4>
                 <div class="paper-action">
-                  <router-link target="_blank" :to="{path:'/do',query:{id:item.id}}">
-                    <el-button type="primary" icon="el-icon-video-play" size="small">开始做题</el-button>
+                  <router-link target="_blank" :to="{ path: '/do', query: { id: item.id } }">
+                    <el-button type="primary" size="small"><el-icon><VideoPlay /></el-icon>开始做题</el-button>
                   </router-link>
                 </div>
               </div>
@@ -98,7 +77,7 @@
 
       <el-row class="section-row">
         <div class="section-header time-header">
-          <i class="el-icon-time"></i>
+          <el-icon><Timer /></el-icon>
           <h3>时段试卷</h3>
         </div>
         <div class="paper-grid" v-loading="loading">
@@ -107,18 +86,18 @@
               <div class="paper-image-wrapper">
                 <img src="@/assets/exam-paper/show2.png" class="paper-image">
                 <div class="time-badge">
-                  <i class="el-icon-time"></i>
+                  <el-icon><Timer /></el-icon>
                 </div>
               </div>
               <div class="paper-info">
-                <h4 class="paper-title">{{item.name}}</h4>
+                <h4 class="paper-title">{{ item.name }}</h4>
                 <p class="paper-time">
-                  <i class="el-icon-calendar"></i>
-                  {{item.startTime}} - {{item.endTime}}
+                  <el-icon><Calendar /></el-icon>
+                  {{ item.startTime }} - {{ item.endTime }}
                 </p>
                 <div class="paper-action">
-                  <router-link target="_blank" :to="{path:'/do',query:{id:item.id}}">
-                    <el-button type="warning" icon="el-icon-video-play" size="small">开始做题</el-button>
+                  <router-link target="_blank" :to="{ path: '/do', query: { id: item.id } }">
+                    <el-button type="warning" size="small"><el-icon><VideoPlay /></el-icon>开始做题</el-button>
                   </router-link>
                 </div>
               </div>
@@ -130,54 +109,49 @@
   </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from 'vuex'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { Tickets, Document, VideoPlay, Edit, View, Collection, Timer, Calendar } from '@element-plus/icons-vue'
 import indexApi from '@/api/dashboard'
-export default {
-  data () {
-    return {
-      fixedPaper: [],
-      timeLimitPaper: [],
-      pushPaper: [],
-      loading: false,
-      taskLoading: false,
-      taskList: []
-    }
-  },
-  created () {
-    let _this = this
-    this.loading = true
-    indexApi.index().then(re => {
-      _this.fixedPaper = re.response.fixedPaper
-      _this.timeLimitPaper = re.response.timeLimitPaper
-      _this.pushPaper = re.response.pushPaper
-      _this.loading = false
-    })
+import { useEnumItemStore } from '@/store/modules/enumItem'
 
-    this.taskLoading = true
-    indexApi.task().then(re => {
-      _this.taskList = re.response
-      _this.taskLoading = false
-    })
-  },
-  methods: {
-    statusTagFormatter (status) {
-      return this.enumFormat(this.statusTag, status)
-    },
-    statusTextFormatter (status) {
-      return this.enumFormat(this.statusEnum, status)
-    }
-  },
-  computed: {
-    ...mapGetters('enumItem', [
-      'enumFormat'
-    ]),
-    ...mapState('enumItem', {
-      statusEnum: state => state.exam.examPaperAnswer.statusEnum,
-      statusTag: state => state.exam.examPaperAnswer.statusTag
-    })
-  }
+const enumItemStore = useEnumItemStore()
+
+const fixedPaper = ref([])
+const timeLimitPaper = ref([])
+const loading = ref(false)
+const taskLoading = ref(false)
+const taskList = ref([])
+
+const carouselImages = [
+  { src: new URL('@/assets/carousel/1.png', import.meta.url).href, title: '智能考试系统', desc: 'AI驱动的智能测评平台' },
+  { src: new URL('@/assets/carousel/2.png', import.meta.url).href, title: '个性化学习路径', desc: '定制专属学习方案' },
+  { src: new URL('@/assets/carousel/3.png', import.meta.url).href, title: '数据分析报告', desc: '详细掌握学习进度' },
+  { src: new URL('@/assets/carousel/4.png', import.meta.url).href, title: '限时挑战模式', desc: '提升应试能力' }
+]
+
+const statusTagFormatter = (status) => {
+  return enumItemStore.enumFormat(enumItemStore.exam.examPaperAnswer.statusTag, status)
 }
+
+const statusTextFormatter = (status) => {
+  return enumItemStore.enumFormat(enumItemStore.exam.examPaperAnswer.statusEnum, status)
+}
+
+onMounted(() => {
+  loading.value = true
+  indexApi.index().then(re => {
+    fixedPaper.value = re.response.fixedPaper
+    timeLimitPaper.value = re.response.timeLimitPaper
+    loading.value = false
+  })
+
+  taskLoading.value = true
+  indexApi.task().then(re => {
+    taskList.value = re.response
+    taskLoading.value = false
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -258,7 +232,7 @@ export default {
   padding-bottom: 15px;
   border-bottom: 2px solid #f0f0f0;
 
-  i {
+  .el-icon {
     font-size: 24px;
     color: #667eea;
     margin-right: 12px;
@@ -273,7 +247,7 @@ export default {
 }
 
 .time-header {
-  i {
+  .el-icon {
     color: #f59f5f;
   }
 }
@@ -281,7 +255,7 @@ export default {
 .task-collapse {
   border: none;
 
-  ::v-deep .el-collapse-item__header {
+  :deep(.el-collapse-item__header) {
     font-size: 16px;
     font-weight: 500;
     color: #1f2f3d;
@@ -289,11 +263,11 @@ export default {
     padding-left: 10px;
   }
 
-  ::v-deep .el-collapse-item__wrap {
+  :deep(.el-collapse-item__wrap) {
     border-bottom: none;
   }
 
-  ::v-deep .el-collapse-item__content {
+  :deep(.el-collapse-item__content) {
     padding: 15px 10px;
   }
 }
@@ -301,10 +275,8 @@ export default {
 .index-task-table {
   width: 100%;
 
-  tr {
-    &:hover {
-      background-color: #f9fafb;
-    }
+  tr:hover {
+    background-color: #f9fafb;
   }
 
   td {
@@ -316,7 +288,7 @@ export default {
     color: #34495e;
     font-size: 15px;
 
-    i {
+    .el-icon {
       color: #667eea;
       margin-right: 8px;
     }
@@ -375,7 +347,7 @@ export default {
   align-items: center;
   justify-content: center;
 
-  i {
+  .el-icon {
     color: #f59f5f;
     font-size: 18px;
   }
@@ -401,7 +373,7 @@ export default {
   color: #909399;
   margin: 0 0 15px;
 
-  i {
+  .el-icon {
     margin-right: 5px;
   }
 }

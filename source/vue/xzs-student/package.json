@@ -1,66 +1,29 @@
 {
   "name": "xzs-student",
-  "version": "3.9.0",
-  "author": "武汉思维跳跃科技有限公司",
-  "description": "学之思开源考试系统",
-  "license": "AGPL-3.0",
+  "version": "4.0.0",
+  "description": "408刷题系统 - 学生端",
   "private": true,
-  "homepage": "https://www.mindskip.net/xzs.html",
   "scripts": {
-    "serve": "vue-cli-service serve --mode dev",
-    "build": "vue-cli-service build --mode prod",
-    "build:dev": "vue-cli-service build --mode dev",
-    "build:test": "vue-cli-service build --mode test",
-    "build:pre": "vue-cli-service build --mode pre",
-    "build:prod": "vue-cli-service build --mode prod",
-    "lint": "vue-cli-service lint"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://gitee.com/mindskip/xzs-mysql.git"
-  },
-  "bugs": {
-    "url": "https://gitee.com/mindskip/xzs-mysql/issues",
-    "email": "mindskip@qq.com"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{js,vue}": [
-      "eslint --fix",
-      "git add"
-    ]
+    "serve": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^0.19.2",
-    "core-js": "^3.49.0",
-    "echarts": "^6.0.0",
-    "element-ui": "^2.15.14",
-    "husky": "^7.0.4",
-    "js-cookie": "2.2.0",
-    "normalize.css": "8.0.1",
-    "nprogress": "0.2.0",
-    "screenfull": "^5.2.0",
-    "vue": "^2.7.16",
-    "vue-router": "^3.6.5",
-    "vuex": "^3.6.2"
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.7.9",
+    "echarts": "^5.5.0",
+    "element-plus": "^2.9.1",
+    "js-cookie": "^3.0.5",
+    "normalize.css": "^8.0.1",
+    "nprogress": "^0.2.0",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.19",
-    "@vue/cli-plugin-eslint": "^4.5.19",
-    "@vue/cli-plugin-router": "^4.5.19",
-    "@vue/cli-plugin-vuex": "^4.5.19",
-    "@vue/cli-service": "^4.5.19",
-    "@vue/eslint-config-standard": "^4.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.2.3",
-    "sass": "^1.99.0",
-    "sass-loader": "^10.5.2",
-    "svg-sprite-loader": "4.1.6",
-    "vue-template-compiler": "^2.7.16"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "autoprefixer": "^10.5.0",
+    "sass": "^1.85.0",
+    "vite": "^6.0.0"
   }
 }

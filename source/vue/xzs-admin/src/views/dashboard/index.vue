@@ -53,85 +53,84 @@
     </el-row>
 
     <div class="echarts-section">
-      <div id="echarts-moth-user" style="width: 100%;height:360px;" v-loading="loading"/>
+      <div ref="echartsUserActionRef" style="width: 100%;height:360px;" v-loading="loading"/>
     </div>
     <div class="echarts-section">
-      <div id="echarts-moth-question" style="width: 100%;height:360px;" v-loading="loading"/>
+      <div ref="echartsQuestionRef" style="width: 100%;height:360px;" v-loading="loading"/>
     </div>
   </div>
 </template>
 
-<script>
-import resize from './components/mixins/resize'
-import CountTo from 'vue-count-to'
+<script setup>
+import { ref, onMounted } from 'vue'
+import * as echarts from 'echarts'
+import CountTo from '@/components/CountTo'
 import dashboardApi from '@/api/dashboard'
-export default {
-  mixins: [resize],
-  components: {
-    CountTo
-  },
-  data () {
-    return {
-      examPaperCount: 0,
-      questionCount: 0,
-      doExamPaperCount: 0,
-      doQuestionCount: 0,
-      echartsUserAction: null,
-      echartsQuestion: null,
-      loading: false
-    }
-  },
-  mounted () {
-    // eslint-disable-next-line no-undef
-    this.echartsUserAction = echarts.init(document.getElementById('echarts-moth-user'), 'macarons')
-    // eslint-disable-next-line no-undef
-    this.echartsQuestion = echarts.init(document.getElementById('echarts-moth-question'), 'macarons')
-    let _this = this
-    this.loading = true
-    dashboardApi.index().then(re => {
-      let response = re.response
-      _this.examPaperCount = response.examPaperCount
-      _this.questionCount = response.questionCount
-      _this.doExamPaperCount = response.doExamPaperCount
-      _this.doQuestionCount = response.doQuestionCount
-      _this.echartsUserAction.setOption(this.option('用户活跃度', '{b}日{c}度', response.mothDayText, response.mothDayUserActionValue))
-      _this.echartsQuestion.setOption(this.option('题目月数量', '{b}日{c}题', response.mothDayText, response.mothDayDoExamQuestionValue))
-      this.loading = false
-    })
-  },
-  methods: {
-    option (title, formatter, label, vaule) {
-      return {
-        title: {
-          text: title,
-          x: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: formatter
-        },
-        xAxis: {
-          type: 'category',
-          data: label
-        },
-        grid: {
-          left: 10,
-          right: 10,
-          bottom: 20,
-          top: 30,
-          containLabel: true
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [{
-          data: vaule,
-          type: 'line'
-        }]
-      }
-    }
+
+const examPaperCount = ref(0)
+const questionCount = ref(0)
+const doExamPaperCount = ref(0)
+const doQuestionCount = ref(0)
+const echartsUserAction = ref(null)
+const echartsQuestion = ref(null)
+const loading = ref(false)
+const echartsUserActionRef = ref(null)
+const echartsQuestionRef = ref(null)
+
+const option = (title, formatter, label, vaule) => {
+  return {
+    title: {
+      text: title,
+      x: 'center'
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: formatter
+    },
+    xAxis: {
+      type: 'category',
+      data: label
+    },
+    grid: {
+      left: 10,
+      right: 10,
+      bottom: 20,
+      top: 30,
+      containLabel: true
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [{
+      data: vaule,
+      type: 'line'
+    }]
   }
 }
+
+onMounted(() => {
+  echartsUserAction.value = echarts.init(echartsUserActionRef.value)
+  echartsQuestion.value = echarts.init(echartsQuestionRef.value)
+  
+  loading.value = true
+  dashboardApi.index().then(re => {
+    const response = re.response
+    examPaperCount.value = response.examPaperCount
+    questionCount.value = response.questionCount
+    doExamPaperCount.value = response.doExamPaperCount
+    doQuestionCount.value = response.doQuestionCount
+    
+    if (echartsUserAction.value) {
+      echartsUserAction.value.setOption(option('用户活跃度', '{b}日{c}度', response.mothDayText, response.mothDayUserActionValue))
+    }
+    if (echartsQuestion.value) {
+      echartsQuestion.value.setOption(option('题目月数量', '{b}日{c}题', response.mothDayText, response.mothDayDoExamQuestionValue))
+    }
+    loading.value = false
+  }).catch(() => {
+    loading.value = false
+  })
+})
 </script>
 
 <style lang="scss" scoped>
