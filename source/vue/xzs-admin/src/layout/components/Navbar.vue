@@ -10,53 +10,47 @@
           <span>{{userName}}</span>
           <i class="el-icon-caret-bottom" />
         </div>
-        <el-dropdown-menu slot="dropdown">
+        <template #dropdown>
           <router-link to="/profile/index">
             <el-dropdown-item>个人信息</el-dropdown-item>
           </router-link>
           <router-link to="/">
             <el-dropdown-item>主页</el-dropdown-item>
           </router-link>
-          <el-dropdown-item  @click.native="logout"  divided>退出</el-dropdown-item>
-        </el-dropdown-menu>
+          <el-dropdown-item  @click="logout"  divided>退出</el-dropdown-item>
+        </template>
       </el-dropdown>
     </div>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapMutations } from 'vuex'
+<script setup>
+import { computed } from 'vue'
 import loginApi from '@/api/login'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { useAppStore } from '@/stores/app'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
-export default {
-  components: {
-    Breadcrumb,
-    Hamburger
-  },
-  computed: {
-    ...mapGetters([
-      'sidebar',
-      'device',
-      'userName'
-    ])
-  },
-  methods: {
-    toggleSideBar () {
-      this.$store.dispatch('app/toggleSideBar')
-    },
-    logout () {
-      let _this = this
-      loginApi.logout().then(function (result) {
-        if (result && result.code === 1) {
-          _this.clearLogin()
-          _this.$router.push({ path: '/login' })
-        }
-      })
-    },
-    ...mapMutations('user', ['clearLogin'])
-  }
+const appStore = useAppStore()
+const userStore = useUserStore()
+const router = useRouter()
+
+const sidebar = computed(() => appStore.sidebar)
+const userName = computed(() => userStore.userName)
+
+const toggleSideBar = () => {
+  appStore.toggleSideBar()
+}
+
+const logout = () => {
+  loginApi.logout().then(function (result) {
+    if (result && result.code === 1) {
+      userStore.clearLogin()
+      router.push({ path: '/login' })
+    }
+  })
 }
 </script>
 

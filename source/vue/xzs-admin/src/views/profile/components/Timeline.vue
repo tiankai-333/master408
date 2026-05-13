@@ -1,36 +1,32 @@
 <template>
-  <div class="block">
+  <el-card title="最近活动" style="margin-top: 20px;">
     <el-timeline>
-      <el-timeline-item  placement="top" :timestamp="userInfo.lastActiveTime">
+      <el-timeline-item
+        v-for="(activity, index) in activities"
+        :key="index"
+        :timestamp="activity.time">
         <el-card>
-          <h4>最后活动时间</h4>
-          <p>{{ userInfo.realName+'在校考系统中最后活动了' }}</p>
-        </el-card>
-      </el-timeline-item>
-      <el-timeline-item  placement="top" :timestamp="userInfo.createTime">
-        <el-card>
-          <h4>加入时间</h4>
-          <p>{{ userInfo.realName+'加入了校考系统' }}</p>
+          <h4>{{ activity.title }}</h4>
+          <p>{{ activity.description }}</p>
         </el-card>
       </el-timeline-item>
     </el-timeline>
-  </div>
+  </el-card>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
+import logApi from '@/api/log'
 
-export default {
-  props: {
-    userInfo: {
-      type: Object,
-      default: () => {
-        return {
-          realName: '',
-          lastActiveTime: '',
-          createTime: ''
-        }
-      }
-    }
-  }
-}
+const activities = ref([])
+
+onMounted(() => {
+  logApi.recent().then(data => {
+    activities.value = data.response.map(item => ({
+      title: item.operation,
+      description: `请求路径: ${item.requestUri}`,
+      time: item.createTime
+    }))
+  })
+})
 </script>

@@ -27,85 +27,84 @@
       <el-table-column prop="name" label="名称"  />
       <el-table-column prop="createTime" label="创建时间" width="160px"/>
       <el-table-column  label="操作" align="center"  width="160px">
-        <template slot-scope="{row}">
-          <el-button size="mini" @click="$router.push({path:'/exam/paper/edit',query:{id:row.id}})" >编辑</el-button>
+        <template #default="{row}">
+          <el-button size="mini" @click="router.push({path:'/exam/paper/edit',query:{id:row.id}})" >编辑</el-button>
           <el-button size="mini" type="danger"  @click="deletePaper(row)" class="link-left">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParam.pageIndex" :limit.sync="queryParam.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParam.pageIndex" v-model:limit="queryParam.pageSize"
                 @pagination="search"/>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState, mapActions } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import Pagination from '@/components/Pagination'
 import examPaperApi from '@/api/examPaper'
+import { useEnumItemStore } from '@/stores/enumItem'
+import { useExamStore } from '@/stores/exam'
 
-export default {
-  components: { Pagination },
-  data () {
-    return {
-      queryParam: {
-        id: null,
-        level: null,
-        subjectId: null,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      subjectFilter: null,
-      listLoading: true,
-      tableData: [],
-      total: 0
-    }
-  },
-  created () {
-    this.initSubject()
-    this.search()
-  },
-  methods: {
-    submitForm () {
-      this.queryParam.pageIndex = 1
-      this.search()
-    },
-    search () {
-      this.listLoading = true
-      examPaperApi.pageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    deletePaper (row) {
-      let _this = this
-      examPaperApi.deletePaper(row.id).then(re => {
-        if (re.code === 1) {
-          _this.search()
-          _this.$message.success(re.message)
-        } else {
-          _this.$message.error(re.message)
-        }
-      })
-    },
-    levelChange () {
-      this.queryParam.subjectId = null
-      this.subjectFilter = this.subjects.filter(data => data.level === this.queryParam.level)
-    },
-    subjectFormatter  (row, column, cellValue, index) {
-      return this.subjectEnumFormat(cellValue)
-    },
-    ...mapActions('exam', { initSubject: 'initSubject' })
-  },
-  computed: {
-    ...mapGetters('enumItem', ['enumFormat']),
-    ...mapState('enumItem', {
-      levelEnum: state => state.user.levelEnum
-    }),
-    ...mapGetters('exam', ['subjectEnumFormat']),
-    ...mapState('exam', { subjects: state => state.subjects })
-  }
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+const examStore = useExamStore()
+
+const queryParam = reactive({
+  id: null,
+  level: null,
+  subjectId: null,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const subjectFilter = ref(null)
+const listLoading = ref(true)
+const tableData = ref([])
+const total = ref(0)
+
+const levelEnum = computed(() => enumItemStore.user.levelEnum)
+
+const search = () => {
+  listLoading.value = true
+  examPaperApi.pageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+const deletePaper = (row) => {
+  examPaperApi.deletePaper(row.id).then(re => {
+    if (re.code === 1) {
+      search()
+      ElMessage.success(re.message)
+    } else {
+      ElMessage.error(re.message)
+    }
+  })
+}
+
+const levelChange = () => {
+  queryParam.subjectId = null
+  subjectFilter.value = examStore.subjects.filter(data => data.level === queryParam.level)
+}
+
+const subjectFormatter = (row, column, cellValue) => {
+  return examStore.subjectEnumFormat(cellValue)
+}
+
+const submitForm = () => {
+  queryParam.pageIndex = 1
+  search()
+}
+
+onMounted(() => {
+  examStore.initSubject()
+  subjectFilter.value = examStore.subjects
+  search()
+})
 </script>

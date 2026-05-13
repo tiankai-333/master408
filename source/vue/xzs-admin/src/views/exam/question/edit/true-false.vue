@@ -1,215 +1,148 @@
 <template>
   <div class="app-container">
-    <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading"  :rules="rules">
-      <el-form-item label="年级：" prop="gradeLevel" required>
-        <el-select v-model="form.gradeLevel" placeholder="年级"  @change="levelChange">
+    <el-form :model="form" ref="formRef" label-width="100px" v-loading="formLoading" :rules="rules">
+      <el-form-item label="年级：" prop="level" required>
+        <el-select v-model="form.level" placeholder="年级" @change="levelChange">
           <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="学科：" prop="subjectId" required>
-        <el-select v-model="form.subjectId" placeholder="学科" >
-          <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id" :label="item.name+' ( '+item.levelName+' )'"></el-option>
+        <el-select v-model="form.subjectId" placeholder="学科">
+          <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
+                     :label="item.name+' ( '+item.levelName+' )'"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="题干：" prop="title" required>
-        <el-input v-model="form.title"   @focus="inputClick(form,'title')" />
-      </el-form-item>
-      <el-form-item label="选项：" required>
-        <el-form-item :label="item.prefix" :key="item.prefix"  v-for="(item) in form.items"  label-width="50px" class="question-item-label">
-          <el-input v-model="item.prefix"  style="width:50px;" />
-          <el-input v-model="item.content"   @focus="inputClick(item,'content')"  class="question-item-content-input"/>
-        </el-form-item>
-      </el-form-item>
-      <el-form-item label="解析：" prop="analyze" required>
-        <el-input v-model="form.analyze"  @focus="inputClick(form,'analyze')" />
+      <el-form-item label="难度：" prop="difficult" required>
+        <el-select v-model="form.difficult" placeholder="难度">
+          <el-option v-for="item in difficultEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="分数：" prop="score" required>
-        <el-input-number v-model="form.score" :precision="1" :step="1" :max="100"></el-input-number>
+        <el-input v-model.number="form.score" type="number"/>
       </el-form-item>
-      <el-form-item label="难度：" required>
-        <el-rate v-model="form.difficult" class="question-item-rate"></el-rate>
+      <el-form-item label="题干：" prop="title" required>
+        <el-input v-model="form.title" type="textarea" :rows="3"/>
       </el-form-item>
-      <el-form-item label="正确答案：" prop="correct" required>
-        <el-radio-group v-model="form.correct">
-          <el-radio  v-for="item in form.items"  :key="item.prefix"  :label="item.prefix">{{item.prefix}}</el-radio>
+      <el-form-item label="正确答案：" prop="items" required>
+        <el-radio-group v-model="answerValue">
+          <el-radio :label="1">正确</el-radio>
+          <el-radio :label="0">错误</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">提交</el-button>
         <el-button @click="resetForm">重置</el-button>
-        <el-button type="success" @click="showQuestion">预览</el-button>
       </el-form-item>
     </el-form>
-    <el-dialog  :visible.sync="richEditor.dialogVisible"  append-to-body :close-on-click-modal="false" style="width: 100%;height: 100%"   :show-close="false" center>
-      <Ueditor @ready="editorReady"/>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editorConfirm">确 定</el-button>
-        <el-button @click="richEditor.dialogVisible = false">取 消</el-button>
-      </span>
-    </el-dialog>
-    <el-dialog :visible.sync="questionShow.dialog" style="width: 100%;height: 100%">
-      <QuestionShow :qType="questionShow.qType" :question="questionShow.question" :qLoading="questionShow.loading"/>
-    </el-dialog>
   </div>
 </template>
 
-<script>
-import QuestionShow from '../components/Show'
-import Ueditor from '@/components/Ueditor'
-import { mapGetters, mapState, mapActions } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import questionApi from '@/api/question'
+import { useEnumItemStore } from '@/stores/enumItem'
+import { useExamStore } from '@/stores/exam'
+import { useTagsViewStore } from '@/stores/tagsView'
 
-export default {
-  components: {
-    Ueditor, QuestionShow
-  },
-  data () {
-    return {
-      form: {
-        id: null,
-        questionType: 3,
-        gradeLevel: null,
-        subjectId: null,
-        title: '',
-        items: [
-          { id: null, prefix: 'A', content: '是' },
-          { id: null, prefix: 'B', content: '否' }
-        ],
-        analyze: '',
-        correct: '',
-        score: '',
-        difficult: 0
-      },
-      subjectFilter: null,
-      formLoading: false,
-      rules: {
-        gradeLevel: [
-          { required: true, message: '请选择年级', trigger: 'change' }
-        ],
-        subjectId: [
-          { required: true, message: '请选择学科', trigger: 'change' }
-        ],
-        title: [
-          { required: true, message: '请输入题干', trigger: 'blur' }
-        ],
-        analyze: [
-          { required: true, message: '请输入解析', trigger: 'blur' }
-        ],
-        score: [
-          { required: true, message: '请输入分数', trigger: 'blur' }
-        ],
-        correct: [
-          { required: true, message: '请选择正确答案', trigger: 'change' }
-        ]
-      },
-      richEditor: {
-        dialogVisible: false,
-        object: null,
-        parameterName: '',
-        instance: null
-      },
-      questionShow: {
-        qType: 0,
-        dialog: false,
-        question: null,
-        loading: false
-      }
-    }
-  },
-  created () {
-    let id = this.$route.query.id
-    let _this = this
-    this.initSubject(function () {
-      _this.subjectFilter = _this.subjects
-    })
-    if (id && parseInt(id) !== 0) {
-      _this.formLoading = true
-      questionApi.select(id).then(re => {
-        _this.form = re.response
-        _this.formLoading = false
-      })
-    }
-  },
-  methods: {
-    editorReady (instance) {
-      this.richEditor.instance = instance
-      let currentContent = this.richEditor.object[this.richEditor.parameterName]
-      this.richEditor.instance.setContent(currentContent)
-      // 光标定位到Ueditor
-      this.richEditor.instance.focus(true)
-    },
-    inputClick (object, parameterName) {
-      this.richEditor.object = object
-      this.richEditor.parameterName = parameterName
-      this.richEditor.dialogVisible = true
-    },
-    editorConfirm () {
-      let content = this.richEditor.instance.getContent()
-      this.richEditor.object[this.richEditor.parameterName] = content
-      this.richEditor.dialogVisible = false
-    },
-    submitForm () {
-      let _this = this
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.formLoading = true
-          questionApi.edit(this.form).then(re => {
-            if (re.code === 1) {
-              _this.$message.success(re.message)
-              _this.delCurrentView(_this).then(() => {
-                _this.$router.push('/exam/question/list')
-              })
-            } else {
-              _this.$message.error(re.message)
-              this.formLoading = false
-            }
-          }).catch(e => {
-            this.formLoading = false
+const route = useRoute()
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+const examStore = useExamStore()
+const tagsViewStore = useTagsViewStore()
+
+const form = reactive({
+  id: null,
+  level: null,
+  subjectId: null,
+  questionType: 4,
+  difficult: 1,
+  score: 2,
+  title: '',
+  items: [{ content: '', isAnswer: false }]
+})
+
+const answerValue = ref(0)
+const subjectFilter = ref(null)
+const formLoading = ref(false)
+const formRef = ref(null)
+
+const levelEnum = computed(() => enumItemStore.user.levelEnum)
+const difficultEnum = computed(() => [
+  { key: 1, value: '简单' },
+  { key: 2, value: '中等' },
+  { key: 3, value: '困难' }
+])
+
+const rules = {
+  level: [{ required: true, message: '请选择年级', trigger: 'change' }],
+  subjectId: [{ required: true, message: '请选择学科', trigger: 'change' }],
+  difficult: [{ required: true, message: '请选择难度', trigger: 'change' }],
+  score: [{ required: true, message: '请输入分数', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入题干', trigger: 'blur' }]
+}
+
+watch(answerValue, (val) => {
+  form.items[0].isAnswer = val === 1
+})
+
+const submitForm = () => {
+  formRef.value.validate((valid) => {
+    if (valid) {
+      formLoading.value = true
+      questionApi.edit(form).then(re => {
+        if (re.code === 1) {
+          ElMessage.success(re.message)
+          tagsViewStore.delVisitedView({ path: route.path }).then(() => {
+            router.push('/exam/question/list')
           })
         } else {
-          return false
+          ElMessage.error(re.message)
+          formLoading.value = false
         }
+      }).catch(() => {
+        formLoading.value = false
       })
-    },
-    resetForm () {
-      let lastId = this.form.id
-      this.$refs['form'].resetFields()
-      this.form = {
-        id: null,
-        questionType: 3,
-        gradeLevel: null,
-        subjectId: null,
-        title: '',
-        items: [
-          { id: null, prefix: 'A', content: '是' },
-          { id: null, prefix: 'B', content: '否' }
-        ],
-        analyze: '',
-        correct: '',
-        score: '',
-        difficult: 0
-      }
-      this.form.id = lastId
-    },
-    levelChange () {
-      this.form.subjectId = null
-      this.subjectFilter = this.subjects.filter(data => data.level === this.form.gradeLevel)
-    },
-    showQuestion () {
-      this.questionShow.dialog = true
-      this.questionShow.qType = this.form.questionType
-      this.questionShow.question = this.form
-    },
-    ...mapActions('exam', { initSubject: 'initSubject' }),
-    ...mapActions('tagsView', { delCurrentView: 'delCurrentView' })
-  },
-  computed: {
-    ...mapGetters('enumItem', ['enumFormat']),
-    ...mapState('enumItem', {
-      questionTypeEnum: state => state.exam.question.typeEnum,
-      levelEnum: state => state.user.levelEnum
-    }),
-    ...mapState('exam', { subjects: state => state.subjects })
-  }
+    }
+  })
 }
+
+const levelChange = () => {
+  form.subjectId = null
+  subjectFilter.value = examStore.subjects.filter(data => data.level === form.level)
+}
+
+const resetForm = () => {
+  const lastId = form.id
+  formRef.value.resetFields()
+  Object.assign(form, {
+    id: null,
+    level: null,
+    subjectId: null,
+    questionType: 4,
+    difficult: 1,
+    score: 2,
+    title: '',
+    items: [{ content: '', isAnswer: false }]
+  })
+  answerValue.value = 0
+  form.id = lastId
+}
+
+onMounted(() => {
+  examStore.initSubject(() => {
+    subjectFilter.value = examStore.subjects
+  })
+  
+  const id = route.query.id
+  if (id && parseInt(id) !== 0) {
+    formLoading.value = true
+    questionApi.select(id).then(re => {
+      Object.assign(form, re.response)
+      answerValue.value = form.items[0]?.isAnswer ? 1 : 0
+      formLoading.value = false
+    })
+  }
+})
 </script>

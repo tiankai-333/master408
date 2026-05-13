@@ -12,6 +12,7 @@ body {
   text-rendering: optimizeLegibility;
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
   background: #f5f7fb;
+  overflow-x: hidden;
 }
 
 label {
@@ -96,6 +97,12 @@ div:focus {
     clear: both;
     height: 0;
   }
+}
+
+.app-container {
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 20px;
 }
 
 aside {
