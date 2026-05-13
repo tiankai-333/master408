@@ -1,26 +1,57 @@
+## 分支管理规则
+
+### 1. 长期分支（始终保留）
+
+| 分支 | 用途 | 保护策略 |
+|------|------|---------|
+| `main` | 稳定生产分支，用于部署上线 | 🔒 禁止直接提交，必须通过 PR 合并 |
+| `dev` | 开发整合分支，用于日常集成 | ⚠️ 建议通过 PR 合并 |
+
+### 2. 短期分支（完成即删）
+
+| 分支前缀 | 用途 | 示例 |
+|----------|------|------|
+| `feature/*` | 新功能开发 | `feature/vue3-migration`、`feature/ai-analyze` |
+| `hotfix/*` | 紧急线上 bug 修复 | `hotfix/login-error` |
+| `refactor/*` | 代码重构 | `refactor/api-layer` |
+
+### 3. 工作流程（5人团队协作）
+
+```
+1. 从 dev 分支创建 feature 分支
+   git checkout dev
+   git checkout -b feature/my-feature
+
+2. 在 feature 分支开发，定期提交
+
+3. 开发完成后，提交 PR 合并回 dev
+
+4. 测试通过后，dev 合并到 main 发布
+```
+
+### 4. 当前活跃分支
+
+| 分支 | 状态 | 说明 |
+|------|------|------|
+| `main` | ✅ 稳定 | 最新稳定版 |
+| `dev` | ⚠️ 开发中 | 开发整合分支 |
+| `feature/vue3-migration` | 🚀 进行中 | Vue2 到 Vue3 的完整迁移 |
+
+---
+
 ## 更新日志
 
-### 最近更新（2026-05-06 15:27）
+### 最近更新（2026-05-14）
 
-本次合并了 `dev` 分支的最新改动到 `main` 分支，主要更新内容：
+**Vue3 迁移完成**
+- 🚀 前端框架升级：Vue2 → Vue3，vue-router3 → 4，Vuex → Pinia
+- 🔧 构建工具升级：vue-cli → Vite
+- 📝 完整迁移文档：`docs/Vue2ToVue3Migration.md`
+- 🗄️ 数据库增强：知识图谱、RAG 检索、AI 解析相关表设计
+- 🐛 问题修复：登录密码卡顿、侧边栏空白、页面溢出等问题
 
-**管理员前端（xzs-admin）更新**
-- 🎨 页面样式：更新登录页、仪表板页面样式
-- 🖼️ 资源文件：更新 favicon.ico、logo.png
-- 📦 依赖更新：更新 package-lock.json 和 package.json
-- 🎯 组件优化：调整导航栏、侧边栏 Logo、标签页组件
-- 🎭 样式统一：新增 element-ui.scss，更新全局样式变量和 SCSS 文件
-- 🔌 API 请求：优化 request.js 配置
-
-**学生端前端（xzs-student）更新**
-- 📦 依赖更新：更新 package-lock.json 和 package.json
-- 🖼️ 资源文件：更新 logo2.png
-- 🌐 页面配置：更新 index.html
-- 🔌 API 调整：修改 question.js
-
-**冲突解决**
-- ✅ 解决了 `package-lock.json` 冲突
-- ✅ 解决了 `src/layout/index.vue` 冲突
+**分支管理优化**
+- 📦 清理旧分支，采用规范的 Git Flow 分支策略
 
 ---
 
