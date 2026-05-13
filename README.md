@@ -55,6 +55,30 @@
 
 ---
 
+### 最近更新（2026-05-06 15:27）
+
+本次合并了 `dev` 分支的最新改动到 `main` 分支，主要更新内容：
+
+**管理员前端（xzs-admin）更新**
+- 🎨 页面样式：更新登录页、仪表板页面样式
+- 🖼️ 资源文件：更新 favicon.ico、logo.png
+- 📦 依赖更新：更新 package-lock.json 和 package.json
+- 🎯 组件优化：调整导航栏、侧边栏 Logo、标签页组件
+- 🎭 样式统一：新增 element-ui.scss，更新全局样式变量和 SCSS 文件
+- 🔌 API 请求：优化 request.js 配置
+
+**学生端前端（xzs-student）更新**
+- 📦 依赖更新：更新 package-lock.json 和 package.json
+- 🖼️ 资源文件：更新 logo2.png
+- 🌐 页面配置：更新 index.html
+- 🔌 API 调整：修改 question.js
+
+**冲突解决**
+- ✅ 解决了 `package-lock.json` 冲突
+- ✅ 解决了 `src/layout/index.vue` 冲突
+
+---
+
 ## 项目运行
 
 ### 1.0 下载
