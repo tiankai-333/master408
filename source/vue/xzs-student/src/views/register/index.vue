@@ -68,7 +68,7 @@
       </div>
 
       <div class="register-footer">
-        <span>Copyright ©2019-2026 武汉思维跳跃科技有限公司 版权所有</span>
+        <span>Open Source at: <a href="https://github.com/tiankai-333/master408" target="_blank" style="color: rgba(255, 255, 255, 0.8);">github.com/tiankai-333/master408</a> | 东华大学软工实训14小组</span>
       </div>
     </div>
 
