@@ -1,105 +1,147 @@
-# 数据库导出说明
+# 数据库说明
 
-## 导出信息
+## 基本信息
 
-- **导出日期**: 2026-05-15
 - **数据库名**: xzs
+- **字符集**: utf8mb4 / utf8mb4_unicode_ci
 - **MySQL 版本**: 8.0.36
-- **文件大小**: 98KB
-- **表数量**: 18
+
+## 快速导入（全新环境）
+
+```bash
+cd database
+mysql -u root -p123456 -e "CREATE DATABASE IF NOT EXISTS xzs DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci"
+python ../import_db.py
+```
+
+> **注意**：不要用 PowerShell 的 `Get-Content | mysql` 管道导入，会导致中文乱码。使用 `import_db.py` 脚本通过 pymysql 连接，保证 UTF-8 编码正确。
 
 ## 文件列表
 
-| 文件 | 说明 |
+| 文件 | 说明 | 执行顺序 |
+|------|------|---------|
+| `01_init_structure.sql` | 表结构（19 张表，从代码反推） | 1 |
+| `02_extend_fields.sql` | 408 真题扩展字段 | 2 |
+| `04_exam_data.sql` | 全量数据（由 `generate_sql.py` 生成） | 3 |
+| `xzs-20260515.sql` | 完整数据库备份（参考用） | - |
+
+## 数据统计
+
+| 数据 | 数量 |
 |------|------|
-| `xzs-20260515.sql` | 完整数据库导出（含表结构和数据） |
+| 选择题 | 616 道（2011-2024） |
+| 综合应用题 | 98 道（2011-2024） |
+| 试卷 | 14 份（2011-2024） |
+| 科目 | 4 个（数据结构、计组、OS、网络） |
+| 用户 | 4 个（admin/student/teacher/231310423） |
+| 知识标签 | 658 道 100% 覆盖 |
+| 文本内容 | 728 条（题目内容 + 试卷框架） |
 
-## 导入步骤
+## 表结构来源
 
-### 方法一：MySQL 命令行
+所有表结构从以下代码反推，保证与代码 100% 一致：
 
-```bash
-# 登录 MySQL
-mysql -u root -p
+- `source/xzs/src/main/resources/mapper/*.xml`（19 个 Mapper XML）
+- `source/xzs/src/main/java/com/mindskip/xzs/domain/*.java`（16 个 Domain 类）
 
-# 创建数据库（如果不存在）
-CREATE DATABASE xzs DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+## 核心表说明
 
-# 退出 MySQL
-exit;
+### t_question（题目表）
 
-# 导入数据
-mysql -u root -p xzs < xzs-20260515.sql
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | int | 主键 |
+| `question_type` | int | 1=单选, 2=多选, 3=判断, 4=填空, 5=综合应用题 |
+| `subject_id` | int | 科目 ID（1=DS, 2=CO, 3=OS, 4=CN） |
+| `score` | int | 分数 × 10（2 分存为 20，10 分存为 100） |
+| `correct` | varchar(255) | 正确答案（选择题 A/B/C/D） |
+| `info_text_content_id` | int | 指向 t_text_content（题目内容 JSON） |
+| `source` | varchar(100) | 来源（如 `2024年408真题`） |
+| `source_year` | int | 来源年份 |
+| `source_question_no` | int | 原始题号（1-47） |
+| `tags` | text | 知识标签，逗号分隔 |
+
+### t_text_content（文本内容表）
+
+存储题目内容和试卷框架，以 JSON 格式。
+
+**题目内容格式**（对应 QuestionObject.java）：
+```json
+{
+  "titleContent": "题干文本",
+  "analyze": "解析文本",
+  "questionItemObjects": [
+    {"prefix": "A", "content": "选项内容", "itemUuid": "xxx"}
+  ]
+}
 ```
 
-### 方法二：Navicat 或其他 GUI 工具
+**试卷框架格式**（对应 ExamPaperTitleItemObject.java）：
+```json
+[
+  {
+    "name": "一、单项选择题（数据结构，1-10题，每题2分）",
+    "questionItems": [{"id": 1, "itemOrder": 1}]
+  }
+]
+```
 
-1. 打开 Navicat，连接到本地 MySQL
-2. 新建数据库 `xzs`，字符集选 `utf8mb4`，排序规则选 `utf8mb4_unicode_ci`
-3. 右键数据库 → 运行 SQL 文件
-4. 选择 `xzs-20260515.sql`
-5. 点击开始，等待导入完成
+### t_exam_paper（试卷表）
 
-### 方法三：MySQL Workbench
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `paper_type` | int | 1=固定试卷, 4=时段试卷, 6=任务试卷 |
+| `score` | int | 总分 × 10（150 分存为 1500） |
+| `frame_text_content_id` | int | 指向 t_text_content（试卷框架 JSON） |
+| `source_year` | int | 来源年份 |
 
-1. 打开 MySQL Workbench，连接到本地 MySQL
-2. Server → Data Import
-3. 选择 `Import from Self-Contained File`
-4. 选择 `xzs-20260515.sql`
-5. 目标 Schema 选择 `xzs`（没有就新建）
-6. 点击 `Start Import`
+### t_subject（科目表）
 
-## 数据库配置
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | int | 1=数据结构, 2=计组, 3=OS, 4=网络 |
+| `level` | int | 年级（已废弃，不再使用） |
+| `deleted` | bit(1) | 软删除 |
 
-项目中使用的数据库配置（`application-dev.yml`）：
+### knowledge_point（知识点表）
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/xzs?useSSL=false&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&allowMultiQueries=true&connectionCollation=utf8mb4_unicode_ci
-    username: root
-    password: 123456
+注意：表名无 `t_` 前缀，与 Mapper XML 一致。
+
+### question_knowledge_point（题目-知识点关联表）
+
+注意：表名无 `t_` 前缀，与 Mapper XML 一致。
+
+## 分数存储机制
+
+xzs 系统中分数以**整数存储**（实际分值 × 10），避免浮点精度问题：
+
+| 实际分值 | 数据库存储 | 前端显示 |
+|---------|-----------|---------|
+| 2 分 | 20 | `ExamUtil.scoreToVM(20)` → "2" |
+| 10 分 | 100 | `ExamUtil.scoreToVM(100)` → "10" |
+| 150 分 | 1500 | `ExamUtil.scoreToVM(1500)` → "150" |
+
+## 常用账号
+
+| 用户名 | 密码 | 角色 |
+|--------|------|------|
+| admin | 123456 | 管理员 |
+| student | 123456 | 学生 |
+| teacher | 123456 | 教师 |
+| 231310423 | 123456 | 学生（测试） |
+
+## 验证数据
+
+```sql
+SELECT question_type, COUNT(*) FROM t_question GROUP BY question_type;
+SELECT source, COUNT(*) FROM t_question GROUP BY source;
+SELECT id, name, score FROM t_exam_paper LIMIT 5;
 ```
 
 ## 注意事项
 
-1. **字符集**: 请确保数据库字符集为 `utf8mb4`，否则中文可能乱码
-2. **权限**: 确保用户有创建表和插入数据的权限
-3. **外键**: SQL 文件已临时关闭外键检查，导入时不会有外键冲突问题
-4. **存储过程/触发器**: 已包含存储过程和触发器的导出
-
-## 包含的表
-
-数据库包含以下表（共 18 个）：
-
-- 用户相关: t_user, t_user_token, t_user_event_log
-- 题目相关: t_question, t_question_type
-- 试卷相关: t_exam_paper, t_exam_paper_type, t_text_content
-- 答题记录: t_exam_paper_answer, t_exam_paper_question_customer_answer
-- 作业相关: t_task_exam, t_task_exam_customer_answer
-- 消息相关: t_message, t_message_user
-- 其他: t_subject, t_dict
-- AI 相关: t_ai_adjustment_log, t_ai_knowledge_base, t_ai_prompt_template, t_ai_usage_record
-
-## 常用账号
-
-### 管理员账号
-- 用户名: admin
-- 密码: 123456
-
-### 学生账号
-- 用户名: student
-- 密码: 123456
-
-（如有其他账号，请自行查看 t_user 表）
-
-## 数据库更新说明
-
-如需更新数据库，请：
-
-1. 修改数据库
-2. 重新导出：
-   ```bash
-   mysqldump -u root -p123456 --default-character-set=utf8mb4 --routines --triggers xzs > xzs-YYYYMMDD.sql
-   ```
-3. 提交新的 SQL 文件到版本控制
+1. `knowledge_point` 和 `question_knowledge_point` 表名无 `t_` 前缀（与 Mapper XML 一致）
+2. `paper_type` 和 `question_type` 是 `int` 类型（不是 varchar）
+3. 用户密码使用 BCrypt 加密
+4. `t_text_content.content` 实际是 TEXT 类型（存储 JSON）
+5. **导入数据必须用 `import_db.py`**，不要用 PowerShell 管道（会乱码）

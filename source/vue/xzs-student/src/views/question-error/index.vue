@@ -150,9 +150,9 @@ const analyzeQuestion = () => {
   const answer = selectItem.value.answerItem
   let options = ''
   if (question.items && Array.isArray(question.items)) {
-    options = question.items.map((item, index) => String.fromCharCode(65 + index) + '. ' + item.content).join('\n')
+    options = question.items.map(item => (item.prefix ? item.prefix + '. ' : '') + item.content).join('\n')
   }
-  let correctAnswer = answer && answer.correct ? answer.correct : ''
+  let correctAnswer = question.correct || (answer && answer.correct ? answer.correct : '')
   let questionType = ''
   switch (question.questionType) {
     case 1: questionType = '单选题'; break
@@ -162,7 +162,8 @@ const analyzeQuestion = () => {
     case 5: questionType = '简答题'; break
     default: questionType = '未知'
   }
-  questionApi.analyzeQuestion({ questionType, questionContent: question.content || question.title || '', options, correctAnswer, style: selectedStyle.value }).then(response => {
+  const titleContent = question.title || question.titleContent || question.content || ''
+  questionApi.analyzeQuestion({ questionType, questionContent: titleContent, options, correctAnswer, style: selectedStyle.value }).then(response => {
     if (response.code === 1 && response.response) {
       aiAnalysisResult.value = {
         content: response.response,

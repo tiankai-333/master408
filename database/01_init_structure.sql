@@ -1,222 +1,439 @@
 -- ============================================
--- 初始化SQL (1) - 数据库表结构初始化
+-- 01_init_structure.sql
+-- 从代码反推的表结构（Mapper XML + Domain Java）
+-- 适用于 master408 智能考试系统
 -- ============================================
 
--- 创建数据库（如果不存在）
-CREATE DATABASE IF NOT EXISTS xzs DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE xzs;
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- ============================================
--- 1. 用户表 t_user
--- ============================================
-DROP TABLE IF EXISTS `t_user`;
-CREATE TABLE `t_user` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `username` varchar(50) NOT NULL COMMENT '用户名/学号',
-  `password` varchar(100) NOT NULL COMMENT '密码',
-  `real_name` varchar(50) NOT NULL COMMENT '真实姓名',
-  `phone` varchar(20) DEFAULT '' COMMENT '手机号',
-  `email` varchar(100) DEFAULT '' COMMENT '邮箱',
-  `school` varchar(100) DEFAULT '' COMMENT '学校',
-  `major` varchar(100) DEFAULT '' COMMENT '专业',
-  `grade` varchar(20) DEFAULT '' COMMENT '年级',
-  `class_name` varchar(50) DEFAULT '' COMMENT '班级',
-  `gender` varchar(10) DEFAULT '' COMMENT '性别',
-  `birthday` date DEFAULT NULL COMMENT '出生日期',
-  `avatar` varchar(255) DEFAULT '' COMMENT '头像URL',
-  `status` int DEFAULT '1' COMMENT '状态 1-正常 0-禁用',
-  `role` varchar(20) DEFAULT 'student' COMMENT '角色 student/teacher/admin',
-  `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
-  `last_login_ip` varchar(50) DEFAULT '' COMMENT '最后登录IP',
-  `total_login_count` int DEFAULT '0' COMMENT '累计登录次数',
-  `create_user` int DEFAULT '1' COMMENT '创建用户ID',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) DEFAULT b'0' COMMENT '删除标记',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_username` (`username`),
-  KEY `idx_status` (`status`),
-  KEY `idx_role` (`role`),
-  KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
-
--- ============================================
--- 2. 学科表 t_subject
--- ============================================
-DROP TABLE IF EXISTS `t_subject`;
-CREATE TABLE `t_subject` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '学科ID',
-  `name` varchar(50) NOT NULL COMMENT '学科名称',
-  `code` varchar(20) NOT NULL COMMENT '学科代码',
-  `description` varchar(500) DEFAULT '' COMMENT '学科描述',
-  `icon` varchar(255) DEFAULT '' COMMENT '图标',
-  `sort` int DEFAULT '0' COMMENT '排序',
-  `enabled` bit(1) DEFAULT b'1' COMMENT '是否启用',
-  `create_user` int DEFAULT '1' COMMENT '创建用户ID',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_enabled` (`enabled`),
-  KEY `idx_sort` (`sort`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='学科表';
-
--- ============================================
--- 3. 题目表 t_question
--- ============================================
+DROP TABLE IF EXISTS `t_exam_paper_question_customer_answer`;
+DROP TABLE IF EXISTS `t_exam_paper_answer`;
+DROP TABLE IF EXISTS `t_task_exam_customer_answer`;
+DROP TABLE IF EXISTS `t_user_event_log`;
+DROP TABLE IF EXISTS `t_user_token`;
+DROP TABLE IF EXISTS `t_message_user`;
+DROP TABLE IF EXISTS `t_message`;
+DROP TABLE IF EXISTS `t_exam_paper`;
 DROP TABLE IF EXISTS `t_question`;
+DROP TABLE IF EXISTS `t_text_content`;
+DROP TABLE IF EXISTS `t_subject`;
+DROP TABLE IF EXISTS `t_task_exam`;
+DROP TABLE IF EXISTS `t_user`;
+DROP TABLE IF EXISTS `question_knowledge_point`;
+DROP TABLE IF EXISTS `knowledge_point`;
+DROP TABLE IF EXISTS `t_ai_usage_log`;
+DROP TABLE IF EXISTS `t_ai_prompt_template`;
+DROP TABLE IF EXISTS `t_ai_knowledge_base`;
+DROP TABLE IF EXISTS `t_ai_adjustment_log`;
+
+-- ============================================
+-- 1. t_user 用户表
+-- Mapper: UserMapper.xml | Domain: User.java
+-- ============================================
+CREATE TABLE `t_user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_uuid` varchar(36) DEFAULT NULL,
+  `user_name` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `real_name` varchar(255) DEFAULT NULL,
+  `age` int DEFAULT NULL,
+  `sex` int DEFAULT NULL,
+  `birth_day` datetime DEFAULT NULL,
+  `user_level` int DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `role` int NOT NULL DEFAULT 1,
+  `status` int NOT NULL DEFAULT 1,
+  `image_path` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modify_time` datetime DEFAULT NULL,
+  `last_active_time` datetime DEFAULT NULL,
+  `deleted` bit(1) DEFAULT b'0',
+  `wx_open_id` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_name` (`user_name`),
+  KEY `idx_role` (`role`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 2. t_subject 科目表
+-- Mapper: SubjectMapper.xml | Domain: Subject.java
+-- ============================================
+CREATE TABLE `t_subject` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `level` int DEFAULT NULL,
+  `level_name` varchar(255) DEFAULT NULL,
+  `item_order` int DEFAULT NULL,
+  `deleted` bit(1) DEFAULT b'0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 3. t_text_content 文本内容表
+-- Mapper: TextContentMapper.xml | Domain: TextContent.java
+-- 注意: Mapper 标注 VARCHAR 但实际存储 JSON 长文本，用 TEXT
+-- ============================================
+CREATE TABLE `t_text_content` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `content` text,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 4. t_question 题目表
+-- Mapper: QuestionMapper.xml | Domain: Question.java
+-- ============================================
 CREATE TABLE `t_question` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '题目ID',
-  `subject_id` int NOT NULL COMMENT '学科ID',
-  `question_type` varchar(20) NOT NULL DEFAULT 'choice' COMMENT '题目类型 choice-选择题 multi_choice-多选题 judge-判断题',
-  `title` text NOT NULL COMMENT '题目内容/题干',
-  `options` text COMMENT '选项 JSON格式 [{"key":"A","value":"...","image":""}]',
-  `correct_answer` varchar(10) NOT NULL COMMENT '正确答案',
-  `analysis` text COMMENT '答案解析',
-  `difficulty` int DEFAULT '2' COMMENT '难度 1-简单 2-中等 3-困难',
-  `score` int DEFAULT '2' COMMENT '分值',
-  `knowledge_point` varchar(200) DEFAULT '' COMMENT '知识点',
-  `source` varchar(100) DEFAULT '' COMMENT '来源 如: 2011年真题',
-  `source_year` int DEFAULT NULL COMMENT '来源年份',
-  `source_question_no` int DEFAULT NULL COMMENT '来源题号',
-  `tags` varchar(255) DEFAULT '' COMMENT '标签',
-  `images` text COMMENT '图片路径，多个用逗号分隔',
-  `total_count` int DEFAULT '0' COMMENT '作答总次数',
-  `correct_count` int DEFAULT '0' COMMENT '答对次数',
-  `error_count` int DEFAULT '0' COMMENT '答错次数',
-  `avg_score` decimal(5,2) DEFAULT '0.00' COMMENT '平均得分率',
-  `status` int DEFAULT '1' COMMENT '状态 1-启用 0-禁用',
-  `create_user` int DEFAULT '1' COMMENT '创建用户ID',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) DEFAULT b'0' COMMENT '删除标记',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question_type` int NOT NULL DEFAULT 1,
+  `subject_id` int NOT NULL,
+  `score` int DEFAULT NULL,
+  `grade_level` int DEFAULT NULL,
+  `difficult` int DEFAULT NULL,
+  `correct` varchar(255) DEFAULT NULL,
+  `info_text_content_id` int DEFAULT NULL,
+  `create_user` int DEFAULT NULL,
+  `status` int NOT NULL DEFAULT 1,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `deleted` bit(1) DEFAULT b'0',
   PRIMARY KEY (`id`),
   KEY `idx_subject_id` (`subject_id`),
   KEY `idx_question_type` (`question_type`),
-  KEY `idx_difficulty` (`difficulty`),
-  KEY `idx_status` (`status`),
-  KEY `idx_source_year` (`source_year`),
-  KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='题目表';
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 4. 试卷表 t_exam_paper
+-- 5. t_exam_paper 试卷表
+-- Mapper: ExamPaperMapper.xml | Domain: ExamPaper.java
 -- ============================================
-DROP TABLE IF EXISTS `t_exam_paper`;
 CREATE TABLE `t_exam_paper` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '试卷ID',
-  `name` varchar(200) NOT NULL COMMENT '试卷名称',
-  `subject_id` int NOT NULL COMMENT '学科ID',
-  `paper_type` varchar(20) NOT NULL DEFAULT 'year_paper' COMMENT '试卷类型 year_paper-年真题卷 chapter_paper-章节卷 mock_paper-模拟卷',
-  `source_year` int DEFAULT NULL COMMENT '真题年份',
-  `total_score` int DEFAULT '100' COMMENT '总分',
-  `pass_score` int DEFAULT '60' COMMENT '及格分数',
-  `duration` int DEFAULT '120' COMMENT '考试时长(分钟)',
-  `question_count` int DEFAULT '0' COMMENT '题目数量',
-  `description` text COMMENT '试卷说明',
-  `suggestion` text COMMENT '复习建议',
-  `difficulty` int DEFAULT '2' COMMENT '难度系数 1-简单 2-中等 3-困难',
-  `total_count` int DEFAULT '0' COMMENT '考试总人次',
-  `avg_score` decimal(5,2) DEFAULT '0.00' COMMENT '平均分',
-  `max_score` decimal(5,2) DEFAULT '0.00' COMMENT '最高分',
-  `min_score` decimal(5,2) DEFAULT '0.00' COMMENT '最低分',
-  `status` int DEFAULT '1' COMMENT '状态 1-启用 0-禁用',
-  `create_user` int DEFAULT '1' COMMENT '创建用户ID',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` bit(1) DEFAULT b'0' COMMENT '删除标记',
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `subject_id` int DEFAULT NULL,
+  `paper_type` int NOT NULL DEFAULT 1,
+  `grade_level` int DEFAULT NULL,
+  `score` int DEFAULT NULL,
+  `question_count` int DEFAULT NULL,
+  `suggest_time` int DEFAULT NULL,
+  `limit_start_time` datetime DEFAULT NULL,
+  `limit_end_time` datetime DEFAULT NULL,
+  `frame_text_content_id` int DEFAULT NULL,
+  `create_user` int DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `deleted` bit(1) DEFAULT b'0',
+  `task_exam_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_subject_id` (`subject_id`),
   KEY `idx_paper_type` (`paper_type`),
-  KEY `idx_source_year` (`source_year`),
-  KEY `idx_status` (`status`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='试卷表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 5. 试卷题目关联表 t_exam_paper_question
+-- 6. t_task_exam 任务考试表
+-- Mapper: TaskExamMapper.xml | Domain: TaskExam.java
 -- ============================================
-DROP TABLE IF EXISTS `t_exam_paper_question`;
-CREATE TABLE `t_exam_paper_question` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `exam_paper_id` int NOT NULL COMMENT '试卷ID',
-  `question_id` int NOT NULL COMMENT '题目ID',
-  `question_no` int NOT NULL COMMENT '题号',
-  `score` int NOT NULL DEFAULT '2' COMMENT '分值',
-  `sort` int DEFAULT '0' COMMENT '排序',
+CREATE TABLE `t_task_exam` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `grade_level` int DEFAULT NULL,
+  `frame_text_content_id` int DEFAULT NULL,
+  `create_user` int DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `deleted` bit(1) DEFAULT b'0',
+  `create_user_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 7. t_exam_paper_answer 试卷答题记录表
+-- Mapper: ExamPaperAnswerMapper.xml | Domain: ExamPaperAnswer.java
+-- ============================================
+CREATE TABLE `t_exam_paper_answer` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `exam_paper_id` int DEFAULT NULL,
+  `paper_name` varchar(255) DEFAULT NULL,
+  `paper_type` int DEFAULT NULL,
+  `subject_id` int DEFAULT NULL,
+  `system_score` int DEFAULT NULL,
+  `user_score` int DEFAULT NULL,
+  `paper_score` int DEFAULT NULL,
+  `question_correct` int DEFAULT NULL,
+  `question_count` int DEFAULT NULL,
+  `do_time` int DEFAULT NULL,
+  `status` int DEFAULT NULL,
+  `create_user` int DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `task_exam_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_exam_paper_id` (`exam_paper_id`),
+  KEY `idx_create_user` (`create_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 8. t_exam_paper_question_customer_answer 答题详情表
+-- Mapper: ExamPaperQuestionCustomerAnswerMapper.xml
+-- Domain: ExamPaperQuestionCustomerAnswer.java
+-- ============================================
+CREATE TABLE `t_exam_paper_question_customer_answer` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question_id` int DEFAULT NULL,
+  `exam_paper_id` int DEFAULT NULL,
+  `exam_paper_answer_id` int DEFAULT NULL,
+  `question_type` int DEFAULT NULL,
+  `subject_id` int DEFAULT NULL,
+  `customer_score` int DEFAULT NULL,
+  `question_score` int DEFAULT NULL,
+  `question_text_content_id` int DEFAULT NULL,
+  `answer` varchar(255) DEFAULT NULL,
+  `text_content_id` int DEFAULT NULL,
+  `do_right` bit(1) DEFAULT NULL,
+  `create_user` int DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `item_order` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_exam_paper_answer_id` (`exam_paper_answer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 9. t_task_exam_customer_answer 任务考试答题表
+-- Mapper: TaskExamCustomerAnswerMapper.xml
+-- Domain: TaskExamCustomerAnswer.java
+-- ============================================
+CREATE TABLE `t_task_exam_customer_answer` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `task_exam_id` int DEFAULT NULL,
+  `create_user` int DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `text_content_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 10. t_message 消息表
+-- Mapper: MessageMapper.xml | Domain: Message.java
+-- ============================================
+CREATE TABLE `t_message` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `content` varchar(500) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `send_user_id` int DEFAULT NULL,
+  `send_user_name` varchar(255) DEFAULT NULL,
+  `send_real_name` varchar(255) DEFAULT NULL,
+  `receive_user_count` int DEFAULT NULL,
+  `read_count` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 11. t_message_user 消息用户关联表
+-- Mapper: MessageUserMapper.xml | Domain: MessageUser.java
+-- ============================================
+CREATE TABLE `t_message_user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `message_id` int DEFAULT NULL,
+  `receive_user_id` int DEFAULT NULL,
+  `receive_user_name` varchar(255) DEFAULT NULL,
+  `receive_real_name` varchar(255) DEFAULT NULL,
+  `readed` bit(1) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `read_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_message_id` (`message_id`),
+  KEY `idx_receive_user_id` (`receive_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 12. t_user_event_log 用户事件日志表
+-- Mapper: UserEventLogMapper.xml | Domain: UserEventLog.java
+-- ============================================
+CREATE TABLE `t_user_event_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `user_name` varchar(255) DEFAULT NULL,
+  `real_name` varchar(255) DEFAULT NULL,
+  `content` text,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 13. t_user_token 用户Token表
+-- Mapper: UserTokenMapper.xml | Domain: UserToken.java
+-- ============================================
+CREATE TABLE `t_user_token` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `token` varchar(36) DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `wx_open_id` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `user_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_token` (`token`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 14. knowledge_point 知识点表
+-- Mapper: KnowledgePointMapper.xml | Domain: KnowledgePoint.java
+-- 注意: 表名无 t_ 前缀，与 Mapper 一致
+-- ============================================
+CREATE TABLE `knowledge_point` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `subject_id` int NOT NULL,
+  `parent_id` int DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `level` int DEFAULT NULL,
+  `sort_order` int DEFAULT 0,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `deleted` bit(1) DEFAULT b'0',
+  PRIMARY KEY (`id`),
+  KEY `idx_subject_id` (`subject_id`),
+  KEY `idx_parent_id` (`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 15. question_knowledge_point 题目-知识点关联表
+-- Mapper: QuestionKnowledgePointMapper.xml
+-- Domain: QuestionKnowledgePoint.java
+-- 注意: 表名无 t_ 前缀，与 Mapper 一致
+-- ============================================
+CREATE TABLE `question_knowledge_point` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question_id` int NOT NULL,
+  `knowledge_point_id` int NOT NULL,
+  `relevance` decimal(3,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `idx_question_id` (`question_id`),
-  UNIQUE KEY `uk_paper_question` (`exam_paper_id`, `question_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='试卷题目关联表';
+  KEY `idx_knowledge_point_id` (`knowledge_point_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 6. 学生答题记录表 t_student_answer
+-- 16. t_ai_usage_log AI使用日志表
+-- Mapper: AiUsageLogMapper.xml | Domain: AiUsageLog.java
 -- ============================================
-DROP TABLE IF EXISTS `t_student_answer`;
-CREATE TABLE `t_student_answer` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '记录ID',
-  `exam_paper_id` int NOT NULL COMMENT '试卷ID',
-  `question_id` int NOT NULL COMMENT '题目ID',
-  `user_id` int NOT NULL COMMENT '用户ID',
-  `answer` varchar(500) DEFAULT '' COMMENT '学生答案',
-  `correct_answer` varchar(10) NOT NULL COMMENT '正确答案',
-  `is_correct` bit(1) DEFAULT b'0' COMMENT '是否正确',
-  `score` int DEFAULT '0' COMMENT '得分',
-  `answer_time` int DEFAULT '0' COMMENT '答题时长(秒)',
-  `ip_address` varchar(50) DEFAULT '' COMMENT 'IP地址',
-  `client_type` varchar(20) DEFAULT 'web' COMMENT '客户端类型 web/app/wechat',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '作答时间',
+CREATE TABLE `t_ai_usage_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `template_id` int DEFAULT NULL,
+  `style` varchar(50) NOT NULL,
+  `ai_type` varchar(20) DEFAULT '',
+  `model` varchar(50) DEFAULT '',
+  `question` text NOT NULL,
+  `knowledge_points` text,
+  `knowledge_base_ids` varchar(255) DEFAULT '',
+  `prompt` text,
+  `response` text,
+  `response_length` int DEFAULT 0,
+  `tokens_used` int DEFAULT 0,
+  `cost` decimal(10,4) DEFAULT 0.0000,
+  `duration_ms` int DEFAULT 0,
+  `success` tinyint(1) DEFAULT 1,
+  `error_message` text,
+  `user_rating` int DEFAULT 0,
+  `user_feedback` text,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_exam_paper_id` (`exam_paper_id`),
-  KEY `idx_question_id` (`question_id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_is_correct` (`is_correct`),
+  KEY `idx_template_id` (`template_id`),
+  KEY `idx_style` (`style`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='学生答题记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 7. 学生考试记录表 t_exam_record
+-- 17. t_ai_knowledge_base AI知识库表
+-- Mapper: AiKnowledgeBaseMapper.xml | Domain: AiKnowledgeBase.java
 -- ============================================
-DROP TABLE IF EXISTS `t_exam_record`;
-CREATE TABLE `t_exam_record` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '记录ID',
-  `exam_paper_id` int NOT NULL COMMENT '试卷ID',
-  `user_id` int NOT NULL COMMENT '用户ID',
-  `score` int DEFAULT '0' COMMENT '得分',
-  `total_score` int DEFAULT '100' COMMENT '总分',
-  `correct_count` int DEFAULT '0' COMMENT '答对题数',
-  `total_count` int DEFAULT '0' COMMENT '总题数',
-  `duration` int DEFAULT '0' COMMENT '考试时长(分钟)',
-  `score_rate` decimal(5,2) DEFAULT '0.00' COMMENT '得分率',
-  `status` varchar(20) DEFAULT 'completed' COMMENT '状态 completed-已完成 submitted-已提交 grading-批改中',
-  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
-  `submit_time` datetime DEFAULT NULL COMMENT '提交时间',
-  `ip_address` varchar(50) DEFAULT '' COMMENT 'IP地址',
-  `client_type` varchar(20) DEFAULT 'web' COMMENT '客户端类型',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+CREATE TABLE `t_ai_knowledge_base` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `category` varchar(50) NOT NULL,
+  `domain` varchar(50) NOT NULL,
+  `sub_domain` varchar(50) DEFAULT '',
+  `title` varchar(200) NOT NULL,
+  `keywords` varchar(255) DEFAULT '',
+  `content` text NOT NULL,
+  `source_type` varchar(50) DEFAULT '',
+  `source_name` varchar(200) DEFAULT '',
+  `source_author` varchar(100) DEFAULT '',
+  `core_concepts` text,
+  `application_scenarios` text,
+  `examples` text,
+  `enabled` tinyint(1) DEFAULT 1,
+  `priority` int DEFAULT 0,
+  `usage_count` int DEFAULT 0,
+  `create_user` int DEFAULT 1,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted` bit(1) DEFAULT b'0',
   PRIMARY KEY (`id`),
-  KEY `idx_exam_paper_id` (`exam_paper_id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_status` (`status`),
+  KEY `idx_category` (`category`),
+  KEY `idx_domain` (`domain`),
+  KEY `idx_enabled` (`enabled`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 18. t_ai_prompt_template AI提示词模板表
+-- Mapper: AiPromptTemplateMapper.xml | Domain: AiPromptTemplate.java
+-- ============================================
+CREATE TABLE `t_ai_prompt_template` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `style` varchar(50) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `icon` varchar(255) DEFAULT NULL,
+  `system_prompt` text,
+  `user_prompt_template` text,
+  `knowledge_base_ids` varchar(500) DEFAULT NULL,
+  `reference_materials` text,
+  `variables` varchar(500) DEFAULT NULL,
+  `output_format` varchar(200) DEFAULT NULL,
+  `temperature` decimal(3,2) DEFAULT 0.70,
+  `max_tokens` int DEFAULT 2000,
+  `enabled` tinyint(1) DEFAULT 1,
+  `is_default` tinyint(1) DEFAULT 0,
+  `usage_count` int DEFAULT 0,
+  `rating_sum` int DEFAULT 0,
+  `rating_count` int DEFAULT 0,
+  `create_user` int DEFAULT 1,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted` bit(1) DEFAULT b'0',
+  PRIMARY KEY (`id`),
+  KEY `idx_style` (`style`),
+  KEY `idx_enabled` (`enabled`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 19. t_ai_adjustment_log AI调整日志表
+-- Mapper: AiAdjustmentLogMapper.xml | Domain: AiAdjustmentLog.java
+-- ============================================
+CREATE TABLE `t_ai_adjustment_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `template_id` int DEFAULT NULL,
+  `style` varchar(50) DEFAULT NULL,
+  `adjustment_type` varchar(50) DEFAULT NULL,
+  `before_content` text,
+  `after_content` text,
+  `adjustment_reason` text,
+  `adjustment_details` text,
+  `test_result` text,
+  `test_question` text,
+  `test_feedback` text,
+  `rating` int DEFAULT NULL,
+  `status` int DEFAULT NULL,
+  `approver_id` int DEFAULT NULL,
+  `approve_time` datetime DEFAULT NULL,
+  `approve_comment` text,
+  `create_user` int DEFAULT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `ip_address` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_template_id` (`template_id`),
   KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='学生考试记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================
--- 插入基础数据
--- ============================================
-
--- 插入学科数据
-INSERT INTO `t_subject` (`id`, `name`, `code`, `description`, `sort`, `enabled`) VALUES
-(1, '数据结构', 'DS', '计算机专业基础课程，主要包括线性表、栈、队列、树、图等数据结构', 1, 1),
-(2, '计算机组成原理', 'CO', '计算机系统组成和工作原理，包括数据表示、运算器、存储器、指令系统等', 2, 1),
-(3, '操作系统', 'OS', '操作系统原理，包括进程管理、存储管理、文件管理、设备管理等', 3, 1),
-(4, '计算机网络', 'CN', '计算机网络原理，包括网络体系结构、物理层、数据链路层、网络层等', 4, 1);
-
--- 插入测试用户
-INSERT INTO `t_user` (`id`, `username`, `password`, `real_name`, `phone`, `email`, `status`, `role`) VALUES
-(1, 'admin', '123456', '管理员', '13800138000', 'admin@example.com', 1, 'admin'),
-(2, 'teacher', '123456', '教师用户', '13800138001', 'teacher@example.com', 1, 'teacher');
-
--- ============================================
--- 初始化完成
--- ============================================
+SET FOREIGN_KEY_CHECKS = 1;
