@@ -53,7 +53,7 @@ CREATE TABLE `t_text_content` (
 DROP TABLE IF EXISTS `t_question`;
 CREATE TABLE `t_question` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT '题目ID',
-  `question_type` int NULL DEFAULT NULL COMMENT '题型：1=单选, 2=多选, 3=判断, 4=填空, 5=简答',
+  `question_type` int NULL DEFAULT NULL COMMENT '题型：1=单选, 2=简答',
   `subject_id` int NULL DEFAULT NULL COMMENT '学科ID',
   `score` int NULL DEFAULT NULL COMMENT '分值',
   `grade_level` int NULL DEFAULT NULL COMMENT '年级等级',

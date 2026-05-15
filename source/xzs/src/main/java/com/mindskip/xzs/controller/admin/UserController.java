@@ -148,4 +148,18 @@ public class UserController extends BaseApiController {
         return RestResponse.ok(keyValues);
     }
 
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+    public RestResponse<String> resetPassword(@RequestParam String userName, @RequestParam String password) {
+        User user = userService.getUserByUserName(userName);
+        if (user == null) {
+            return new RestResponse<>(1, "用户不存在");
+        }
+        org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder = 
+            new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+        user.setPassword(encoder.encode(password));
+        user.setModifyTime(new Date());
+        userService.updateByIdFilter(user);
+        return RestResponse.ok("密码已重置为: " + password);
+    }
+
 }
