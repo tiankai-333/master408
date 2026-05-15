@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.AiPromptTemplateMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.ai.AiPromptTemplate">
+        <id column="id" property="id"/>
+        <result column="style" property="style"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="icon" property="icon"/>
+        <result column="system_prompt" property="systemPrompt"/>
+        <result column="user_prompt_template" property="userPromptTemplate"/>
+        <result column="knowledge_base_ids" property="knowledgeBaseIds"/>
+        <result column="reference_materials" property="referenceMaterials"/>
+        <result column="variables" property="variables"/>
+        <result column="output_format" property="outputFormat"/>
+        <result column="temperature" property="temperature"/>
+        <result column="max_tokens" property="maxTokens"/>
+        <result column="enabled" property="enabled"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="usage_count" property="usageCount"/>
+        <result column="rating_sum" property="ratingSum"/>
+        <result column="rating_count" property="ratingCount"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_prompt_template WHERE deleted = b'0' ORDER BY create_time DESC
+    </select>
+
+    <select id="selectEnabled" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_prompt_template WHERE deleted = b'0' AND enabled = 1 ORDER BY usage_count DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_prompt_template WHERE id = #{id}
+    </select>
+
+    <select id="selectByStyle" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_prompt_template WHERE style = #{style} AND deleted = b'0'
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiPromptTemplate" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_ai_prompt_template (
+            style, name, description, icon, system_prompt, user_prompt_template,
+            knowledge_base_ids, reference_materials, variables, output_format,
+            temperature, max_tokens, enabled, is_default, usage_count,
+            rating_sum, rating_count, create_user, create_time, update_time, deleted
+        ) VALUES (
+            #{style}, #{name}, #{description}, #{icon}, #{systemPrompt}, #{userPromptTemplate},
+            #{knowledgeBaseIds}, #{referenceMaterials}, #{variables}, #{outputFormat},
+            #{temperature}, #{maxTokens}, #{enabled}, #{isDefault}, #{usageCount},
+            #{ratingSum}, #{ratingCount}, #{createUser}, #{createTime}, #{updateTime}, #{deleted}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.mindskip.xzs.domain.ai.AiPromptTemplate">
+        UPDATE t_ai_prompt_template SET
+            style = #{style},
+            name = #{name},
+            description = #{description},
+            icon = #{icon},
+            system_prompt = #{systemPrompt},
+            user_prompt_template = #{userPromptTemplate},
+            knowledge_base_ids = #{knowledgeBaseIds},
+            reference_materials = #{referenceMaterials},
+            variables = #{variables},
+            output_format = #{outputFormat},
+            temperature = #{temperature},
+            max_tokens = #{maxTokens},
+            enabled = #{enabled},
+            is_default = #{isDefault},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        UPDATE t_ai_prompt_template SET deleted = b'1' WHERE id = #{id}
+    </delete>
+
+    <update id="incrementUsageCount">
+        UPDATE t_ai_prompt_template SET usage_count = usage_count + 1 WHERE id = #{id}
+    </update>
+
+</mapper>

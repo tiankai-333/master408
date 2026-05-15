@@ -96,9 +96,13 @@ const current = ref(1)
 
 const initSubject = () => {
   subjectApi.list().then(re => {
-    subjectList.value = re.response
+    const subjects = re.response || []
+    subjectList.value = [
+      { id: 0, name: '全部' },
+      ...subjects
+    ]
     const subjectId = subjectList.value[0].id
-    queryParam.subjectId = subjectId
+    queryParam.subjectId = subjectId === 0 ? null : subjectId
     tabId.value = subjectId.toString()
     search()
   })
@@ -120,7 +124,8 @@ const paperTypeChange = () => {
 }
 
 const subjectChange = () => {
-  queryParam.subjectId = Number(tabId.value)
+  const subjectId = Number(tabId.value)
+  queryParam.subjectId = subjectId === 0 ? null : subjectId
   search()
 }
 

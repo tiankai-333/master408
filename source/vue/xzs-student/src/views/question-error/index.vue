@@ -40,27 +40,33 @@
             <template #header>
               <div class="card-header">
                 <el-icon><View /></el-icon><span>题目详情</span>
-                <el-button type="primary" size="small" class="ai-analyze-btn" :loading="aiAnalyzing" @click="analyzeQuestion" :disabled="!selectItem.questionItem">
-                  <el-icon><MagicStick /></el-icon> {{ aiAnalyzing ? 'AI分析中...' : 'AI分析' }}
-                </el-button>
+                <div class="ai-analyze-wrapper">
+                  <el-select v-model="selectedStyle" size="small" class="style-select" placeholder="选择解析风格">
+                    <el-option
+                      v-for="style in aiStyles"
+                      :key="style.id"
+                      :label="style.name"
+                      :value="style.id">
+                      <span style="float: left">{{ style.name }}</span>
+                      <span style="float: right; color: #8492a6; font-size: 12px">{{ style.description }}</span>
+                    </el-option>
+                  </el-select>
+                  <el-button type="primary" size="small" class="ai-analyze-btn" :loading="aiAnalyzing" @click="analyzeQuestion" :disabled="!selectItem.questionItem">
+                    <el-icon><MagicStick /></el-icon> {{ aiAnalyzing ? 'AI分析中...' : 'AI分析' }}
+                  </el-button>
+                </div>
               </div>
             </template>
             <div class="question-answer-wrapper">
               <QuestionAnswerShow :qType="selectItem.questionType" :qLoading="qAnswerLoading" :question="selectItem.questionItem" :answer="selectItem.answerItem" />
             </div>
             <div v-if="aiAnalysisResult" class="ai-analysis-section">
-              <div class="ai-analysis-header"><el-icon><Document /></el-icon><span>AI解题分析</span></div>
+              <div class="ai-analysis-header">
+                <el-icon><Document /></el-icon><span>AI解题分析</span>
+                <el-tag size="small" type="success" style="margin-left: 10px;">{{ aiAnalysisResult.styleName }}</el-tag>
+              </div>
               <div class="ai-analysis-content">
-                <div v-if="aiAnalysisResult.isPlainText" class="analysis-item">
-                  <div class="analysis-label">解析结果</div>
-                  <div class="analysis-value">{{ aiAnalysisResult['解析结果'] }}</div>
-                </div>
-                <template v-else>
-                  <div v-if="aiAnalysisResult['解题思路']" class="analysis-item"><div class="analysis-label">解题思路</div><div class="analysis-value">{{ aiAnalysisResult['解题思路'] }}</div></div>
-                  <div v-if="aiAnalysisResult['知识点']" class="analysis-item"><div class="analysis-label">知识点</div><div class="analysis-value">{{ aiAnalysisResult['知识点'] }}</div></div>
-                  <div v-if="aiAnalysisResult['易错点']" class="analysis-item"><div class="analysis-label">易错点</div><div class="analysis-value">{{ aiAnalysisResult['易错点'] }}</div></div>
-                  <div v-if="aiAnalysisResult['答案解析']" class="analysis-item"><div class="analysis-label">答案解析</div><div class="analysis-value">{{ aiAnalysisResult['答案解析'] }}</div></div>
-                </template>
+                <div v-if="aiAnalysisResult.isMarkdown" class="markdown-content" v-html="formatMarkdown(aiAnalysisResult.content)"></div>
               </div>
             </div>
           </el-card>
@@ -91,6 +97,14 @@ const qAnswerLoading = ref(false)
 const selectItem = ref({ questionType: 0, questionItem: null, answerItem: null })
 const aiAnalyzing = ref(false)
 const aiAnalysisResult = ref(null)
+const selectedStyle = ref('default')
+
+const aiStyles = ref([
+  { id: 'default', name: '📚 标准解析', description: '老师讲课式' },
+  { id: 'feynman', name: '🎓 费曼风格', description: '小白讲故事' },
+  { id: 'plato', name: '❓ 柏拉图式', description: '自问自答式' },
+  { id: 'first-principles', name: '⚡ 第一性原理', description: '拆解到本质' }
+])
 
 const questionTypeFormatter = (cellValue) => enumItemStore.enumFormat(questionTypeEnum, cellValue)
 
@@ -148,12 +162,12 @@ const analyzeQuestion = () => {
     case 5: questionType = '简答题'; break
     default: questionType = '未知'
   }
-  questionApi.analyzeQuestion({ questionType, questionContent: question.content || question.title || '', options, correctAnswer }).then(response => {
+  questionApi.analyzeQuestion({ questionType, questionContent: question.content || question.title || '', options, correctAnswer, style: selectedStyle.value }).then(response => {
     if (response.code === 1 && response.response) {
-      try {
-        aiAnalysisResult.value = JSON.parse(response.response)
-      } catch (e) {
-        aiAnalysisResult.value = { '解析结果': response.response, 'isPlainText': true }
+      aiAnalysisResult.value = {
+        content: response.response,
+        isMarkdown: true,
+        styleName: aiStyles.value.find(s => s.id === selectedStyle.value)?.name
       }
     } else {
       ElMessage.error(response.message || '分析失败')
@@ -163,6 +177,21 @@ const analyzeQuestion = () => {
   }).finally(() => {
     aiAnalyzing.value = false
   })
+}
+
+const formatMarkdown = (text) => {
+  if (!text) return ''
+  let formatted = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>')
+    .replace(/^###\s(.*)/gm, '<h3>$1</h3>')
+    .replace(/^##\s(.*)/gm, '<h2>$1</h2>')
+    .replace(/^#\s(.*)/gm, '<h1>$1</h1>')
+    .replace(/^\*\s(.*)/gm, '<li>$1</li>')
+    .replace(/^(\d+)\.\s(.*)/gm, '<li>$2</li>')
+  return formatted
 }
 
 onMounted(() => {
@@ -185,7 +214,9 @@ onMounted(() => {
 .question-list-card, .question-detail-card { border: none; border-radius: 16px; overflow: hidden; height: 100%;
   .card-header { display: flex; align-items: center; font-size: 18px; font-weight: 600; color: #1f2f3d;
     .el-icon { margin-right: 10px; color: #f59f5f; font-size: 20px; }
-    .ai-analyze-btn { margin-left: auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 20px;
+    .ai-analyze-wrapper { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .style-select { width: 160px; }
+    .ai-analyze-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 20px;
       &:hover { opacity: 0.9; transform: translateY(-2px); }
       .el-icon { margin-right: 5px; color: #fff; font-size: 14px; }
     }
@@ -227,6 +258,16 @@ onMounted(() => {
       &::before { content: '•'; margin-right: 5px; font-size: 18px; }
     }
     .analysis-value { font-size: 14px; color: #333; line-height: 1.6; padding-left: 15px; }
+    .markdown-content { font-size: 14px; color: #333; line-height: 1.8;
+      h1, h2, h3 { color: #667eea; margin: 15px 0 10px; font-weight: 600; }
+      h1 { font-size: 20px; }
+      h2 { font-size: 17px; }
+      h3 { font-size: 15px; }
+      li { margin-left: 20px; list-style: disc; }
+      code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+      strong { color: #667eea; font-weight: 600; }
+      em { color: #764ba2; font-style: italic; }
+    }
   }
 }
 @media screen and (max-width: 992px) {

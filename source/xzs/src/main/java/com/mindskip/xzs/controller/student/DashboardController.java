@@ -47,16 +47,13 @@ public class DashboardController extends BaseApiController {
     @RequestMapping(value = "/index", method = RequestMethod.POST)
     public RestResponse<IndexVM> index() {
         IndexVM indexVM = new IndexVM();
-        User user = getCurrentUser();
 
         PaperFilter fixedPaperFilter = new PaperFilter();
-        fixedPaperFilter.setGradeLevel(user.getUserLevel());
         fixedPaperFilter.setExamPaperType(ExamPaperTypeEnum.Fixed.getCode());
         indexVM.setFixedPaper(examPaperService.indexPaper(fixedPaperFilter));
 
         PaperFilter timeLimitPaperFilter = new PaperFilter();
         timeLimitPaperFilter.setDateTime(new Date());
-        timeLimitPaperFilter.setGradeLevel(user.getUserLevel());
         timeLimitPaperFilter.setExamPaperType(ExamPaperTypeEnum.TimeLimit.getCode());
 
         List<PaperInfo> limitPaper = examPaperService.indexPaper(timeLimitPaperFilter);
@@ -74,7 +71,7 @@ public class DashboardController extends BaseApiController {
     @RequestMapping(value = "/task", method = RequestMethod.POST)
     public RestResponse<List<TaskItemVm>> task() {
         User user = getCurrentUser();
-        List<TaskExam> taskExams = taskExamService.getByGradeLevel(user.getUserLevel());
+        List<TaskExam> taskExams = taskExamService.getByGradeLevel(null);
         if (taskExams.size() == 0) {
             return RestResponse.ok(new ArrayList<>());
         }

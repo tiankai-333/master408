@@ -37,8 +37,8 @@
             AI题目识别
           </el-menu-item>
           <el-menu-item index="/knowledge-graph/index">
-            <el-icon><Share /></el-icon>
-            知识图谱
+            <el-icon><MagicStick /></el-icon>
+            408Master
           </el-menu-item>
         </el-menu>
         <div class="head-user">
@@ -80,7 +80,7 @@ import userApi from '@/api/user'
 import avatarDefault from '@/assets/avatar.png'
 import {
   Reading, HomeFilled, Document, Tickets, WarningFilled,
-  Search, Share, User, Bell, SwitchButton
+  Search, Share, User, Bell, SwitchButton, MagicStick
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -93,7 +93,7 @@ const userInfo = reactive({
 })
 
 const routeSelect = (path) => {
-  const topPath = ['/', '/index', '/paper/index', '/record/index', '/question/index', '/knowledge-graph/index']
+  const topPath = ['/', '/index', '/paper/index', '/record/index', '/question/index', '/question/ai-analyze', '/knowledge-graph/index']
   if (topPath.indexOf(path) >= 0) {
     return path
   }
