@@ -29,7 +29,7 @@
       </el-header>
       <el-main>
         <el-form :model="form" ref="formRef" v-loading="formLoading" label-width="100px">
-          <el-row :key="index" v-for="(titleItem, index) in form.titleItems">
+          <el-row :key="index" v-for="(titleItem, index) in form.titleItems" class="exam-paper-section">
             <h3>{{ titleItem.name }}</h3>
             <el-card class="exampaper-item-box" v-if="titleItem.questionItems.length !== 0">
               <el-form-item :key="questionItem.itemOrder" :label="questionItem.itemOrder + '.'"
@@ -42,7 +42,7 @@
           </el-row>
           <el-row class="do-align-center">
             <el-button type="primary" @click="submitForm">提交</el-button>
-            <el-button>取消</el-button>
+            <el-button @click="cancelExam">取消</el-button>
           </el-row>
         </el-form>
       </el-main>
@@ -129,6 +129,17 @@ const submitForm = () => {
   }).catch(() => {
     formLoading.value = false
   })
+}
+
+const cancelExam = () => {
+  ElMessageBox.confirm('确定取消本次作答并返回试卷列表吗？未提交答案不会保存。', '取消作答', {
+    confirmButtonText: '确定',
+    cancelButtonText: '继续作答',
+    type: 'warning'
+  }).then(() => {
+    clearInterval(timer.value)
+    router.push('/paper/index')
+  }).catch(() => {})
 }
 
 onMounted(() => {

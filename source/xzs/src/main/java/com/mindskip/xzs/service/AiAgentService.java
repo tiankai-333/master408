@@ -48,6 +48,8 @@ public interface AiAgentService {
 
     List<AiKnowledgeBase> searchKnowledgeBase(String keyword);
 
+    List<Map<String, Object>> getKnowledgeBaseStatistics();
+
     // ============ 调整日志 ============
 
     List<AiAdjustmentLog> getAdjustmentLogs(Integer templateId, String style, int limit);

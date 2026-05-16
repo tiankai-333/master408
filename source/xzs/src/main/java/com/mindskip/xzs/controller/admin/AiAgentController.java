@@ -2,6 +2,7 @@ package com.mindskip.xzs.controller.admin;
 
 import com.mindskip.xzs.base.BaseApiController;
 import com.mindskip.xzs.base.RestResponse;
+import com.mindskip.xzs.ai.RagService;
 import com.mindskip.xzs.domain.ai.AiPromptTemplate;
 import com.mindskip.xzs.domain.ai.AiKnowledgeBase;
 import com.mindskip.xzs.domain.ai.AiAdjustmentLog;
@@ -18,6 +19,9 @@ public class AiAgentController extends BaseApiController {
 
     @Autowired
     private AiAgentService aiAgentService;
+
+    @Autowired
+    private RagService ragService;
 
     // ============ 模板管理 ============
 
@@ -79,6 +83,11 @@ public class AiAgentController extends BaseApiController {
     @GetMapping("/knowledge-base/search")
     public RestResponse<List<AiKnowledgeBase>> searchKnowledgeBase(@RequestParam String keyword) {
         return RestResponse.ok(aiAgentService.searchKnowledgeBase(keyword));
+    }
+
+    @GetMapping("/knowledge-base/statistics")
+    public RestResponse<List<Map<String, Object>>> getKnowledgeBaseStatistics() {
+        return RestResponse.ok(aiAgentService.getKnowledgeBaseStatistics());
     }
 
     @GetMapping("/knowledge-base/{id}")
@@ -148,5 +157,12 @@ public class AiAgentController extends BaseApiController {
     @GetMapping("/statistics")
     public RestResponse<Map<String, Object>> getStatistics() {
         return RestResponse.ok(aiAgentService.getUsageStatistics());
+    }
+
+    @GetMapping("/rag/debug")
+    public RestResponse<List<RagService.RagDocument>> debugRag(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "5") int topK) {
+        return RestResponse.ok(ragService.keywordFallback(keyword, topK));
     }
 }

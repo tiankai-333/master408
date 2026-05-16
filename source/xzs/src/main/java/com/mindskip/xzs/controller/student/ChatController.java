@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindskip.xzs.base.BaseApiController;
 import com.mindskip.xzs.base.RestResponse;
 import com.mindskip.xzs.domain.Subject;
+import com.mindskip.xzs.domain.User;
+import com.mindskip.xzs.repository.ExamPaperAnswerMapper;
 import com.mindskip.xzs.service.SubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,9 @@ public class ChatController extends BaseApiController {
 
     @Autowired
     private SubjectService subjectService;
+
+    @Autowired
+    private ExamPaperAnswerMapper examPaperAnswerMapper;
 
     @Value("${ai.api.type:glm}")
     private String aiApiType;
@@ -169,19 +174,18 @@ public class ChatController extends BaseApiController {
     @RequestMapping(value = "/user/stats", method = RequestMethod.GET)
     public RestResponse<Map<String, Object>> getUserStats() {
         try {
+            User user = getCurrentUser();
+            Map<String, Object> summary = examPaperAnswerMapper.selectStudentQuestionSummary(user.getId());
+            int totalQuestions = numberValue(summary.get("totalQuestions"));
+            int correctQuestions = numberValue(summary.get("correctQuestions"));
+            int accuracy = totalQuestions == 0 ? 0 : Math.round(correctQuestions * 100f / totalQuestions);
+
             Map<String, Object> stats = new HashMap<>();
-            stats.put("totalQuestions", 156);
-            stats.put("accuracy", 72);
-            stats.put("weakPoints", 8);
-            
-            List<Map<String, Object>> subjects = new ArrayList<>();
-            subjects.add(createSubjectStats("数据结构", 75));
-            subjects.add(createSubjectStats("组成原理", 62));
-            subjects.add(createSubjectStats("操作系统", 80));
-            subjects.add(createSubjectStats("计算机网络", 70));
-            
-            stats.put("subjects", subjects);
-            
+            stats.put("totalQuestions", totalQuestions);
+            stats.put("accuracy", accuracy);
+            stats.put("weakPoints", numberValue(summary.get("weakPoints")));
+            stats.put("subjects", examPaperAnswerMapper.selectStudentSubjectAccuracy(user.getId()));
+
             logger.info("用户统计数据返回: 总题目={}, 正确率={}%", 
                 stats.get("totalQuestions"), stats.get("accuracy"));
             
@@ -192,51 +196,44 @@ public class ChatController extends BaseApiController {
         }
     }
 
-    private Map<String, Object> createSubjectStats(String name, int accuracy) {
-        Map<String, Object> subject = new HashMap<>();
-        subject.put("id", new Random().nextInt(100) + 1);
-        subject.put("name", name);
-        subject.put("accuracy", accuracy);
-        return subject;
+    private int numberValue(Object value) {
+        if (value == null) {
+            return 0;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return Integer.parseInt(value.toString());
     }
 
     @RequestMapping(value = "/knowledge-graph", method = RequestMethod.GET)
     public RestResponse<Map<String, Object>> getKnowledgeGraph(
             @RequestParam(required = false) Integer subjectId) {
         try {
+            User user = getCurrentUser();
+            List<Map<String, Object>> subjectStats = examPaperAnswerMapper.selectStudentSubjectAccuracy(user.getId());
+
             Map<String, Object> graph = new HashMap<>();
-            
             List<Map<String, Object>> nodes = new ArrayList<>();
             List<Map<String, Object>> links = new ArrayList<>();
             List<Map<String, Object>> categories = new ArrayList<>();
-            
-            Map<String, Object> osCategory = new HashMap<>();
-            osCategory.put("name", "操作系统");
-            categories.add(osCategory);
-            
-            Map<String, Object> dsCategory = new HashMap<>();
-            dsCategory.put("name", "数据结构");
-            categories.add(dsCategory);
-            
-            nodes.add(createNode(1, "进程", 60, "knowledge_point", 0));
-            nodes.add(createNode(2, "线程", 50, "knowledge_point", 0));
-            nodes.add(createNode(3, "调度算法", 55, "knowledge_point", 0));
-            nodes.add(createNode(4, "内存管理", 65, "knowledge_point", 0));
-            nodes.add(createNode(5, "分页", 45, "knowledge_point", 0));
-            nodes.add(createNode(6, "分段", 45, "knowledge_point", 0));
-            nodes.add(createNode(7, "进程同步", 50, "knowledge_point", 0));
-            nodes.add(createNode(8, "死锁", 55, "knowledge_point", 0));
-            nodes.add(createNode(9, "栈", 40, "knowledge_point", 1));
-            nodes.add(createNode(10, "队列", 40, "knowledge_point", 1));
-            
-            links.add(createLink(1, 2, "包含"));
-            links.add(createLink(1, 3, "需要"));
-            links.add(createLink(4, 5, "实现方式"));
-            links.add(createLink(4, 6, "实现方式"));
-            links.add(createLink(1, 7, "相关"));
-            links.add(createLink(7, 8, "可能导致"));
-            links.add(createLink(9, 10, "同属线性表"));
-            
+
+            Map<String, Object> category = new HashMap<>();
+            category.put("name", "学生答题统计");
+            categories.add(category);
+
+            nodes.add(createNode(-1, "当前学习记录", 70, "summary", 0));
+            for (Map<String, Object> subject : subjectStats) {
+                Integer id = numberValue(subject.get("id"));
+                if (subjectId != null && !subjectId.equals(id)) {
+                    continue;
+                }
+                Integer accuracy = numberValue(subject.get("accuracy"));
+                String name = subject.get("name") + " " + accuracy + "%";
+                nodes.add(createNode(id, name, 35 + Math.round(accuracy * 0.4f), "subject", 0));
+                links.add(createLink(-1, id, "正确率"));
+            }
+
             graph.put("nodes", nodes);
             graph.put("links", links);
             graph.put("categories", categories);

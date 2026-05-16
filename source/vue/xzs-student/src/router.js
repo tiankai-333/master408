@@ -5,7 +5,7 @@ import 'nprogress/nprogress.css'
 NProgress.configure({ showSpinner: false })
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/login', name: 'Login', component: () => import('@/views/login/index.vue'), meta: { title: '登录', bodyBackground: '#fbfbfb' } },
     { path: '/register', name: 'Register', component: () => import('@/views/register/index.vue'), meta: { title: '注册', bodyBackground: '#fbfbfb' } },

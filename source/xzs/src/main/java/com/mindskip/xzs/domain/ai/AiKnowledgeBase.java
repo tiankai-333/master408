@@ -11,6 +11,11 @@ public class AiKnowledgeBase {
     private String title;
     private String keywords;
     private String content;
+    private String embedding;
+    private String embeddingModel;
+    private Integer embeddingDimension;
+    private Integer chunkIndex;
+    private String contentHash;
     private String sourceType;
     private String sourceName;
     private String sourceAuthor;
@@ -79,6 +84,46 @@ public class AiKnowledgeBase {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getEmbedding() {
+        return embedding;
+    }
+
+    public void setEmbedding(String embedding) {
+        this.embedding = embedding;
+    }
+
+    public String getEmbeddingModel() {
+        return embeddingModel;
+    }
+
+    public void setEmbeddingModel(String embeddingModel) {
+        this.embeddingModel = embeddingModel;
+    }
+
+    public Integer getEmbeddingDimension() {
+        return embeddingDimension;
+    }
+
+    public void setEmbeddingDimension(Integer embeddingDimension) {
+        this.embeddingDimension = embeddingDimension;
+    }
+
+    public Integer getChunkIndex() {
+        return chunkIndex;
+    }
+
+    public void setChunkIndex(Integer chunkIndex) {
+        this.chunkIndex = chunkIndex;
+    }
+
+    public String getContentHash() {
+        return contentHash;
+    }
+
+    public void setContentHash(String contentHash) {
+        this.contentHash = contentHash;
     }
 
     public String getSourceType() {

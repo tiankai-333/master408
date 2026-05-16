@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ExamPaperAnswerMapper extends BaseMapper<ExamPaperAnswer> {
@@ -17,6 +18,10 @@ public interface ExamPaperAnswerMapper extends BaseMapper<ExamPaperAnswer> {
     Integer selectAllCount();
 
     List<KeyValue> selectCountByDate(@Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+    Map<String, Object> selectStudentQuestionSummary(@Param("uid") Integer uid);
+
+    List<Map<String, Object>> selectStudentSubjectAccuracy(@Param("uid") Integer uid);
 
     ExamPaperAnswer getByPidUid(@Param("pid") Integer paperId, @Param("uid") Integer uid);
 

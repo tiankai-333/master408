@@ -24,7 +24,7 @@
       </el-header>
       <el-main>
         <el-form :model="form" ref="formRef" v-loading="formLoading" label-width="100px">
-          <el-row :key="index" v-for="(titleItem, index) in form.titleItems">
+          <el-row :key="index" v-for="(titleItem, index) in form.titleItems" class="exam-paper-section">
             <h3>{{ titleItem.name }}</h3>
             <el-card class="exampaper-item-box" v-if="titleItem.questionItems.length !== 0">
               <el-form-item :key="questionItem.itemOrder" :label="questionItem.itemOrder + '.'"

@@ -75,6 +75,11 @@ public class PromptTemplate {
     }
 
     public String formatUserPrompt(String question, String knowledgePoints, String referenceDocs) {
+        return formatUserPrompt(question, knowledgePoints, referenceDocs, null, null);
+    }
+
+    public String formatUserPrompt(String question, String knowledgePoints, String referenceDocs,
+                                   String studentProfile, String feedbackNotes) {
         String prompt = userPromptTemplate;
         prompt = prompt.replace("{question}", question != null ? question : "");
         
@@ -90,6 +95,18 @@ public class PromptTemplate {
             referenceBlock = "\n\n**以下内容来自题库中的相关题目，请参考这些内容确保你的答案准确无误，不要编造与参考答案矛盾的信息**：\n" + referenceDocs;
         }
         prompt = prompt.replace("{reference_docs}", referenceBlock);
+
+        String profileBlock = "";
+        if (studentProfile != null && !studentProfile.trim().isEmpty()) {
+            profileBlock = "\n\n**学生画像（用于个性化讲解，不作为题目事实依据）**：\n" + studentProfile;
+        }
+        prompt = prompt.replace("{student_profile}", profileBlock);
+
+        String feedbackBlock = "";
+        if (feedbackNotes != null && !feedbackNotes.trim().isEmpty()) {
+            feedbackBlock = "\n\n**该学生对本风格的历史反馈（请据此微调表达方式）**：\n" + feedbackNotes;
+        }
+        prompt = prompt.replace("{feedback_notes}", feedbackBlock);
         return prompt;
     }
 }

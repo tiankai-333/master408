@@ -177,12 +177,7 @@ const userStats = reactive({
   weakPoints: 0
 })
 
-const subjectStats = ref([
-  { id: 1, name: '数据结构', accuracy: 75 },
-  { id: 2, name: '组成原理', accuracy: 62 },
-  { id: 3, name: '操作系统', accuracy: 80 },
-  { id: 4, name: '计算机网络', accuracy: 70 }
-])
+const subjectStats = ref([])
 
 const progressColor = computed(() => {
   if (userStats.accuracy >= 80) return '#67c23a'
@@ -219,17 +214,19 @@ const loadUserStats = async () => {
     const response = await get('/api/student/user/stats')
     if (response.code === 1) {
       Object.assign(userStats, response.response)
+      subjectStats.value = response.response.subjects || []
     }
   } catch (error) {
-    userStats.totalQuestions = 156
-    userStats.accuracy = 72
-    userStats.weakPoints = 8
+    userStats.totalQuestions = 0
+    userStats.accuracy = 0
+    userStats.weakPoints = 0
+    subjectStats.value = []
   }
 }
 
 const loadGraph = async () => {
   try {
-    const response = await get('/api/student/knowledge-graph', { subjectId: filterSubject.value })
+    const response = await get('/api/student/knowledge-graph/graph', { subjectId: filterSubject.value })
     if (response.code === 1) {
       graphData.nodes = response.response.nodes
       graphData.links = response.response.links
@@ -238,27 +235,11 @@ const loadGraph = async () => {
     }
   } catch (error) {
     console.error('加载知识图谱失败:', error)
-    renderMockGraph()
+    graphData.nodes = []
+    graphData.links = []
+    graphData.categories = []
+    renderChart()
   }
-}
-
-const renderMockGraph = () => {
-  graphData.nodes = [
-    { id: 1, name: '进程', symbolSize: 60, type: 'knowledge_point', category: 0 },
-    { id: 2, name: '线程', symbolSize: 50, type: 'knowledge_point', category: 0 },
-    { id: 3, name: '调度算法', symbolSize: 55, type: 'knowledge_point', category: 0 },
-    { id: 4, name: '内存管理', symbolSize: 65, type: 'knowledge_point', category: 0 },
-    { id: 5, name: '分页', symbolSize: 45, type: 'knowledge_point', category: 0 },
-    { id: 6, name: '分段', symbolSize: 45, type: 'knowledge_point', category: 0 }
-  ]
-  graphData.links = [
-    { source: 1, target: 2, relation: '包含' },
-    { source: 1, target: 3, relation: '需要' },
-    { source: 4, target: 5, relation: '实现方式' },
-    { source: 4, target: 6, relation: '实现方式' }
-  ]
-  graphData.categories = [{ name: '操作系统' }]
-  renderChart()
 }
 
 const initChart = () => {
@@ -316,34 +297,34 @@ const sendMessage = async () => {
     } else {
       messages.value.push({ 
         role: 'assistant', 
-        content: `我是你的408Master导师！我注意到你在"进程调度"这部分的正确率只有40%，要不要我用**第一性原理**的方式帮你讲透这部分内容？
+        content: `我是你的408Master导师！我已经读取了你当前账号的做题统计，可以据此给你学习建议。
 
 📊 你的学习数据：
 - 总做题数：${userStats.totalQuestions}
 - 正确率：${userStats.accuracy}%
-- 薄弱知识点：${userStats.weakPoints}个
+- 错题数：${userStats.weakPoints}个
 
 💡 你可以问我：
 - "帮我分析一下这道题"
-- "进程调度有哪些算法？"
-- "给我生成一些进程调度的练习题"
+- "操作系统有哪些高频考点？"
+- "给我生成一些408练习题"
 - "我的薄弱点是什么？"`
       })
     }
   } catch (error) {
     messages.value.push({ 
       role: 'assistant', 
-      content: `我是你的408Master导师！我注意到你在"进程调度"这部分的正确率只有40%，要不要我用**第一性原理**的方式帮你讲透这部分内容？
+      content: `我是你的408Master导师！我已经读取了你当前账号的做题统计，可以据此给你学习建议。
 
 📊 你的学习数据：
 - 总做题数：${userStats.totalQuestions}
 - 正确率：${userStats.accuracy}%
-- 薄弱知识点：${userStats.weakPoints}个
+- 错题数：${userStats.weakPoints}个
 
 💡 你可以问我：
 - "帮我分析一下这道题"
-- "进程调度有哪些算法？"
-- "给我生成一些进程调度的练习题"
+- "操作系统有哪些高频考点？"
+- "给我生成一些408练习题"
 - "我的薄弱点是什么？"`
     })
   } finally {
@@ -362,7 +343,7 @@ const scrollToBottom = () => {
 const quickAction = (type) => {
   const prompts = {
     analyze: '帮我分析一下这道题应该怎么做',
-    practice: '给我生成5道进程调度的练习题',
+    practice: '给我生成5道408练习题',
     review: '帮我回顾一下我的错题',
     suggestion: '根据我的学习数据，给我一些学习建议'
   }
@@ -430,9 +411,9 @@ onMounted(async () => {
 📊 我已经分析了你的学习数据：
 - 总做题数：**${userStats.totalQuestions}道**
 - 正确率：**${userStats.accuracy}%**
-- 需要强化的知识点：**${userStats.weakPoints}个**
+- 当前错题数：**${userStats.weakPoints}个**
 
-🎯 我发现你最近在"**进程调度**"这部分错题较多，需要我帮你重点突破吗？
+🎯 我会根据这些真实做题记录来给你学习建议；记录越多，建议会越准。
 
 💡 你可以这样和我交流：
 - **题目解析**：把题目发给我，我会用不同风格给你讲解

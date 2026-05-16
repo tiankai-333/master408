@@ -28,6 +28,8 @@ python ../import_db.py
 | `supplement_knowledge_system.sql` | 知识体系补充 | 6 |
 | `optimize_study_system.sql` | 学习系统优化 | 7 |
 | `create_question_wrong_analysis.sql` | 错题分析表 | 8 |
+| `05_rag_embeddings.sql` | 题目解析 embedding 字段 | 9 |
+| `06_ai_knowledge_rag.sql` | AI知识库、RAG、学生档案与反馈闭环增强 | 10 |
 | `xzs-20260515.sql` | 完整数据库备份（参考用） | - |
 
 ## 数据统计
@@ -41,6 +43,7 @@ python ../import_db.py
 | 用户 | 4 个（admin/student/teacher/231310423） |
 | 知识标签 | 652 道有标签，6 道无标签（网站缺失） |
 | 文本内容 | 672 条（题目内容 + 试卷框架） |
+| AI知识库 | 116 条 408 知识点 + 方法论摘要 |
 
 ## 表结构来源
 
@@ -117,6 +120,14 @@ python ../import_db.py
 ### question_knowledge_point（题目-知识点关联表）
 
 注意：表名无 `t_` 前缀，与 Mapper XML 一致。
+
+### t_ai_knowledge_base（AI知识库/RAG文档表）
+
+用于 RAG 检索与 skill 解析参考资料。`06_ai_knowledge_rag.sql` 会在原表基础上增加 `embedding`、`embedding_model`、`embedding_dimension`、`chunk_index`、`content_hash` 字段。408 知识点爬虫写入 `source_type='csgraduates'`，方法论摘要写入 `source_type='method_summary'`。
+
+### t_user_learning_profile / t_user_learning_event / t_user_skill_feedback
+
+用于 agent 学生档案和反馈闭环。v1 只做个人上下文修饰，不自动改写全局 prompt 模板。
 
 ## 分数存储机制
 

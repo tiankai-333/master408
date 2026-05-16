@@ -10,7 +10,7 @@
 SET @col_exists = 0;
 SELECT COUNT(*) INTO @col_exists 
 FROM information_schema.COLUMNS 
-WHERE TABLE_SCHEMA = 'xzas' AND TABLE_NAME = 't_text_content' AND COLUMN_NAME = 'embedding';
+WHERE TABLE_SCHEMA = 'xzs' AND TABLE_NAME = 't_text_content' AND COLUMN_NAME = 'embedding';
 
 SET @sql = IF(@col_exists = 0, 
     'ALTER TABLE t_text_content ADD COLUMN embedding LONGTEXT NULL COMMENT ''题目解析的向量嵌入(JSON float[] 格式)''',

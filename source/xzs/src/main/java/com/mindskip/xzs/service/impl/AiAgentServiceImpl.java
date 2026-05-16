@@ -198,6 +198,11 @@ public class AiAgentServiceImpl implements AiAgentService {
         return knowledgeBaseMapper.search(keyword);
     }
 
+    @Override
+    public List<Map<String, Object>> getKnowledgeBaseStatistics() {
+        return knowledgeBaseMapper.selectStatistics();
+    }
+
     // ============ 调整日志 ============
 
     @Override

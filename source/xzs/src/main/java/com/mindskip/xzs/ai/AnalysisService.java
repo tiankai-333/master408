@@ -79,8 +79,13 @@ public class AnalysisService {
     }
 
     public String generatePrompt(String style, String question, String knowledgePoints, String referenceDocs) {
+        return generatePrompt(style, question, knowledgePoints, referenceDocs, null, null);
+    }
+
+    public String generatePrompt(String style, String question, String knowledgePoints, String referenceDocs,
+                                 String studentProfile, String feedbackNotes) {
         PromptTemplate template = getTemplate(style);
-        return template.formatUserPrompt(question, knowledgePoints, referenceDocs);
+        return template.formatUserPrompt(question, knowledgePoints, referenceDocs, studentProfile, feedbackNotes);
     }
 
     public String analyzeWithAI(String style, String question, String knowledgePoints) throws Exception {
@@ -88,8 +93,13 @@ public class AnalysisService {
     }
 
     public String analyzeWithAI(String style, String question, String knowledgePoints, String referenceDocs) throws Exception {
+        return analyzeWithAI(style, question, knowledgePoints, referenceDocs, null, null);
+    }
+
+    public String analyzeWithAI(String style, String question, String knowledgePoints, String referenceDocs,
+                                String studentProfile, String feedbackNotes) throws Exception {
         PromptTemplate template = getTemplate(style);
-        String userPrompt = template.formatUserPrompt(question, knowledgePoints, referenceDocs);
+        String userPrompt = template.formatUserPrompt(question, knowledgePoints, referenceDocs, studentProfile, feedbackNotes);
         String systemPrompt = template.getSystemPrompt();
         String model = "glm-4.5-air";
         return callAiApi(systemPrompt, userPrompt, aiApiType, aiApiKey, aiApiUrl, model);
@@ -102,8 +112,14 @@ public class AnalysisService {
 
     public String analyzeWithCustomAI(String aiType, String apiKey, String apiUrl, String model, 
                                       String style, String question, String knowledgePoints, String referenceDocs) throws Exception {
+        return analyzeWithCustomAI(aiType, apiKey, apiUrl, model, style, question, knowledgePoints, referenceDocs, null, null);
+    }
+
+    public String analyzeWithCustomAI(String aiType, String apiKey, String apiUrl, String model, 
+                                      String style, String question, String knowledgePoints, String referenceDocs,
+                                      String studentProfile, String feedbackNotes) throws Exception {
         PromptTemplate template = getTemplate(style);
-        String userPrompt = template.formatUserPrompt(question, knowledgePoints, referenceDocs);
+        String userPrompt = template.formatUserPrompt(question, knowledgePoints, referenceDocs, studentProfile, feedbackNotes);
         String systemPrompt = template.getSystemPrompt();
         return callAiApi(systemPrompt, userPrompt, aiType, apiKey, apiUrl, model);
     }

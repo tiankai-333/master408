@@ -10,6 +10,11 @@
         <result column="title" property="title"/>
         <result column="keywords" property="keywords"/>
         <result column="content" property="content"/>
+        <result column="embedding" property="embedding"/>
+        <result column="embedding_model" property="embeddingModel"/>
+        <result column="embedding_dimension" property="embeddingDimension"/>
+        <result column="chunk_index" property="chunkIndex"/>
+        <result column="content_hash" property="contentHash"/>
         <result column="source_type" property="sourceType"/>
         <result column="source_name" property="sourceName"/>
         <result column="source_author" property="sourceAuthor"/>
@@ -47,6 +52,17 @@
         ORDER BY priority DESC
     </select>
 
+    <select id="selectAllWithEmbedding" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base
+        WHERE deleted = b'0'
+          AND enabled = 1
+          AND embedding IS NOT NULL
+          AND embedding != ''
+          AND content IS NOT NULL
+          AND content != ''
+        ORDER BY priority DESC, id
+    </select>
+
     <select id="selectById" resultMap="BaseResultMap">
         SELECT * FROM t_ai_knowledge_base WHERE id = #{id}
     </select>
@@ -62,14 +78,29 @@
         ORDER BY priority DESC
     </select>
 
+    <select id="selectStatistics" resultType="map">
+        SELECT
+            category,
+            domain,
+            source_type AS sourceType,
+            COUNT(*) AS count,
+            SUM(CASE WHEN embedding IS NOT NULL AND embedding != '' THEN 1 ELSE 0 END) AS embeddedCount
+        FROM t_ai_knowledge_base
+        WHERE deleted = b'0'
+        GROUP BY category, domain, source_type
+        ORDER BY count DESC
+    </select>
+
     <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiKnowledgeBase" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_ai_knowledge_base (
             category, domain, sub_domain, title, keywords, content,
+            embedding, embedding_model, embedding_dimension, chunk_index, content_hash,
             source_type, source_name, source_author, core_concepts,
             application_scenarios, examples, enabled, priority,
             usage_count, create_user, create_time, update_time, deleted
         ) VALUES (
             #{category}, #{domain}, #{subDomain}, #{title}, #{keywords}, #{content},
+            #{embedding}, #{embeddingModel}, #{embeddingDimension}, #{chunkIndex}, #{contentHash},
             #{sourceType}, #{sourceName}, #{sourceAuthor}, #{coreConcepts},
             #{applicationScenarios}, #{examples}, #{enabled}, #{priority},
             #{usageCount}, #{createUser}, #{createTime}, #{updateTime}, #{deleted}
@@ -84,6 +115,11 @@
             title = #{title},
             keywords = #{keywords},
             content = #{content},
+            embedding = #{embedding},
+            embedding_model = #{embeddingModel},
+            embedding_dimension = #{embeddingDimension},
+            chunk_index = #{chunkIndex},
+            content_hash = #{contentHash},
             source_type = #{sourceType},
             source_name = #{sourceName},
             source_author = #{sourceAuthor},

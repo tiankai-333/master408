@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindskip.xzs.domain.TextContent;
+import com.mindskip.xzs.domain.ai.AiKnowledgeBase;
+import com.mindskip.xzs.repository.AiKnowledgeBaseMapper;
 import com.mindskip.xzs.repository.TextContentMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,9 @@ public class RagService {
     @Autowired
     private TextContentMapper textContentMapper;
 
+    @Autowired
+    private AiKnowledgeBaseMapper aiKnowledgeBaseMapper;
+
     @Value("${ai.api.key:}")
     private String aiApiKey;
 
@@ -35,8 +40,10 @@ public class RagService {
     private String embeddingModel;
 
     public List<RagCandidate> loadCandidates() {
-        List<TextContent> textContents = textContentMapper.selectAllWithEmbedding();
         List<RagCandidate> candidates = new ArrayList<>();
+        candidates.addAll(loadKnowledgeBaseCandidates());
+
+        List<TextContent> textContents = textContentMapper.selectAllWithEmbedding();
         for (TextContent tc : textContents) {
             if (tc.getEmbedding() != null && tc.getContent() != null) {
                 String title = "真题解析 #" + tc.getId();
@@ -53,7 +60,9 @@ public class RagService {
                     tc.getId(),
                     "题#" + tc.getId() + ": " + title,
                     tc.getContent(),
-                    tc.getEmbedding()
+                    tc.getEmbedding(),
+                    "真题解析",
+                    "text_content"
                 ));
             }
         }
@@ -61,9 +70,35 @@ public class RagService {
         return candidates;
     }
 
+    public List<RagCandidate> loadKnowledgeBaseCandidates() {
+        List<RagCandidate> candidates = new ArrayList<>();
+        try {
+            List<AiKnowledgeBase> knowledgeBases = aiKnowledgeBaseMapper.selectAllWithEmbedding();
+            for (AiKnowledgeBase kb : knowledgeBases) {
+                if (kb.getEmbedding() != null && kb.getContent() != null) {
+                    candidates.add(new RagCandidate(
+                        kb.getId(),
+                        buildKnowledgeBaseTitle(kb),
+                        kb.getContent(),
+                        kb.getEmbedding(),
+                        kb.getCategory(),
+                        kb.getSourceType()
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to load AI knowledge-base embeddings: {}", e.getMessage());
+        }
+        return candidates;
+    }
+
     public List<RagDocument> retrieve(String query, int topK) throws Exception {
         List<RagCandidate> candidates = loadCandidates();
-        return retrieve(candidates, query, topK);
+        List<RagDocument> docs = retrieve(candidates, query, topK);
+        if (!docs.isEmpty()) {
+            return docs;
+        }
+        return keywordFallback(query, topK);
     }
 
     public float[] embed(String text) throws Exception {
@@ -141,7 +176,9 @@ public class RagService {
                             candidate.getTitle(),
                             candidate.getContent(),
                             similarity,
-                            candidate.getId()
+                            candidate.getId(),
+                            candidate.getCategory(),
+                            candidate.getSourceType()
                         ));
                     }
                 } catch (Exception e) {
@@ -164,17 +201,83 @@ public class RagService {
         return topResults;
     }
 
+    public List<RagDocument> keywordFallback(String query, int topK) {
+        if (query == null || query.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String keyword = extractKeyword(query);
+        if (keyword.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            List<AiKnowledgeBase> rows = aiKnowledgeBaseMapper.search(keyword);
+            List<RagDocument> docs = new ArrayList<>();
+            for (AiKnowledgeBase kb : rows) {
+                if (kb.getContent() == null || kb.getContent().trim().isEmpty()) {
+                    continue;
+                }
+                docs.add(new RagDocument(
+                    buildKnowledgeBaseTitle(kb),
+                    kb.getContent(),
+                    0.50,
+                    kb.getId(),
+                    kb.getCategory(),
+                    kb.getSourceType()
+                ));
+                if (docs.size() >= topK) {
+                    break;
+                }
+            }
+            logger.info("RAG keyword fallback retrieved {} documents for keyword={}", docs.size(), keyword);
+            return docs;
+        } catch (Exception e) {
+            logger.warn("RAG keyword fallback failed: {}", e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    private String extractKeyword(String query) {
+        String cleaned = query.replaceAll("[^\\u4e00-\\u9fa5A-Za-z0-9]", " ").trim();
+        String[] parts = cleaned.split("\\s+");
+        String best = "";
+        for (String part : parts) {
+            if (part.length() > best.length()) {
+                best = part;
+            }
+        }
+        if (best.length() > 30) {
+            best = best.substring(0, 30);
+        }
+        return best;
+    }
+
+    private String buildKnowledgeBaseTitle(AiKnowledgeBase kb) {
+        String category = kb.getCategory() != null ? kb.getCategory() : "知识库";
+        String title = kb.getTitle() != null ? kb.getTitle() : "未命名资料";
+        return category + "：" + title;
+    }
+
     public String formatReferenceDocs(List<RagDocument> docs) {
         if (docs == null || docs.isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("\n\n## 参考资料（来自题库，供辅助参考）\n\n");
+        sb.append("\n\n## 参考资料（来自知识库/RAG检索，供辅助参考）\n\n");
         for (int i = 0; i < docs.size(); i++) {
             RagDocument doc = docs.get(i);
             sb.append("【参考").append(i + 1).append("】").append(doc.getTitle()).append("\n");
+            if (doc.getCategory() != null && !doc.getCategory().isEmpty()) {
+                sb.append("类型：").append(doc.getCategory());
+                if (doc.getSourceType() != null && !doc.getSourceType().isEmpty()) {
+                    sb.append(" / ").append(doc.getSourceType());
+                }
+                sb.append("\n");
+            }
             if (doc.getContent() != null && !doc.getContent().isEmpty()) {
-                sb.append(doc.getContent()).append("\n\n");
+                String content = doc.getContent();
+                sb.append(content, 0, Math.min(content.length(), 1800)).append("\n\n");
             }
         }
         return sb.toString();
@@ -210,14 +313,22 @@ public class RagService {
         private String content;
         private double similarity;
         private Integer id;
+        private String category;
+        private String sourceType;
 
         public RagDocument() {}
 
         public RagDocument(String title, String content, double similarity, Integer id) {
+            this(title, content, similarity, id, null, null);
+        }
+
+        public RagDocument(String title, String content, double similarity, Integer id, String category, String sourceType) {
             this.title = title;
             this.content = content;
             this.similarity = similarity;
             this.id = id;
+            this.category = category;
+            this.sourceType = sourceType;
         }
 
         public String getTitle() { return title; }
@@ -228,6 +339,10 @@ public class RagService {
         public void setSimilarity(double similarity) { this.similarity = similarity; }
         public Integer getId() { return id; }
         public void setId(Integer id) { this.id = id; }
+        public String getCategory() { return category; }
+        public void setCategory(String category) { this.category = category; }
+        public String getSourceType() { return sourceType; }
+        public void setSourceType(String sourceType) { this.sourceType = sourceType; }
 
         @Override
         public String toString() {
@@ -240,14 +355,22 @@ public class RagService {
         private String title;
         private String content;
         private String embedding;
+        private String category;
+        private String sourceType;
 
         public RagCandidate() {}
 
         public RagCandidate(Integer id, String title, String content, String embedding) {
+            this(id, title, content, embedding, null, null);
+        }
+
+        public RagCandidate(Integer id, String title, String content, String embedding, String category, String sourceType) {
             this.id = id;
             this.title = title;
             this.content = content;
             this.embedding = embedding;
+            this.category = category;
+            this.sourceType = sourceType;
         }
 
         public Integer getId() { return id; }
@@ -258,5 +381,9 @@ public class RagService {
         public void setContent(String content) { this.content = content; }
         public String getEmbedding() { return embedding; }
         public void setEmbedding(String embedding) { this.embedding = embedding; }
+        public String getCategory() { return category; }
+        public void setCategory(String category) { this.category = category; }
+        public String getSourceType() { return sourceType; }
+        public void setSourceType(String sourceType) { this.sourceType = sourceType; }
     }
 }

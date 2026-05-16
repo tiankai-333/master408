@@ -7,6 +7,7 @@
 ## 功能特性
 
 - 爬取 2011-2024 年 408 历年真题（选择题 + 综合应用题）
+- 爬取 408 四门课知识点页面，导入 `knowledge_point` 与 `t_ai_knowledge_base`
 - 自动识别题型：选择题（1-40 题）、综合应用题（41-47 题）
 - 自动提取每道题的知识标签（如"复杂度分析"、"链表"、"虚拟页式管理"等）
 - 支持图片本地化下载（SVG/JPG）
@@ -28,6 +29,8 @@ crawler/
 ├── improved_exam_crawler.py     # 改进版选择题爬虫
 ├── improved_essay_crawler.py    # 综合应用题爬虫
 ├── crawl_tags.py                # 知识标签爬虫（更新数据库）
+├── knowledge_crawler.py         # 408知识点爬虫（知识图谱 + AI知识库）
+├── sync_image_paths.py          # 图片路径审计/同步工具
 ├── generate_sql.py              # 从 JSON/CSV 生成 SQL 导入文件
 ├── analyze_html.py              # HTML 结构分析工具
 ├── check_images.py              # 图片检查工具
@@ -35,6 +38,7 @@ crawler/
 │   ├── exam_questions.json      # 选择题 JSON（616 道）
 │   ├── essay_questions.csv      # 综合应用题 CSV（98 道）
 │   ├── knowledge_tags.json      # 知识标签 JSON（658 道）
+│   ├── knowledge_pages.json     # 408知识点页面 JSON（116 条）
 │   ├── image_manifest.json      # 图片清单
 │   └── images/                  # 本地图片
 │       ├── 2011_OS_27_1.svg
@@ -79,6 +83,43 @@ python crawl_tags.py
 1. 从 csgraduates.com 获取每道题的知识标签
 2. 直接更新 `t_question` 表的 `tags` 字段
 3. 导出 `data/knowledge_tags.json` 备份
+
+### 爬取 408 知识点并导入知识库
+
+```bash
+python3 crawler/knowledge_crawler.py --import-db --clear-existing --delay 0.2 --timeout 12
+```
+
+如果已经有 `crawler/data/knowledge_pages.json` 快照，只想重新导入数据库：
+
+```bash
+python3 crawler/knowledge_crawler.py --skip-crawl --import-db --clear-existing
+```
+
+该脚本会：
+
+1. 抓取 CSGraduates 上数据结构、组成原理、操作系统、计算机网络四门课知识点。
+2. 保存 JSON 快照到 `crawler/data/knowledge_pages.json`。
+3. 写入 `knowledge_point`，供知识图谱使用。
+4. 写入 `t_ai_knowledge_base`，供 RAG 和 AI skill 使用。
+
+当前快照统计：**116 条知识点页面**，其中数据结构 30、组成原理 30、操作系统 22、计算机网络 34。
+
+### 审计并同步真题图片路径
+
+先 dry-run 查看会修改哪些记录：
+
+```bash
+python3 crawler/sync_image_paths.py
+```
+
+确认后同步到数据库：
+
+```bash
+python3 crawler/sync_image_paths.py --apply
+```
+
+同步逻辑按图片文件名中的年份、科目代码、题号匹配 `t_question` 和 `t_essay_question`，并把路径统一为 `images/{year}/{year}_{question_no}.{ext}`。后端静态资源目录应包含对应文件：`source/xzs/src/main/resources/static/images/`。
 
 ### 生成 SQL 导入文件
 
@@ -170,8 +211,16 @@ year,subject,question_no,title,total_score,answer,analysis,images
 
 ### 图片
 
-- 选择题图片：17 张（SVG 为主）
-- 综合应用题图片：2 张
+- 选择题图片清单：17 条原始下载记录（SVG 为主，含重复来源）
+- 当前唯一静态图片文件：15 个
+- 数据库 `t_question` 已挂图：15 道
+- 数据库 `t_essay_question` 已挂图：4 条
+
+图片静态路径统一放在：
+
+```
+source/xzs/src/main/resources/static/images/{year}/{year}_{question_no}.{ext}
+```
 
 ## 数据库字段映射
 
@@ -204,6 +253,7 @@ xzs 系统中分数以**整数存储**（实际分值 × 10），例如：
 1. **选项数据不完整**：616 道选择题中，仅 35 道有独立的 `options` 字段，其余 581 道的选项混在 `question` 文本中。`generate_sql.py` 会尝试从题目文本中解析 ABCD 选项，但无法保证 100% 成功。
 2. **综合应用题内容为空**：98 道应用题中约 83 道内容为空（显示"待补充"），需要完善爬虫补全。
 3. **计算机网络选择题缺失**：每年只有 8 道，缺第 39、40 题。
+4. **RAG 向量未自动生成**：知识点正文已入 `t_ai_knowledge_base`，但 embedding 需要后续脚本或后台任务生成。未生成向量时，后端会用关键词检索兜底。
 
 ## 许可证
 

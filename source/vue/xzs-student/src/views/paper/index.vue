@@ -9,12 +9,7 @@
     </div>
 
     <div class="paper-content">
-      <el-tabs tab-position="left" v-model="tabId" @tab-click="tabChange" class="subject-tabs">
-        <el-tab-pane label="408综合" :name="'0'" key="0">
-          <div class="tab-content">
-            <paper-table :data="tableData" :loading="listLoading" :total="total" :query-param="queryParam" @search="search" />
-          </div>
-        </el-tab-pane>
+      <el-tabs tab-position="left" v-model="tabId" @tab-change="tabChange" class="subject-tabs">
         <el-tab-pane v-for="item in subjectList" :label="item.name" :key="item.id" :name="String(item.id)">
           <div class="tab-content">
             <paper-table :data="tableData" :loading="listLoading" :total="total" :query-param="queryParam" @search="search" />
@@ -41,7 +36,7 @@ const queryParam = reactive({
   paperType: 1,
   subjectId: null,
   pageIndex: 1,
-  pageSize: 10
+  pageSize: 100
 })
 
 const search = () => {
@@ -55,18 +50,26 @@ const search = () => {
   })
 }
 
-const tabChange = () => {
-  const id = Number(tabId.value)
-  queryParam.subjectId = id === 0 ? null : id
+const tabChange = (name) => {
+  const id = Number(name || tabId.value)
+  queryParam.subjectId = id
   queryParam.pageIndex = 1
   search()
 }
 
-onMounted(() => {
-  subjectApi.list().then(re => {
-    subjectList.value = re.response || []
-    search()
-  })
+const loadSubjectTabs = async () => {
+  const re = await subjectApi.list()
+  subjectList.value = re.response || []
+  const defaultSubject = subjectList.value[subjectList.value.length - 1]
+  if (defaultSubject) {
+    tabId.value = String(defaultSubject.id)
+    queryParam.subjectId = defaultSubject.id
+  }
+}
+
+onMounted(async () => {
+  await loadSubjectTabs()
+  search()
 })
 </script>
 

@@ -243,6 +243,37 @@
 	</select>
 
 
+  <select id="selectStudentQuestionSummary" resultType="java.util.Map">
+    SELECT
+      COUNT(qa.id) AS totalQuestions,
+      COALESCE(SUM(CASE WHEN qa.do_right = b'1' THEN 1 ELSE 0 END), 0) AS correctQuestions,
+      COALESCE(SUM(CASE WHEN qa.do_right = b'1' THEN 0 ELSE 1 END), 0) AS weakPoints
+    FROM t_exam_paper_question_customer_answer qa
+    INNER JOIN t_exam_paper_answer ea ON qa.exam_paper_answer_id = ea.id
+    WHERE ea.create_user = #{uid}
+      AND ea.status = 2
+  </select>
+
+
+  <select id="selectStudentSubjectAccuracy" resultType="java.util.Map">
+    SELECT
+      s.id AS id,
+      s.name AS name,
+      ROUND(SUM(CASE WHEN qa.do_right = b'1' THEN 1 ELSE 0 END) * 100 / COUNT(qa.subject_id)) AS accuracy
+    FROM t_subject s
+    INNER JOIN (
+      SELECT qa.subject_id, qa.do_right
+      FROM t_exam_paper_question_customer_answer qa
+      INNER JOIN t_exam_paper_answer ea ON qa.exam_paper_answer_id = ea.id
+      WHERE ea.create_user = #{uid}
+        AND ea.status = 2
+    ) qa ON qa.subject_id = s.id
+    WHERE s.deleted = b'0'
+    GROUP BY s.id, s.name, s.item_order
+    ORDER BY s.item_order
+  </select>
+
+
   <select id="getByPidUid" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
