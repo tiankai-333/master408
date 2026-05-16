@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.AiKnowledgeBaseMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.ai.AiKnowledgeBase">
+        <id column="id" property="id"/>
+        <result column="category" property="category"/>
+        <result column="domain" property="domain"/>
+        <result column="sub_domain" property="subDomain"/>
+        <result column="title" property="title"/>
+        <result column="keywords" property="keywords"/>
+        <result column="content" property="content"/>
+        <result column="source_type" property="sourceType"/>
+        <result column="source_name" property="sourceName"/>
+        <result column="source_author" property="sourceAuthor"/>
+        <result column="core_concepts" property="coreConcepts"/>
+        <result column="application_scenarios" property="applicationScenarios"/>
+        <result column="examples" property="examples"/>
+        <result column="enabled" property="enabled"/>
+        <result column="priority" property="priority"/>
+        <result column="usage_count" property="usageCount"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base WHERE deleted = b'0' ORDER BY priority DESC, create_time DESC
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted = b'0'
+    </select>
+
+    <select id="selectByCategory" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base WHERE category = #{category} AND deleted = b'0' 
+        ORDER BY priority DESC
+    </select>
+
+    <select id="selectByDomain" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base WHERE domain = #{domain} AND deleted = b'0' 
+        ORDER BY priority DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base WHERE id = #{id}
+    </select>
+
+    <select id="search" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_knowledge_base 
+        WHERE deleted = b'0' 
+        AND (
+            title LIKE CONCAT('%', #{keyword}, '%')
+            OR keywords LIKE CONCAT('%', #{keyword}, '%')
+            OR content LIKE CONCAT('%', #{keyword}, '%')
+        )
+        ORDER BY priority DESC
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiKnowledgeBase" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_ai_knowledge_base (
+            category, domain, sub_domain, title, keywords, content,
+            source_type, source_name, source_author, core_concepts,
+            application_scenarios, examples, enabled, priority,
+            usage_count, create_user, create_time, update_time, deleted
+        ) VALUES (
+            #{category}, #{domain}, #{subDomain}, #{title}, #{keywords}, #{content},
+            #{sourceType}, #{sourceName}, #{sourceAuthor}, #{coreConcepts},
+            #{applicationScenarios}, #{examples}, #{enabled}, #{priority},
+            #{usageCount}, #{createUser}, #{createTime}, #{updateTime}, #{deleted}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.mindskip.xzs.domain.ai.AiKnowledgeBase">
+        UPDATE t_ai_knowledge_base SET
+            category = #{category},
+            domain = #{domain},
+            sub_domain = #{subDomain},
+            title = #{title},
+            keywords = #{keywords},
+            content = #{content},
+            source_type = #{sourceType},
+            source_name = #{sourceName},
+            source_author = #{sourceAuthor},
+            core_concepts = #{coreConcepts},
+            application_scenarios = #{applicationScenarios},
+            examples = #{examples},
+            enabled = #{enabled},
+            priority = #{priority},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        UPDATE t_ai_knowledge_base SET deleted = b'1' WHERE id = #{id}
+    </delete>
+
+</mapper>

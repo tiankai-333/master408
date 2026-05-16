@@ -1,70 +1,63 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParam" ref="queryForm" :inline="true">
-      <el-form-item label="用户Id：">
-        <el-input v-model="queryParam.userId"></el-input>
+      <el-form-item label="操作人：">
+        <el-input v-model="queryParam.userName" clearable></el-input>
       </el-form-item>
-      <el-form-item label="用户名：">
-        <el-input v-model="queryParam.userName"></el-input>
+      <el-form-item label="操作类型：">
+        <el-input v-model="queryParam.operation" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">查询</el-button>
       </el-form-item>
     </el-form>
-
     <el-table v-loading="listLoading" :data="tableData" border fit highlight-current-row style="width: 100%">
-      <el-table-column prop="id" label="Id" width="100" />
-      <el-table-column prop="userName" label="用户名" width="150" />
-      <el-table-column prop="realName" label="真实姓名" width="150" />
-      <el-table-column prop="content" label="动态" />
-      <el-table-column prop="createTime" label="创建时间" width="160px"/>
+      <el-table-column prop="id" label="Id" width="80px"/>
+      <el-table-column prop="userName" label="操作人" width="120px"/>
+      <el-table-column prop="operation" label="操作类型" width="150px"/>
+      <el-table-column prop="method" label="请求方式" width="100px"/>
+      <el-table-column prop="requestUri" label="请求路径"/>
+      <el-table-column prop="ip" label="IP" width="120px"/>
+      <el-table-column prop="createTime" label="操作时间" width="160px"/>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParam.pageIndex" :limit.sync="queryParam.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParam.pageIndex" v-model:limit="queryParam.pageSize"
                 @pagination="search"/>
   </div>
 </template>
 
-<script>
+<script setup>
+import { reactive, ref, onMounted } from 'vue'
 import Pagination from '@/components/Pagination'
-import userApi from '@/api/user'
+import logApi from '@/api/log'
 
-export default {
-  components: { Pagination },
-  data () {
-    return {
-      queryParam: {
-        userId: null,
-        userName: null,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      listLoading: true,
-      tableData: [],
-      total: 0
-    }
-  },
-  created () {
-    let userId = this.$route.query.userId
-    if (userId && parseInt(userId) !== 0) {
-      this.queryParam.userId = userId
-    }
-    this.search()
-  },
-  methods: {
-    search () {
-      this.listLoading = true
-      userApi.getUserEventPageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    submitForm () {
-      this.queryParam.pageIndex = 1
-      this.search()
-    }
-  }
+const queryParam = reactive({
+  userName: null,
+  operation: null,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const listLoading = ref(true)
+const tableData = ref([])
+const total = ref(0)
+
+const search = () => {
+  listLoading.value = true
+  logApi.pageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+const submitForm = () => {
+  queryParam.pageIndex = 1
+  search()
+}
+
+onMounted(() => {
+  search()
+})
 </script>

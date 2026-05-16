@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.KnowledgePointMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.KnowledgePoint">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="description" property="description"/>
+        <result column="level" property="level"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="create_time" property="createTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM knowledge_point WHERE deleted = FALSE ORDER BY sort_order
+    </select>
+
+    <select id="findBySubjectId" resultMap="BaseResultMap">
+        SELECT * FROM knowledge_point WHERE subject_id = #{subjectId} AND deleted = FALSE ORDER BY sort_order
+    </select>
+
+    <select id="findByParentId" resultMap="BaseResultMap">
+        SELECT * FROM knowledge_point WHERE parent_id = #{parentId} AND deleted = FALSE ORDER BY sort_order
+    </select>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM knowledge_point WHERE id = #{id} AND deleted = FALSE
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.KnowledgePoint">
+        INSERT INTO knowledge_point (name, subject_id, parent_id, description, level, sort_order, create_time, deleted)
+        VALUES (#{name}, #{subjectId}, #{parentId}, #{description}, #{level}, #{sortOrder}, NOW(), FALSE)
+    </insert>
+
+    <update id="update" parameterType="com.mindskip.xzs.domain.KnowledgePoint">
+        UPDATE knowledge_point SET
+            name = #{name},
+            subject_id = #{subjectId},
+            parent_id = #{parentId},
+            description = #{description},
+            level = #{level},
+            sort_order = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        UPDATE knowledge_point SET deleted = TRUE WHERE id = #{id}
+    </delete>
+
+</mapper>

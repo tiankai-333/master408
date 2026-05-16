@@ -1,0 +1,73 @@
+{
+  "total_images": 17,
+  "images": [
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2011/27.drawio.svg",
+      "local_path": "data\\images\\2011_OS_27_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2012_4.drawio.svg",
+      "local_path": "data\\images\\2012_DS_04_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2012/27.drawio.svg",
+      "local_path": "data\\images\\2012_OS_27_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2012_27.drawio.svg",
+      "local_path": "data\\images\\2012_OS_27_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2012_29.drawio.svg",
+      "local_path": "data\\images\\2012_OS_29_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2012/44.drawio.svg",
+      "local_path": "data\\images\\2012_CO_44_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2012_44.drawio.svg",
+      "local_path": "data\\images\\2012_CO_44_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2012/47_1.drawio.svg",
+      "local_path": "data\\images\\2012_CN_47_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2015/6.drawio.svg",
+      "local_path": "data\\images\\2015_DS_06_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2016_4.drawio.svg",
+      "local_path": "data\\images\\2016_DS_04_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2016/6.drawio.svg",
+      "local_path": "data\\images\\2016_DS_06_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2017/47.drawio.svg",
+      "local_path": "data\\images\\2017_CN_47_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2018/6.drawio.svg",
+      "local_path": "data\\images\\2018_DS_06_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2019/38.drawio.svg",
+      "local_path": "data\\images\\2019_CN_38_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2020_41.drawio.svg",
+      "local_path": "data\\images\\2020_DS_41_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/paper/2021/40.drawio.svg",
+      "local_path": "data\\images\\2021_CN_40_1.svg"
+    },
+    {
+      "original_url": "https://www.csgraduates.com/images/2023_19_ans.jpg",
+      "local_path": "data\\images\\2023_CO_19_1.jpg"
+    }
+  ]
+}

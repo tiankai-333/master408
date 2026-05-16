@@ -29,3 +29,24 @@ logs/
 Thumbs.db
 
 *.class
+
+# Node & Build
+node_modules/
+dist/
+build/
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+
+# Environment
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.log
+
+# Large files/PDFs
+*.pdf

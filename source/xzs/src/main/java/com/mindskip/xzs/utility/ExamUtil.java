@@ -20,6 +20,9 @@ public class ExamUtil {
      * @return the string
      */
     public static String scoreToVM(Integer score) {
+        if (score == null) {
+            return "-";
+        }
         if (score % 10 == 0) {
             return String.valueOf(score / 10);
         } else {
@@ -48,6 +51,9 @@ public class ExamUtil {
      * @return the string
      */
     public static String secondToVM(Integer second) {
+        if (second == null) {
+            return "-";
+        }
         String dateTimes;
         long days = second / (60 * 60 * 24);
         long hours = (second % (60 * 60 * 24)) / (60 * 60);

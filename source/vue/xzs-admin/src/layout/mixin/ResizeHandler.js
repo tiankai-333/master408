@@ -1,45 +1,45 @@
-import store from '@/store'
+import { onMounted, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAppStore } from '@/stores/app'
 
-const { body } = document
-const WIDTH = 992 // refer to Bootstrap's responsive design
+const WIDTH = 992
 
-export default {
-  watch: {
-    $route (route) {
-      if (this.device === 'mobile' && this.sidebar.opened) {
-        store.dispatch('app/closeSideBar', { withoutAnimation: false })
-      }
-    }
-  },
-  beforeMount () {
-    window.addEventListener('resize', this.$_resizeHandler)
-  },
-  beforeDestroy () {
-    window.removeEventListener('resize', this.$_resizeHandler)
-  },
-  mounted () {
-    const isMobile = this.$_isMobile()
-    if (isMobile) {
-      store.dispatch('app/toggleDevice', 'mobile')
-      store.dispatch('app/closeSideBar', { withoutAnimation: true })
-    }
-  },
-  methods: {
-    // use $_ for mixins properties
-    // https://vuejs.org/v2/style-guide/index.html#Private-property-names-essential
-    $_isMobile () {
-      const rect = body.getBoundingClientRect()
-      return rect.width - 1 < WIDTH
-    },
-    $_resizeHandler () {
-      if (!document.hidden) {
-        const isMobile = this.$_isMobile()
-        store.dispatch('app/toggleDevice', isMobile ? 'mobile' : 'desktop')
+export default function () {
+  const appStore = useAppStore()
+  const route = useRoute()
 
-        if (isMobile) {
-          store.dispatch('app/closeSideBar', { withoutAnimation: true })
-        }
+  const isMobile = () => {
+    const rect = document.body.getBoundingClientRect()
+    return rect.width - 1 < WIDTH
+  }
+
+  const resizeHandler = () => {
+    if (!document.hidden) {
+      const mobile = isMobile()
+      appStore.toggleDevice(mobile ? 'mobile' : 'desktop')
+
+      if (mobile) {
+        appStore.closeSideBar(true)
       }
     }
   }
+
+  watch(() => route.path, () => {
+    if (appStore.device === 'mobile' && appStore.sidebar.opened) {
+      appStore.closeSideBar(false)
+    }
+  })
+
+  onMounted(() => {
+    window.addEventListener('resize', resizeHandler)
+    const mobile = isMobile()
+    if (mobile) {
+      appStore.toggleDevice('mobile')
+      appStore.closeSideBar(true)
+    }
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', resizeHandler)
+  })
 }
