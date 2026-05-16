@@ -5,15 +5,25 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="content" jdbcType="VARCHAR" property="content" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="embedding" jdbcType="LONGVARCHAR" property="embedding" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, content, create_time
+    id, content, create_time, embedding
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from t_text_content
     where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAllWithEmbedding" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from t_text_content
+    where embedding IS NOT NULL
+      AND content IS NOT NULL
+      AND content != ''
+    order by id
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from t_text_content
@@ -37,6 +47,9 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="embedding != null">
+        embedding,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -47,6 +60,9 @@
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="embedding != null">
+        #{embedding,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -59,13 +75,17 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="embedding != null">
+        embedding = #{embedding,jdbcType=LONGVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.mindskip.xzs.domain.TextContent">
     update t_text_content
     set content = #{content,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      embedding = #{embedding,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

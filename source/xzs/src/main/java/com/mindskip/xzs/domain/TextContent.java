@@ -28,6 +28,11 @@ public class TextContent implements Serializable {
      */
     private Date createTime;
 
+    /**
+     * 向量嵌入(Embedding JSON)
+     */
+    private String embedding;
+
     public Integer getId() {
         return id;
     }
@@ -50,5 +55,13 @@ public class TextContent implements Serializable {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getEmbedding() {
+        return embedding;
+    }
+
+    public void setEmbedding(String embedding) {
+        this.embedding = embedding;
     }
 }
