@@ -1,9 +1,21 @@
 logging:
   path: ./log/
+  level:
+    root: info
+    com.mindskip.xzs: info
 
 spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
   datasource:
-    url: jdbc:mysql://localhost:3306/xzs?useSSL=false&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&allowMultiQueries=true
+    url: jdbc:mysql://localhost:3306/xzs?useSSL=false&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&allowMultiQueries=true&connectionCollation=utf8mb4_unicode_ci
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  configuration:
+    lazy-loading-enabled: false

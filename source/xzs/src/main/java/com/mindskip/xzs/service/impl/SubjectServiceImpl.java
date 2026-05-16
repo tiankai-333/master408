@@ -44,7 +44,8 @@ public class SubjectServiceImpl extends BaseServiceImpl<Subject> implements Subj
 
     @Override
     public Integer levelBySubjectId(Integer id) {
-        return this.selectById(id).getLevel();
+        Subject subject = this.selectById(id);
+        return subject != null ? subject.getLevel() : null;
     }
 
     @Override

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.AiUsageLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.ai.AiUsageLog">
+        <id column="id" property="id"/>
+        <result column="template_id" property="templateId"/>
+        <result column="style" property="style"/>
+        <result column="ai_type" property="aiType"/>
+        <result column="model" property="model"/>
+        <result column="question" property="question"/>
+        <result column="knowledge_points" property="knowledgePoints"/>
+        <result column="knowledge_base_ids" property="knowledgeBaseIds"/>
+        <result column="prompt" property="prompt"/>
+        <result column="response" property="response"/>
+        <result column="response_length" property="responseLength"/>
+        <result column="tokens_used" property="tokensUsed"/>
+        <result column="cost" property="cost"/>
+        <result column="duration_ms" property="durationMs"/>
+        <result column="success" property="success"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="user_rating" property="userRating"/>
+        <result column="user_feedback" property="userFeedback"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="selectByTemplateId" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_usage_log 
+        WHERE template_id = #{templateId}
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_usage_log WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiUsageLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_ai_usage_log (
+            template_id, style, ai_type, model, question, knowledge_points,
+            knowledge_base_ids, prompt, response, response_length,
+            tokens_used, cost, duration_ms, success, error_message,
+            user_rating, user_feedback, create_time
+        ) VALUES (
+            #{templateId}, #{style}, #{aiType}, #{model}, #{question}, #{knowledgePoints},
+            #{knowledgeBaseIds}, #{prompt}, #{response}, #{responseLength},
+            #{tokensUsed}, #{cost}, #{durationMs}, #{success}, #{errorMessage},
+            #{userRating}, #{userFeedback}, #{createTime}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.mindskip.xzs.domain.ai.AiUsageLog">
+        UPDATE t_ai_usage_log SET
+            user_rating = #{userRating},
+            user_feedback = #{userFeedback}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM t_ai_usage_log WHERE id = #{id}
+    </delete>
+
+    <select id="countTotal" resultType="int">
+        SELECT COUNT(*) FROM t_ai_usage_log
+    </select>
+
+    <select id="countSuccessRate" resultType="double">
+        SELECT IFNULL(SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) / COUNT(*), 0) 
+        FROM t_ai_usage_log
+    </select>
+
+    <select id="getTopStyles" resultType="map">
+        SELECT style, COUNT(*) as count 
+        FROM t_ai_usage_log 
+        GROUP BY style 
+        ORDER BY count DESC 
+        LIMIT #{limit}
+    </select>
+
+</mapper>

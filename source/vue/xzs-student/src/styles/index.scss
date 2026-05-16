@@ -23,35 +23,39 @@ html {
 }
 
 .student-header {
-  border-bottom: solid 1px #e0e4f0 !important;
+  border-bottom: none !important;
   padding: 0px !important;
-  background: #ffffff !important;
-  box-shadow: 0 2px 12px rgba(91, 110, 245, 0.08);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%) !important;
+  background-size: 200% 200%;
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    0 0 60px rgba(83, 52, 131, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
   .el-menu-title {
     border-bottom: 0px !important;
     float: right;
 
     .el-menu-item {
-      font-size: 15px !important;
-      line-height: 62px !important;
-      color: #3a3f5c !important;
+      font-size: 16px !important;
+      line-height: 70px !important;
+      color: rgba(255, 255, 255, 0.9) !important;
       font-weight: 500;
 
       &.is-active {
-        color: #5b6ef5 !important;
-        border-bottom: 2px solid #5b6ef5 !important;
+        color: #c4b5fd !important;
+        border-bottom: 3px solid #a855f7 !important;
       }
 
       &:hover {
-        color: #5b6ef5 !important;
-        background-color: transparent !important;
+        color: #fff !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
       }
     }
   }
 
   .head-user {
-    color: #909399;
+    color: rgba(255, 255, 255, 0.8);
     float: right;
     margin: 0px 0px 0px 10px;
 

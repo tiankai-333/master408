@@ -1,11 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="form" ref="form" label-width="100px" v-loading="formLoading" :rules="rules">
-      <el-form-item label="年级：" prop="level" required>
-        <el-select v-model="form.level" placeholder="年级"  @change="levelChange">
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
+    <el-form :model="form" ref="formRef" label-width="100px" v-loading="formLoading" :rules="rules">
       <el-form-item label="学科：" prop="subjectId" required>
         <el-select v-model="form.subjectId" placeholder="学科">
           <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
@@ -55,7 +50,7 @@
         <el-button type="success" @click="addTitle">添加标题</el-button>
       </el-form-item>
     </el-form>
-    <el-dialog :visible.sync="questionPage.showDialog"  width="70%">
+    <el-dialog v-model="questionPage.showDialog"  width="70%">
       <el-form :model="questionPage.queryParam" ref="queryForm" :inline="true">
         <el-form-item label="ID：">
           <el-input v-model="questionPage.queryParam.id"  clearable></el-input>
@@ -77,194 +72,190 @@
         <el-table-column prop="shortTitle" label="题干" show-overflow-tooltip/>
       </el-table>
       <pagination v-show="questionPage.total>0" :total="questionPage.total"
-                  :page.sync="questionPage.queryParam.pageIndex" :limit.sync="questionPage.queryParam.pageSize"
+                  v-model:page="questionPage.queryParam.pageIndex" v-model:limit="questionPage.queryParam.pageSize"
                   @pagination="search"/>
-      <span slot="footer" class="dialog-footer">
+      <template #footer>
           <el-button @click="questionPage.showDialog = false">取 消</el-button>
           <el-button type="primary" @click="confirmQuestionSelect">确定</el-button>
-     </span>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-
-import { mapGetters, mapState, mapActions } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Pagination from '@/components/Pagination'
-import QuestionShow from '../question/components/Show'
+import QuestionShow from '../question/components/Show.vue'
 import examPaperApi from '@/api/examPaper'
 import questionApi from '@/api/question'
+import { useEnumItemStore } from '@/stores/enumItem'
+import { useExamStore } from '@/stores/exam'
+import { useTagsViewStore } from '@/stores/tagsView'
 
-export default {
-  components: { Pagination, QuestionShow },
-  data () {
-    return {
-      form: {
-        id: null,
-        level: null,
-        subjectId: null,
-        paperType: 1,
-        limitDateTime: [],
-        name: '',
-        suggestTime: null,
-        titleItems: []
-      },
-      subjectFilter: null,
-      formLoading: false,
-      rules: {
-        level: [
-          { required: true, message: '请选择年级', trigger: 'change' }
-        ],
-        subjectId: [
-          { required: true, message: '请选择学科', trigger: 'change' }
-        ],
-        paperType: [
-          { required: true, message: '请选择试卷类型', trigger: 'change' }
-        ],
-        name: [
-          { required: true, message: '请输入试卷名称', trigger: 'blur' }
-        ],
-        suggestTime: [
-          { required: true, message: '请输入建议时长', trigger: 'blur' }
-        ]
-      },
-      questionPage: {
-        multipleSelection: [],
-        showDialog: false,
-        queryParam: {
-          id: null,
-          questionType: null,
-          subjectId: 1,
-          pageIndex: 1,
-          pageSize: 5
-        },
-        listLoading: true,
-        tableData: [],
-        total: 0
-      },
-      currentTitleItem: null
-    }
+const route = useRoute()
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+const examStore = useExamStore()
+const tagsViewStore = useTagsViewStore()
+
+const form = reactive({
+  memberId: null,
+  subjectId: null,
+  paperType: 1,
+  limitDateTime: [],
+  name: '',
+  suggestTime: null,
+  titleItems: []
+})
+
+const subjectFilter = ref(null)
+const formLoading = ref(false)
+const formRef = ref(null)
+const currentTitleItem = ref(null)
+
+const questionPage = reactive({
+  multipleSelection: [],
+  showDialog: false,
+  queryParam: {
+    id: null,
+    questionType: null,
+    subjectId: 1,
+    pageIndex: 1,
+    pageSize: 5
   },
-  created () {
-    let id = this.$route.query.id
-    let _this = this
-    this.initSubject(function () {
-      _this.subjectFilter = _this.subjects
-    })
-    if (id && parseInt(id) !== 0) {
-      _this.formLoading = true
-      examPaperApi.select(id).then(re => {
-        _this.form = re.response
-        _this.formLoading = false
-      })
-    }
-  },
-  methods: {
-    submitForm () {
-      let _this = this
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.formLoading = true
-          examPaperApi.edit(this.form).then(re => {
-            if (re.code === 1) {
-              _this.$message.success(re.message)
-              _this.delCurrentView(_this).then(() => {
-                _this.$router.push('/exam/paper/list')
-              })
-            } else {
-              _this.$message.error(re.message)
-              this.formLoading = false
-            }
-          }).catch(e => {
-            this.formLoading = false
+  listLoading: true,
+  tableData: [],
+  total: 0
+})
+
+const questionTypeEnum = computed(() => [
+  { key: 1, value: '单选题' },
+  { key: 2, value: '多选题' },
+  { key: 3, value: '填空题' },
+  { key: 4, value: '判断题' },
+  { key: 5, value: '简答题' }
+])
+
+const paperTypeEnum = computed(() => [
+  { key: 1, value: '练习卷' },
+  { key: 2, value: '作业卷' },
+  { key: 3, value: '测试卷' },
+  { key: 4, value: '考试卷' }
+])
+
+const rules = {
+  subjectId: [
+    { required: true, message: '请选择学科', trigger: 'change' }
+  ],
+  paperType: [
+    { required: true, message: '请选择试卷类型', trigger: 'change' }
+  ],
+  name: [
+    { required: true, message: '请输入试卷名称', trigger: 'blur' }
+  ],
+  suggestTime: [
+    { required: true, message: '请输入建议时长', trigger: 'blur' }
+  ]
+}
+
+const submitForm = () => {
+  formRef.value.validate((valid) => {
+    if (valid) {
+      formLoading.value = true
+      examPaperApi.edit(form).then(re => {
+        if (re.code === 1) {
+          ElMessage.success(re.message)
+          tagsViewStore.delVisitedView({ path: route.path }).then(() => {
+            router.push('/exam/paper/list')
           })
         } else {
-          return false
+          ElMessage.error(re.message)
+          formLoading.value = false
         }
+      }).catch(() => {
+        formLoading.value = false
       })
-    },
-    addTitle () {
-      this.form.titleItems.push({
-        name: '',
-        questionItems: []
-      })
-    },
-    addQuestion (titleItem) {
-      this.currentTitleItem = titleItem
-      this.questionPage.showDialog = true
-      this.search()
-    },
-    removeTitleItem (titleItem) {
-      this.form.titleItems.remove(titleItem)
-    },
-    removeQuestion (titleItem, questionItem) {
-      titleItem.questionItems.remove(questionItem)
-    },
-    queryForm () {
-      this.questionPage.queryParam.pageIndex = 1
-      this.search()
-    },
-    confirmQuestionSelect () {
-      let _this = this
-      this.questionPage.multipleSelection.forEach(q => {
-        questionApi.select(q.id).then(re => {
-          _this.currentTitleItem.questionItems.push(re.response)
-        })
-      })
-      this.questionPage.showDialog = false
-    },
-    levelChange () {
-      this.form.subjectId = null
-      this.subjectFilter = this.subjects.filter(data => data.level === this.form.level)
-    },
-    search () {
-      this.questionPage.queryParam.subjectId = this.form.subjectId
-      this.questionPage.listLoading = true
-      questionApi.pageList(this.questionPage.queryParam).then(data => {
-        const re = data.response
-        this.questionPage.tableData = re.list
-        this.questionPage.total = re.total
-        this.questionPage.queryParam.pageIndex = re.pageNum
-        this.questionPage.listLoading = false
-      })
-    },
-    handleSelectionChange (val) {
-      this.questionPage.multipleSelection = val
-    },
-    questionTypeFormatter (row, column, cellValue, index) {
-      return this.enumFormat(this.questionTypeEnum, cellValue)
-    },
-    subjectFormatter (row, column, cellValue, index) {
-      return this.subjectEnumFormat(cellValue)
-    },
-    resetForm () {
-      let lastId = this.form.id
-      this.$refs['form'].resetFields()
-      this.form = {
-        id: null,
-        level: null,
-        subjectId: null,
-        paperType: 1,
-        limitDateTime: [],
-        name: '',
-        suggestTime: null,
-        titleItems: []
-      }
-      this.form.id = lastId
-    },
-    ...mapActions('exam', { initSubject: 'initSubject' }),
-    ...mapActions('tagsView', { delCurrentView: 'delCurrentView' })
-  },
-  computed: {
-    ...mapGetters('enumItem', ['enumFormat']),
-    ...mapState('enumItem', {
-      questionTypeEnum: state => state.exam.question.typeEnum,
-      paperTypeEnum: state => state.exam.examPaper.paperTypeEnum,
-      levelEnum: state => state.user.levelEnum
-    }),
-    ...mapState('exam', { subjects: state => state.subjects })
-  }
+    }
+  })
 }
+
+const addTitle = () => {
+  form.titleItems.push({
+    name: '',
+    questionItems: []
+  })
+}
+
+const addQuestion = (titleItem) => {
+  currentTitleItem.value = titleItem
+  questionPage.showDialog = true
+  search()
+}
+
+const queryForm = () => {
+  questionPage.queryParam.pageIndex = 1
+  search()
+}
+
+const confirmQuestionSelect = () => {
+  questionPage.multipleSelection.forEach(q => {
+    questionApi.select(q.id).then(re => {
+      currentTitleItem.value.questionItems.push(re.response)
+    })
+  })
+  questionPage.showDialog = false
+}
+
+const search = () => {
+  questionPage.queryParam.subjectId = form.subjectId
+  questionPage.listLoading = true
+  questionApi.pageList(questionPage.queryParam).then(data => {
+    const re = data.response
+    questionPage.tableData = re.list
+    questionPage.total = re.total
+    questionPage.queryParam.pageIndex = re.pageNum
+    questionPage.listLoading = false
+  })
+}
+
+const handleSelectionChange = (val) => {
+  questionPage.multipleSelection = val
+}
+
+const questionTypeFormatter = (row, column, cellValue) => {
+  return enumItemStore.enumFormat(questionTypeEnum.value, cellValue)
+}
+
+const resetForm = () => {
+  const lastId = form.id
+  formRef.value.resetFields()
+  Object.assign(form, {
+    id: null,
+    subjectId: null,
+    paperType: 1,
+    limitDateTime: [],
+    name: '',
+    suggestTime: null,
+    titleItems: []
+  })
+  form.id = lastId
+}
+
+onMounted(() => {
+  const id = route.query.id
+  examStore.initSubject(() => {
+    subjectFilter.value = examStore.subjects
+  })
+  if (id && parseInt(id) !== 0) {
+    formLoading.value = true
+    examPaperApi.select(id).then(re => {
+      Object.assign(form, re.response)
+      formLoading.value = false
+    })
+  }
+})
 </script>
 
 <style lang="scss">

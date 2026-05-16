@@ -1,0 +1,3950 @@
+[
+  {
+    "source": "2011年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "入栈出栈序列"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "队列"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "完全二叉树"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "二叉树的遍历"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "树的概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "二叉排序树"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "图的概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "散列表"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "堆的概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "指令执行指标"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "存储器概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "存储器概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "指令寻址方式"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "标志寄存器"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "流水线概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "计算机性能指标中断屏蔽"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "总线概念"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "多级中断中断屏蔽"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "程序查询IO方式"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "用户态和内核态"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "进程和线程"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "IO软件层次"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "银行家算法"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "缺页异常"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "抖动"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "程序的链接程序的装入"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "缓冲区"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "进程和线程"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "TCP/IP模型"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "调制方法"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "ARQ协议"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "介质访问控制"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "子网聚合"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "子网划分"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP三次握手"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "TCP滑动窗口"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "邻接矩阵关键路径"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "归并排序"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "补码类型转换"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "虚拟页式管理地址翻译cache概念TLB"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "文件物理结构"
+  },
+  {
+    "source": "2011年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "ARPHTTP"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "中缀转后缀"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "二叉树的遍历"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "平衡二叉树"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "图的遍历"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "拓扑排序"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "最短路径"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "最小生成树"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机体系结构"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "无符号数类型转换"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "数据对齐"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": ""
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "cache映射方式"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "控制器种类"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线事务"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "总线类型"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "总线概念"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "中断IO异常和中断"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "用户态和内核态"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "寄存器类型"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "虚拟页式管理"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "IO软件层次"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "银行家算法"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "系统调用缺页异常"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "进程和线程"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "磁盘概念"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "TCP/IP模型ICMP"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "物理层接口特性"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "以太网"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "ARQ协议信道利用率"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "路由器"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "ARP"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "网络号和主机号"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "电子邮件"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "哈夫曼树归并排序"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "链表"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "计算机性能指标cache概念DMA主存容量的扩展"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "流水线概念流水线冒险"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "驻留集"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "文件物理结构"
+  },
+  {
+    "source": "2012年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "TCP首部协议数据单元"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "入栈出栈序列"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "平衡二叉树"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "树的概念带权路径长度"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "线索二叉树"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "二叉排序树"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "邻接矩阵"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "图的遍历"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "关键路径"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "指令执行指标"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "补码"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "差错控制海明码"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "地址翻译"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "指令寻址方式"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "流水线概念"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线类型"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "RAID"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "磁盘性能指标"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "中断IODMA"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "文件概念"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "文件物理结构"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "CHS地址IO软件层次"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "inode"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "缓冲区"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "用户态和内核态系统调用"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "系统引导流程"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "缺页异常"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "处理机调度概念"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "银行家算法"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "传输介质"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "交换方式"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "介质访问控制"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "HDLC"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "交换方式"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP滑动窗口"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "电子邮件"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "顺序表"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "平均查找长度"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "计算机性能指标cache概念总线事务"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "指令格式标志寄存器数据通路"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "页表虚拟页式管理"
+  },
+  {
+    "source": "2013年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "路由器路由聚合路由协议"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "中缀转后缀"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "队列"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "线索二叉树"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "二叉树和森林的转换"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "前缀编码"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "拓扑排序"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "散列表"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法希尔排序"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法快速排序"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机性能指标"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "主存容量的扩展"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "cache概念"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "指令寻址方式寄存器类型"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "微程序控制器"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线指标"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "总线事务"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "IO接口"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "死锁产生的必要条件"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "用户态和内核态陷阱指令"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "外存空间管理位图法"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "地址翻译TLB页表"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "文件概念inode"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "Belady异常"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "进程间通信"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "页表"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "交换机"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "香农定理通信指标"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "ARQ协议信道利用率"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "CDMA"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "TCP拥塞控制"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "UDP"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "HTTP"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "二叉树遍历带权路径长度"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "路由器路由协议最短路径"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "路由器最长前缀匹配"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "汇编代码指令操作码指令寻址方式流水线冒险"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "虚拟页式管理cache概念缺页异常"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "文件物理结构"
+  },
+  {
+    "source": "2014年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "栈"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "入栈出栈序列卡特兰数"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "哈夫曼树"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "平衡二叉树"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "图的遍历"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "最小生成树"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "数组查找"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "KMP算法"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "排序算法基数排序"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "堆的概念"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法希尔排序"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机体系结构"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": ""
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "浮点数加减"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "cache映射方式cache写策略"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "cache写策略TLB"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "存储器概念"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "主存容量的扩展"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线定时"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "磁盘性能指标"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "异常和中断"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "寄存器类型中断IO"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "用户态和内核态"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "死锁的处理方法"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "页面置换算法LRU"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "缓冲区"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "文件物理结构"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "页框分配和置换策略"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "位图法"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "磁盘调度算法"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "电子邮件"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "编码方法"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "信道利用率"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "CSMA/CD"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "交换机"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "路由器最长前缀匹配"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP拥塞控制"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "HTTP"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "链表"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "邻接矩阵"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "寄存器类型数据通路"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "指令格式"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "页表虚拟页式管理"
+  },
+  {
+    "source": "2015年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "DHCPARP路由表"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "链表"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "链表"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "队列"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "特殊矩阵三对角矩阵"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "森林的概念"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "图的遍历DFS"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "复杂度分析邻接表拓扑排序"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "最短路径"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "数组查找"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "B树B+树"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "外部排序"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机体系结构"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "类型转换"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "大小端"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "cache概念cache映射方式"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": ""
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "指令寻址方式"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "寄存器类型"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "流水线冒险"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "单周期处理器总线架构"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "总线事务"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "异常和中断"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "操作系统概念"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "处理机调度概念"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "死锁预防临界资源"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "页面置换算法clock算法"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "硬件互斥指令"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "地址翻译分段内存管理"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "驻留集"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "进程的互斥"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "SPOOLing"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "管程"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型网络设备"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "香农定理"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "网络设备"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "CSMA/CD限制条件"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "路由算法"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "网络号和主机号"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "子网划分"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "DNS"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "TCP三次握手TCP滑动窗口"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "树的概念"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "快速排序"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "计算机性能指标中断IO"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "虚拟页式管理TLBcache概念"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2016年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "目录文件分配表"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "栈入栈出栈序列"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "特殊矩阵"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "二叉树的遍历"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "二叉树的遍历"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "哈夫曼编码"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "图的概念"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "二叉排序树ABCD"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "B+树"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法归并排序插入排序"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "指令体系结构"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "主存容量的扩展"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "cache概念"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "指令寻址方式"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "操作码扩展编码"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "超流水线"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "寄存器类型"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "流水线概念数据通路"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "总线架构总线类型"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "IO接口"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "多重中断"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "系统调用"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "动态内存管理"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "外存空间管理"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "处理机调度算法时间片轮转"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "操作系统概念"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "磁盘格式化"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "inode"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "inode文件链接"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "DMA"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "奈奎斯特定理"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "CSMA/CA"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "网络号和主机号"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "路由协议"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "网络号和主机号"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP拥塞控制"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "FTP"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "二叉树遍历"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "最小生成树"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "补码IEEE浮点数表示"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "复杂和精简指令集标志寄存器指令操作码"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "页表地址翻译中断IO"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "信号量"
+  },
+  {
+    "source": "2017年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "ARQ协议信道利用率"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "后序表达式求值"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "入栈出栈序列"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "特殊矩阵"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "满二叉树"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "哈夫曼树"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "二叉排序树"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "拓扑排序"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "散列表平均查找长度"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法希尔排序"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "堆的概念"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机体系结构"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码类型转换"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "大小端"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "逻辑移位"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "主存容量的扩展"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "指令寻址方式"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "标志寄存器"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "流水线概念"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "总线指标"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "总线事务中断IO"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "操作系统概念"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "进程和线程"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "银行家算法"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "管程条件变量"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "磁盘调度算法"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "缓冲区"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "硬件互斥指令信号量"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "网络协议"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "物理层接口特性"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "CSMA/CA"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "ARQ协议信道利用率"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "MAC地址"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "子网聚合"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "UDP"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "电子邮件"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "顺序表"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "最小生成树邻接表路由器"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "计算机性能指标IO方式"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "虚拟页式管理TLBcache映射方式"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "地址翻译clock算法"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "文件系统文件物理结构"
+  },
+  {
+    "source": "2018年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "子网划分IP数据报分片"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "树和二叉树的转换"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "哈夫曼树"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "平衡二叉树"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "关键路径"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "图表示树"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "散列表平均查找长度"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "KMP算法"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "外部排序"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机体系结构"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码类型转换"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "缺页异常"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "大小端"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "计算机性能指标"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "寄存器类型指令寻址方式"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "流水线冒险"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线指标"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "磁盘概念"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "DMA"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "用户级和内核级线程"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "系统调用用户态和内核态"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "外存空间管理"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "段式内存管理"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": ""
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "死锁产生的必要条件"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "地址翻译页表"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "动态内存管理"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "传输介质"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "ARQ协议窗口大小限制"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "CSMA/CD限制条件"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "子网划分"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "TCP拥塞控制"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP三次握手"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "网络应用模型"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "链表"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "队列"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "机械硬盘CHS地址IO软件层次"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "汇编代码指令寻址方式标志寄存器"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "虚拟页式存储cache映射方式地址翻译"
+  },
+  {
+    "source": "2019年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "交换机路由器NAT"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "特殊矩阵"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "入栈出栈序列"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "二叉树存储"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "二叉树的遍历二叉树构建"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "二叉排序树"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "DFS图的遍历"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "最小生成树"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "关键路径"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "堆的概念"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法插入排序"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "寄存器类型计算机性能指标"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码IEEE浮点数表示"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "大小端数据对齐"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "cache概念TLB"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "指令寻址方式指令格式"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "流水线概念单周期CPU"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "陷阱指令"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线指标"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "异常和中断中断IO"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "中断屏蔽异常和中断"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "DMA"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "进程文件管理"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "文件物理结构"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "银行家算法"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "访存过程"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "进程概念"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "设备分配和回收"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "目录inode"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "同步原则"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "网络协议要素"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "数据报和虚电路"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "网络设备"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "ARQ协议信道利用率"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "CSMA/CA"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "TCP拥塞控制"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP三次握手TCP四次挥手"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "DNS"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "顺序表"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "前缀编码"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "运算电路指令种类"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "访存过程"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "虚拟页式管理地址翻译"
+  },
+  {
+    "source": "2020年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "路由器NAT"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "链表"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "队列"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "二维数组"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "二叉树构建二叉树和森林的转换"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "哈夫曼树"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "平衡二叉树"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "拓扑排序"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "最短路径"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "树的概念"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法基数排序"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "堆的概念"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机性能指标"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "主存容量的扩展"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "cache映射方式cache写策略"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "寄存器类型"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "数据通路"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "总线概念"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "IO接口"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "异常和中断"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "多重中断"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "用户态和内核态"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "进程控制块进程状态"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "处理机调度算法时间片轮转"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "磁盘调度算法"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "页面置换算法clock算法"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "页表"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "文件链接"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "死锁产生的必要条件"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "系统调用"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "编码方法"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "子网划分"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "IP数据报分片"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "距离向量算法"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "TCP四次挥手"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP首部UDP"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "TCP滑动窗口"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "邻接矩阵"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "指令格式指令操作码"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "地址翻译TLB"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "系统引导流程磁盘格式化"
+  },
+  {
+    "source": "2021年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "协议数据单元交换机"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "复杂度分析"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "入栈出栈序列"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "二叉树遍历"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "树的概念"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "哈夫曼树"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "图的概念"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "关键路径"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "散列表"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "归并排序"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机性能指标"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "页表"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "cache映射方式"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": ""
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "指令体系结构"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "指令种类操作码扩展编码"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "编译过程"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "多处理机"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "操作系统概念"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "处理机调度算法"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "银行家算法"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "用户态和内核态"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "缺页异常"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "页面置换算法缓冲区"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "系统调用"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "IO软件层次"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "OSI模型"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "奈奎斯特定理"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "网络号和主机号"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "路由表"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "软件定义网络"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "TCP拥塞控制"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "TCP四次挥手"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "HTTP"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "二叉排序树"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "堆的概念插入排序"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "寄存器类型控制器"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "CHS地址DMA"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "文件物理结构目录"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "同步问题设计"
+  },
+  {
+    "source": "2022年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "传输介质CSMA/CD限制条件DHCP"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "顺序表"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "链表"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "特殊矩阵三元组表"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "哈夫曼树"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "二叉树遍历"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "最小生成树"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "B树"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "数组查找"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "散列表平均查找长度"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "排序算法"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "计算机性能指标"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "补码"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "存储器地址"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "标志寄存器"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "指令寻址方式"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "数据通路"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "流水线冒险"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "总线指标"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "异常和中断"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "IO方式"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "操作系统概念"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "位图法"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "用户态和内核态"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "进程状态"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "虚拟页式管理"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "调度指标处理机调度算法"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "虚拟页式管理"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "inode"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "设备分配和回收"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "通信指标"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "奈奎斯特定理"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "ARQ协议信道利用率"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "传输介质CSMA/CD"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "差错控制循环冗余码"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "NAT"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "网络号和主机号"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "IPv6"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "邻接矩阵"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "外部排序"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": "虚拟页式管理cache概念"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "指令寻址方式大小端缺页异常"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "软件互斥算法"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "中断IOIO软件层次用户态和内核态"
+  },
+  {
+    "source": "2023年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "FTPTCP四次挥手TCP滑动窗口"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 1,
+    "question_type": "choice",
+    "tags": "链表"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 2,
+    "question_type": "choice",
+    "tags": "中缀转后缀"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 3,
+    "question_type": "choice",
+    "tags": "二叉树的遍历"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 4,
+    "question_type": "choice",
+    "tags": "邻接多重表"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 5,
+    "question_type": "choice",
+    "tags": "数组查找"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 6,
+    "question_type": "choice",
+    "tags": "KMP算法"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 7,
+    "question_type": "choice",
+    "tags": "二叉排序树"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 8,
+    "question_type": "choice",
+    "tags": "快速排序"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 9,
+    "question_type": "choice",
+    "tags": "堆的概念"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 10,
+    "question_type": "choice",
+    "tags": "归并排序"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 11,
+    "question_type": "choice",
+    "tags": "败者树"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 12,
+    "question_type": "choice",
+    "tags": "补码类型转换"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 13,
+    "question_type": "choice",
+    "tags": "微程序控制器"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 14,
+    "question_type": "choice",
+    "tags": "IEEE浮点数表示补码"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 15,
+    "question_type": "choice",
+    "tags": "运算电路"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 16,
+    "question_type": "choice",
+    "tags": "虚拟页式管理"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 17,
+    "question_type": "choice",
+    "tags": "TLB"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 18,
+    "question_type": "choice",
+    "tags": "虚拟页式管理"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 19,
+    "question_type": "choice",
+    "tags": "流水线冒险"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 20,
+    "question_type": "choice",
+    "tags": "总线指标"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 21,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 22,
+    "question_type": "choice",
+    "tags": "DMA"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 23,
+    "question_type": "choice",
+    "tags": "异常和中断"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 24,
+    "question_type": "choice",
+    "tags": "进程概念"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 25,
+    "question_type": "choice",
+    "tags": "虚拟页式管理寄存器类型"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 26,
+    "question_type": "choice",
+    "tags": "外存空间管理"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 27,
+    "question_type": "choice",
+    "tags": "动态内存管理"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 28,
+    "question_type": "choice",
+    "tags": "进程和线程"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 29,
+    "question_type": "choice",
+    "tags": "系统调用进程文件管理"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 30,
+    "question_type": "choice",
+    "tags": "处理机调度算法时间片轮转"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 31,
+    "question_type": "choice",
+    "tags": "中断IO"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 32,
+    "question_type": "choice",
+    "tags": "磁盘调度算法"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 33,
+    "question_type": "choice",
+    "tags": "交换方式"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 34,
+    "question_type": "choice",
+    "tags": "调制方法"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 35,
+    "question_type": "choice",
+    "tags": "交换机VLANARP"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 36,
+    "question_type": "choice",
+    "tags": "CSMA/CA"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 37,
+    "question_type": "choice",
+    "tags": "ARQ协议"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 38,
+    "question_type": "choice",
+    "tags": "TCP三次握手TCP四次挥手"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 39,
+    "question_type": "choice",
+    "tags": "UDP"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 40,
+    "question_type": "choice",
+    "tags": "HTTP"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 41,
+    "question_type": "essay",
+    "tags": "拓扑排序邻接矩阵"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 42,
+    "question_type": "essay",
+    "tags": "散列表"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 43,
+    "question_type": "essay",
+    "tags": ""
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 44,
+    "question_type": "essay",
+    "tags": "汇编代码虚拟页式管理大小端"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 45,
+    "question_type": "essay",
+    "tags": "虚拟页式管理缺页异常页表"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 46,
+    "question_type": "essay",
+    "tags": "进程概念信号量"
+  },
+  {
+    "source": "2024年408真题",
+    "question_no": 47,
+    "question_type": "essay",
+    "tags": "路由协议路由表"
+  }
+]
