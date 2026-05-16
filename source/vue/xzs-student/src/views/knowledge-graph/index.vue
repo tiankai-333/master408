@@ -70,9 +70,17 @@
 
         <el-card class="knowledge-mini" shadow="hover">
           <template #header>
-            <div class="card-header"><el-icon><Share /></el-icon><span>知识图谱</span></div>
+            <div class="card-header"><el-icon><MagicStick /></el-icon><span>AI 解析风格</span></div>
           </template>
-          <div class="mini-graph" ref="miniChartRef"></div>
+          <div class="style-buttons">
+            <div v-for="style in aiStyles" :key="style.id"
+                 :class="['style-btn', { active: selectedStyle === style.id }]"
+                 @click="switchStyle(style.id)">
+              <span class="style-emoji">{{ style.emoji }}</span>
+              <span class="style-name">{{ style.name }}</span>
+              <span class="style-desc">{{ style.description }}</span>
+            </div>
+          </div>
         </el-card>
       </div>
 
@@ -151,11 +159,17 @@ const messages = ref([])
 const filterSubject = ref(null)
 const subjects = ref([])
 const chartRef = ref(null)
-const miniChartRef = ref(null)
 const messagesRef = ref(null)
 const chartInstance = ref(null)
-const miniChartInstance = ref(null)
 const graphData = reactive({ nodes: [], links: [], categories: [] })
+
+const selectedStyle = ref('default')
+const aiStyles = [
+  { id: 'default', emoji: '📚', name: '标准解析', description: '清晰讲透知识点' },
+  { id: 'feynman', emoji: '🎓', name: '费曼风格', description: '像给小白讲故事' },
+  { id: 'plato', emoji: '❓', name: '柏拉图式', description: '启发式自问自答' },
+  { id: 'first-principles', emoji: '⚡', name: '第一性原理', description: '从本质逐步推导' }
+]
 
 const userStats = reactive({
   totalQuestions: 0,
@@ -221,7 +235,6 @@ const loadGraph = async () => {
       graphData.links = response.response.links
       graphData.categories = response.response.categories
       renderChart()
-      renderMiniChart()
     }
   } catch (error) {
     console.error('加载知识图谱失败:', error)
@@ -246,7 +259,6 @@ const renderMockGraph = () => {
   ]
   graphData.categories = [{ name: '操作系统' }]
   renderChart()
-  renderMiniChart()
 }
 
 const initChart = () => {
@@ -280,30 +292,6 @@ const renderChart = () => {
     }]
   }
   chartInstance.value.setOption(option)
-}
-
-const renderMiniChart = () => {
-  if (!miniChartRef.value) return
-  if (!miniChartInstance.value) {
-    miniChartInstance.value = echarts.init(miniChartRef.value)
-  }
-  const option = {
-    backgroundColor: '#fff',
-    series: [{
-      type: 'graph',
-      layout: 'force',
-      data: graphData.nodes.slice(0, 8).map(node => ({
-        name: node.name, symbolSize: 25,
-        itemStyle: { color: node.type === 'subject' ? '#667eea' : '#f59f5f' }
-      })),
-      links: graphData.links.slice(0, 5).map(link => ({
-        source: link.source, target: link.target
-      })),
-      roam: false,
-      force: { repulsion: 150, edgeLength: 30 }
-    }]
-  }
-  miniChartInstance.value.setOption(option)
 }
 
 const sendMessage = async () => {
@@ -379,6 +367,13 @@ const quickAction = (type) => {
     suggestion: '根据我的学习数据，给我一些学习建议'
   }
   inputMessage.value = prompts[type]
+  sendMessage()
+}
+
+const switchStyle = (styleId) => {
+  selectedStyle.value = styleId
+  const styleNames = { default: '标准解析', feynman: '费曼风格', plato: '柏拉图式', 'first-principles': '第一性原理' }
+  inputMessage.value = `请用${styleNames[styleId]}的风格帮我解析题目`
   sendMessage()
 }
 
@@ -536,8 +531,56 @@ onMounted(async () => {
   }
 }
 
-.mini-graph {
-  height: 150px;
+.style-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .style-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s;
+    border: 2px solid transparent;
+    background: #f8f9fa;
+
+    .style-emoji {
+      font-size: 20px;
+      width: 32px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .style-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2f3d;
+      flex-shrink: 0;
+    }
+
+    .style-desc {
+      font-size: 11px;
+      color: #909399;
+      margin-left: auto;
+    }
+
+    &:hover {
+      background: #eef0ff;
+      border-color: #c0c8ff;
+      transform: translateX(4px);
+    }
+
+    &.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: #667eea;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+
+      .style-name, .style-desc { color: #fff; }
+    }
+  }
 }
 
 .chat-container {

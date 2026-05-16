@@ -8,11 +8,6 @@
         <el-input v-model="queryParam.content" clearable></el-input>
       </el-form-item>
 
-      <el-form-item label="年级：">
-        <el-select v-model="queryParam.level" placeholder="年级"  @change="levelChange" clearable>
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="学科：">
         <el-select v-model="queryParam.subjectId" clearable>
           <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
@@ -79,7 +74,6 @@ const examStore = useExamStore()
 const queryParam = reactive({
   id: null,
   questionType: null,
-  level: null,
   subjectId: null,
   pageIndex: 1,
   pageSize: 10
@@ -112,9 +106,6 @@ const editUrlEnum = computed(() => [
   { key: 4, name: '判断题', value: '/exam/question/edit/true-false' },
   { key: 5, name: '简答题', value: '/exam/question/edit/short-answer' }
 ])
-
-const levelEnum = computed(() => enumItemStore.user.levelEnum)
-
 const search = () => {
   listLoading.value = true
   questionApi.pageList(queryParam).then(data => {
@@ -126,10 +117,7 @@ const search = () => {
   })
 }
 
-const levelChange = () => {
-  queryParam.subjectId = null
-  subjectFilter.value = examStore.subjects.filter(data => data.level === queryParam.level)
-}
+
 
 const showQuestion = (row) => {
   questionShow.dialog = true

@@ -54,7 +54,7 @@ public class ExamPaperAnswerController extends BaseApiController {
             vm.setSystemScore(ExamUtil.scoreToVM(e.getSystemScore()));
             vm.setUserScore(ExamUtil.scoreToVM(e.getUserScore()));
             vm.setPaperScore(ExamUtil.scoreToVM(e.getPaperScore()));
-            vm.setSubjectName(subject.getName());
+            vm.setSubjectName(subject != null ? subject.getName() : "未知");
             vm.setCreateTime(DateTimeUtil.dateFormat(e.getCreateTime()));
             return vm;
         });

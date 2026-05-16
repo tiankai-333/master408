@@ -1,11 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="form" ref="formRef" label-width="100px" v-loading="formLoading" :rules="rules">
-      <el-form-item label="年级：" prop="level" required>
-        <el-select v-model="form.level" placeholder="年级" @change="levelChange">
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="学科：" prop="subjectId" required>
         <el-select v-model="form.subjectId" placeholder="学科">
           <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
@@ -54,7 +49,6 @@ const tagsViewStore = useTagsViewStore()
 
 const form = reactive({
   id: null,
-  level: null,
   subjectId: null,
   questionType: 4,
   difficult: 1,
@@ -68,7 +62,6 @@ const subjectFilter = ref(null)
 const formLoading = ref(false)
 const formRef = ref(null)
 
-const levelEnum = computed(() => enumItemStore.user.levelEnum)
 const difficultEnum = computed(() => [
   { key: 1, value: '简单' },
   { key: 2, value: '中等' },
@@ -76,7 +69,6 @@ const difficultEnum = computed(() => [
 ])
 
 const rules = {
-  level: [{ required: true, message: '请选择年级', trigger: 'change' }],
   subjectId: [{ required: true, message: '请选择学科', trigger: 'change' }],
   difficult: [{ required: true, message: '请选择难度', trigger: 'change' }],
   score: [{ required: true, message: '请输入分数', trigger: 'blur' }],
@@ -108,17 +100,11 @@ const submitForm = () => {
   })
 }
 
-const levelChange = () => {
-  form.subjectId = null
-  subjectFilter.value = examStore.subjects.filter(data => data.level === form.level)
-}
-
 const resetForm = () => {
   const lastId = form.id
   formRef.value.resetFields()
   Object.assign(form, {
     id: null,
-    level: null,
     subjectId: null,
     questionType: 4,
     difficult: 1,

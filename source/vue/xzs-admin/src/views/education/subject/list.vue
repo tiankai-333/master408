@@ -4,11 +4,6 @@
       <el-form-item label="学科名称：">
         <el-input v-model="queryParam.name" clearable></el-input>
       </el-form-item>
-      <el-form-item label="年级：">
-        <el-select v-model="queryParam.level" clearable>
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">查询</el-button>
         <router-link :to="{path:'/education/subject/edit'}" class="link-left">
@@ -18,7 +13,6 @@
     </el-form>
     <el-table v-loading="listLoading" :data="tableData" border fit highlight-current-row style="width: 100%">
       <el-table-column prop="id" label="Id" width="80px"/>
-      <el-table-column prop="levelName" label="年级" width="100px"/>
       <el-table-column prop="name" label="学科名称"/>
       <el-table-column prop="sort" label="排序" width="80px"/>
       <el-table-column prop="createTime" label="创建时间" width="160px"/>
@@ -47,7 +41,6 @@ const enumItemStore = useEnumItemStore()
 
 const queryParam = reactive({
   name: null,
-  level: null,
   pageIndex: 1,
   pageSize: 10
 })
@@ -55,9 +48,6 @@ const queryParam = reactive({
 const listLoading = ref(true)
 const tableData = ref([])
 const total = ref(0)
-
-const levelEnum = computed(() => enumItemStore.user.levelEnum)
-
 const search = () => {
   listLoading.value = true
   subjectApi.pageList(queryParam).then(data => {

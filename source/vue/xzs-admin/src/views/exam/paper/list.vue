@@ -4,11 +4,6 @@
       <el-form-item label="题目ID：">
         <el-input v-model="queryParam.id" clearable></el-input>
       </el-form-item>
-      <el-form-item label="年级：">
-        <el-select v-model="queryParam.level" placeholder="年级" @change="levelChange" clearable>
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="学科：" >
         <el-select v-model="queryParam.subjectId"  clearable>
           <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id" :label="item.name+' ( '+item.levelName+' )'"></el-option>
@@ -53,7 +48,6 @@ const examStore = useExamStore()
 
 const queryParam = reactive({
   id: null,
-  level: null,
   subjectId: null,
   pageIndex: 1,
   pageSize: 10
@@ -63,9 +57,6 @@ const subjectFilter = ref(null)
 const listLoading = ref(true)
 const tableData = ref([])
 const total = ref(0)
-
-const levelEnum = computed(() => enumItemStore.user.levelEnum)
-
 const search = () => {
   listLoading.value = true
   examPaperApi.pageList(queryParam).then(data => {
@@ -88,10 +79,7 @@ const deletePaper = (row) => {
   })
 }
 
-const levelChange = () => {
-  queryParam.subjectId = null
-  subjectFilter.value = examStore.subjects.filter(data => data.level === queryParam.level)
-}
+
 
 const subjectFormatter = (row, column, cellValue) => {
   return examStore.subjectEnumFormat(cellValue)

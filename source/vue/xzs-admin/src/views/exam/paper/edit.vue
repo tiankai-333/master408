@@ -1,11 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="form" ref="formRef" label-width="100px" v-loading="formLoading" :rules="rules">
-      <el-form-item label="年级：" prop="level" required>
-        <el-select v-model="form.level" placeholder="年级"  @change="levelChange">
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="学科：" prop="subjectId" required>
         <el-select v-model="form.subjectId" placeholder="学科">
           <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
@@ -106,8 +101,7 @@ const examStore = useExamStore()
 const tagsViewStore = useTagsViewStore()
 
 const form = reactive({
-  id: null,
-  level: null,
+  memberId: null,
   subjectId: null,
   paperType: 1,
   limitDateTime: [],
@@ -151,12 +145,7 @@ const paperTypeEnum = computed(() => [
   { key: 4, value: '考试卷' }
 ])
 
-const levelEnum = computed(() => enumItemStore.user.levelEnum)
-
 const rules = {
-  level: [
-    { required: true, message: '请选择年级', trigger: 'change' }
-  ],
   subjectId: [
     { required: true, message: '请选择学科', trigger: 'change' }
   ],
@@ -219,11 +208,6 @@ const confirmQuestionSelect = () => {
   questionPage.showDialog = false
 }
 
-const levelChange = () => {
-  form.subjectId = null
-  subjectFilter.value = examStore.subjects.filter(data => data.level === form.level)
-}
-
 const search = () => {
   questionPage.queryParam.subjectId = form.subjectId
   questionPage.listLoading = true
@@ -249,7 +233,6 @@ const resetForm = () => {
   formRef.value.resetFields()
   Object.assign(form, {
     id: null,
-    level: null,
     subjectId: null,
     paperType: 1,
     limitDateTime: [],

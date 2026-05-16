@@ -22,7 +22,6 @@
               <div class="user-name">{{ form.userName }}</div>
               <div class="user-stats">
                 <div class="stat-item"><el-icon><Medal /></el-icon><span class="stat-label">姓名</span><span class="stat-value">{{ form.realName || '未填写' }}</span></div>
-                <div class="stat-item"><el-icon><List /></el-icon><span class="stat-label">年级</span><span class="stat-value">{{ levelFormatter(form.userLevel) }}</span></div>
                 <div class="stat-item"><el-icon><Calendar /></el-icon><span class="stat-label">注册时间</span><span class="stat-value">{{ form.createTime }}</span></div>
               </div>
             </div>
@@ -59,11 +58,6 @@
                   <el-form-item label="手机：">
                     <el-input v-model="form.phone" placeholder="请输入手机号" />
                   </el-form-item>
-                  <el-form-item label="年级：" prop="userLevel" required>
-                    <el-select v-model="form.userLevel" placeholder="请选择年级" class="full-width">
-                      <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-                    </el-select>
-                  </el-form-item>
                   <el-form-item>
                     <el-button type="primary" @click="submitForm" class="submit-btn"><el-icon><Check /></el-icon> 更新信息</el-button>
                   </el-form-item>
@@ -80,14 +74,13 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { User, Postcard, Camera, Medal, List, Calendar, Document, Check } from '@element-plus/icons-vue'
+import { User, Postcard, Camera, Medal, Calendar, Document, Check } from '@element-plus/icons-vue'
 import userApi from '@/api/user'
 import { useEnumItemStore } from '@/store/modules/enumItem'
 import avatarDefault from '@/assets/avatar.png'
 
 const enumItemStore = useEnumItemStore()
 const sexEnum = enumItemStore.user.sexEnum
-const levelEnum = enumItemStore.user.levelEnum
 
 const formRef = ref(null)
 const event = ref([])
@@ -98,11 +91,8 @@ const form = reactive({
 })
 
 const rules = {
-  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }],
-  userLevel: [{ required: true, message: '请选择年级', trigger: 'change' }]
+  realName: [{ required: true, message: '请输入真实姓名', trigger: 'blur' }]
 }
-
-const levelFormatter = (level) => enumItemStore.enumFormat(levelEnum, level)
 
 const uploadSuccess = (re) => {
   if (re.code === 1) {

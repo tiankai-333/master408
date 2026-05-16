@@ -44,15 +44,6 @@
           </el-form-item>
 
           <el-form-item>
-            <div class="input-wrapper">
-              <el-icon><List /></el-icon>
-              <el-select v-model="loginForm.userLevel" placeholder="请选择年级" class="level-select">
-                <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-              </el-select>
-            </div>
-          </el-form-item>
-
-          <el-form-item>
             <el-button type="primary" class="register-btn" @click="handleRegister">
               <el-icon><Check /></el-icon> 注册
             </el-button>
@@ -82,19 +73,17 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { UserFilled, User, Lock, List, Check, ArrowLeft } from '@element-plus/icons-vue'
+import { UserFilled, User, Lock, Check, ArrowLeft } from '@element-plus/icons-vue'
 import registerApi from '@/api/register'
 import { useEnumItemStore } from '@/store/modules/enumItem'
 
 const router = useRouter()
 const enumItemStore = useEnumItemStore()
 
-const levelEnum = enumItemStore.user.levelEnum
-
 const loginForm = reactive({
   userName: '',
   password: '',
-  userLevel: 1
+  userLevel: null
 })
 
 const handleRegister = () => {

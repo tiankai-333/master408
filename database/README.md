@@ -22,20 +22,25 @@ python ../import_db.py
 |------|------|---------|
 | `01_init_structure.sql` | 表结构（19 张表，从代码反推） | 1 |
 | `02_extend_fields.sql` | 408 真题扩展字段 | 2 |
-| `04_exam_data.sql` | 全量数据（由 `generate_sql.py` 生成） | 3 |
+| `04_exam_data.sql` | 全量数据（由 `crawler/generate_sql.py` 生成） | 3 |
+| `init_knowledge_data.sql` | 知识体系初始化数据 | 4 |
+| `enhance_knowledge_system.sql` | 知识体系增强 | 5 |
+| `supplement_knowledge_system.sql` | 知识体系补充 | 6 |
+| `optimize_study_system.sql` | 学习系统优化 | 7 |
+| `create_question_wrong_analysis.sql` | 错题分析表 | 8 |
 | `xzs-20260515.sql` | 完整数据库备份（参考用） | - |
 
 ## 数据统计
 
 | 数据 | 数量 |
 |------|------|
-| 选择题 | 616 道（2011-2024） |
+| 选择题 | 560 道（2011-2024） |
 | 综合应用题 | 98 道（2011-2024） |
 | 试卷 | 14 份（2011-2024） |
-| 科目 | 4 个（数据结构、计组、OS、网络） |
+| 科目 | 5 个（408综合 + 数据结构、计组、OS、网络） |
 | 用户 | 4 个（admin/student/teacher/231310423） |
-| 知识标签 | 658 道 100% 覆盖 |
-| 文本内容 | 728 条（题目内容 + 试卷框架） |
+| 知识标签 | 652 道有标签，6 道无标签（网站缺失） |
+| 文本内容 | 672 条（题目内容 + 试卷框架） |
 
 ## 表结构来源
 
@@ -90,7 +95,9 @@ python ../import_db.py
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
+| `subject_id` | int | 科目 ID（5=408综合，所有真题试卷统一指向此科目） |
 | `paper_type` | int | 1=固定试卷, 4=时段试卷, 6=任务试卷 |
+| `grade_level` | int | 年级（已废弃，保留字段兼容旧代码） |
 | `score` | int | 总分 × 10（150 分存为 1500） |
 | `frame_text_content_id` | int | 指向 t_text_content（试卷框架 JSON） |
 | `source_year` | int | 来源年份 |
@@ -99,7 +106,7 @@ python ../import_db.py
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `id` | int | 1=数据结构, 2=计组, 3=OS, 4=网络 |
+| `id` | int | 1=数据结构, 2=计组, 3=OS, 4=网络, 5=408综合 |
 | `level` | int | 年级（已废弃，不再使用） |
 | `deleted` | bit(1) | 软删除 |
 
