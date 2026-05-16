@@ -19,7 +19,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 
-GLM_API_KEY = os.environ.get("GLM_API_KEY", "e4a645c3ea464385acdafec1f41b2e9b.vJnGYzcGzAESUSBu")
+GLM_API_KEY = os.environ.get("GLM_API_KEY")
 EMBED_API_URL = "https://open.bigmodel.cn/api/paas/v4/embeddings"
 EMBED_MODEL = "embedding-2"
 BATCH_SIZE = 20
@@ -27,13 +27,20 @@ MAX_WORKERS = 5
 MAX_TEXT_LENGTH = 8000
 
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 3306,
-    "user": "root",
-    "password": "123456",
-    "database": "xzs",
+    "host": os.environ.get("DB_HOST", "127.0.0.1"),
+    "port": int(os.environ.get("DB_PORT", "3306")),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ.get("DB_PASSWORD", "123456"),
+    "database": os.environ.get("DB_NAME", "xzs"),
     "charset": "utf8mb4",
 }
+
+def _check_prerequisites():
+    if not GLM_API_KEY:
+        print("ERROR: 未设置 GLM_API_KEY 环境变量")
+        print("  export GLM_API_KEY=your_glm_api_key  (Linux/Mac)")
+        print("  $env:GLM_API_KEY='your_glm_api_key'   (PowerShell)")
+        sys.exit(1)
 
 db_lock = Lock()
 
@@ -62,7 +69,7 @@ def get_unembedded_rows(conn, limit=None):
 def get_id_title_mapping(conn):
     """获取 text_content id -> 题目标题 的映射（通过 t_question 关联）"""
     sql = """
-        SELECT tc.id, COALESCE(q.question_title, tc.id) AS title
+        SELECT tc.id, COALESCE(q.title, tc.id) AS title
         FROM t_text_content tc
         LEFT JOIN t_question q ON q.info_text_content_id = tc.id
         WHERE tc.embedding IS NULL
@@ -132,6 +139,8 @@ def embed_batch(rows, id_title_map, conn):
 
 
 def main():
+    _check_prerequisites()
+
     print("=" * 60)
     print("408Master RAG Embedding Generator")
     print(f"Model: {EMBED_MODEL}")

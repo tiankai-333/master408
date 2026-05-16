@@ -1,0 +1,16 @@
+# ============================================================
+# Docker Compose Override - Embedding / Debug 专用
+#
+# 用途：临时暴露 MySQL 3306 端口到宿主机，以便运行 ai/embed_questions.py
+# 使用方式：
+#   docker compose -f docker-compose.yml -f docker-compose.override-embed.yml up -d mysql
+#   # 执行 embedding 脚本
+#   $env:GLM_API_KEY='your_key'; python ai/embed_questions.py
+#   # 执行完毕后恢复：
+#   docker compose -f docker-compose.yml -f docker-compose.override-embed.yml down mysql
+#   docker compose up -d mysql
+# ============================================================
+services:
+  mysql:
+    ports:
+      - "3306:3306"
