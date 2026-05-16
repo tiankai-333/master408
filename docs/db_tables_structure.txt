@@ -1,0 +1,325 @@
+## 表: t_ai_adjustment_log
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+template_id	int	YES	MUL	NULL	
+style	varchar(50)	NO	MUL	NULL	
+adjustment_type	varchar(50)	NO	MUL	NULL	
+before_content	text	YES		NULL	
+after_content	text	YES		NULL	
+adjustment_reason	varchar(500)	YES			
+adjustment_details	text	YES		NULL	
+test_result	text	YES		NULL	
+test_question	text	YES		NULL	
+test_feedback	varchar(500)	YES			
+rating	int	YES		0	
+status	varchar(20)	YES	MUL	pending	
+approver_id	int	YES		NULL	
+approve_time	datetime	YES		NULL	
+approve_comment	varchar(500)	YES			
+create_user	int	YES		1	
+create_time	datetime	YES	MUL	CURRENT_TIMESTAMP	DEFAULT_GENERATED
+ip_address	varchar(50)	YES			
+
+
+
+## 表: t_ai_knowledge_base
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+category	varchar(50)	NO	MUL	NULL	
+domain	varchar(50)	NO	MUL	NULL	
+sub_domain	varchar(50)	YES			
+title	varchar(200)	NO		NULL	
+keywords	varchar(255)	YES			
+content	text	NO		NULL	
+source_type	varchar(50)	YES			
+source_name	varchar(200)	YES			
+source_author	varchar(100)	YES			
+core_concepts	text	YES		NULL	
+application_scenarios	text	YES		NULL	
+examples	text	YES		NULL	
+enabled	tinyint(1)	YES	MUL	1	
+priority	int	YES	MUL	0	
+usage_count	int	YES		0	
+create_user	int	YES		1	
+create_time	datetime	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+update_time	datetime	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP
+deleted	bit(1)	YES		b'0'	
+
+
+
+## 表: t_ai_prompt_template
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+style	varchar(50)	NO	UNI	NULL	
+name	varchar(100)	NO		NULL	
+description	varchar(500)	YES			
+icon	varchar(50)	YES			
+system_prompt	text	NO		NULL	
+user_prompt_template	text	NO		NULL	
+knowledge_base_ids	varchar(255)	YES			
+reference_materials	text	YES		NULL	
+variables	varchar(255)	YES			
+output_format	varchar(50)	YES		markdown	
+temperature	decimal(3,2)	YES		0.70	
+max_tokens	int	YES		4096	
+enabled	tinyint(1)	YES	MUL	1	
+is_default	tinyint(1)	YES		0	
+usage_count	int	YES		0	
+rating_sum	int	YES		0	
+rating_count	int	YES		0	
+create_user	int	YES		1	
+create_time	datetime	YES	MUL	CURRENT_TIMESTAMP	DEFAULT_GENERATED
+update_time	datetime	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP
+deleted	bit(1)	YES		b'0'	
+
+
+
+## 表: t_ai_usage_log
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+template_id	int	YES	MUL	NULL	
+style	varchar(50)	NO	MUL	NULL	
+ai_type	varchar(20)	YES			
+model	varchar(50)	YES			
+question	text	NO		NULL	
+knowledge_points	text	YES		NULL	
+knowledge_base_ids	varchar(255)	YES			
+prompt	text	YES		NULL	
+response	text	YES		NULL	
+response_length	int	YES		0	
+tokens_used	int	YES		0	
+cost	decimal(10,4)	YES		0.0000	
+duration_ms	int	YES		0	
+success	tinyint(1)	YES		1	
+error_message	text	YES		NULL	
+user_rating	int	YES		0	
+user_feedback	text	YES		NULL	
+create_time	datetime	YES	MUL	CURRENT_TIMESTAMP	DEFAULT_GENERATED
+
+
+
+## 表: t_exam_paper
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(255)	YES		NULL	
+subject_id	int	YES		NULL	
+paper_type	int	YES		NULL	
+score	int	YES		NULL	
+question_count	int	YES		NULL	
+suggest_time	int	YES		NULL	
+limit_start_time	datetime	YES		NULL	
+limit_end_time	datetime	YES		NULL	
+type_text	varchar(255)	YES		NULL	
+grade_level	int	YES		NULL	
+frame_text_content_id	int	YES		NULL	
+create_user	int	YES		NULL	
+create_time	datetime	YES		NULL	
+deleted	bit(1)	YES		b'0'	
+task_exam_id	int	YES		NULL	
+create_user_name	varchar(255)	YES		NULL	
+
+
+
+## 表: t_exam_paper_answer
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+exam_paper_id	int	YES		NULL	
+paper_name	varchar(255)	YES		NULL	
+paper_type	int	YES		1	
+subject_id	int	YES		NULL	
+system_score	int	YES		0	
+user_score	int	YES		0	
+score	int	YES		NULL	
+paper_score	int	YES		NULL	
+question_correct	int	YES		NULL	
+question_count	int	YES		NULL	
+do_time	int	YES		NULL	
+status	int	YES		NULL	
+create_user	int	YES		NULL	
+create_time	datetime	YES		NULL	
+task_exam_id	int	YES		NULL	
+
+
+
+## 表: t_exam_paper_question
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+exam_paper_id	int	YES	MUL	NULL	
+question_id	int	YES		NULL	
+question_type	int	YES		NULL	
+subject_id	int	YES		NULL	
+score	int	YES		NULL	
+item_order	int	YES		NULL	
+question_text_content_id	int	YES		NULL	
+
+
+
+## 表: t_exam_paper_question_customer_answer
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+question_id	int	YES		NULL	
+exam_paper_id	int	YES		NULL	
+exam_paper_answer_id	int	YES		NULL	
+question_type	int	YES		NULL	
+subject_id	int	YES		NULL	
+customer_score	int	YES		NULL	
+question_score	int	YES		NULL	
+question_text_content_id	int	YES		NULL	
+answer	varchar(255)	YES		NULL	
+text_content_id	int	YES		NULL	
+do_right	bit(1)	YES		NULL	
+create_user	int	YES		NULL	
+create_time	datetime	YES		NULL	
+item_order	int	YES		NULL	
+
+
+
+## 表: t_message
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+title	varchar(255)	YES		NULL	
+content	varchar(500)	YES		NULL	
+create_time	datetime	YES		NULL	
+send_user_id	int	YES		NULL	
+send_user_name	varchar(255)	YES		NULL	
+send_real_name	varchar(255)	YES		NULL	
+receive_user_count	int	YES		NULL	
+read_count	int	YES		NULL	
+
+
+
+## 表: t_message_user
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+message_id	int	YES		NULL	
+receive_user_id	int	YES		NULL	
+receive_user_name	varchar(255)	YES		NULL	
+receive_real_name	varchar(255)	YES		NULL	
+readed	bit(1)	YES		NULL	
+create_time	datetime	YES		NULL	
+read_time	datetime	YES		NULL	
+
+
+
+## 表: t_question
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+question_type	int	YES		NULL	
+subject_id	int	YES	MUL	NULL	
+score	int	YES		NULL	
+grade_level	int	YES		NULL	
+difficult	int	YES		NULL	
+correct	text	YES		NULL	
+info_text_content_id	int	YES		NULL	
+create_user	int	YES		NULL	
+status	int	YES		NULL	
+create_time	datetime	YES		NULL	
+deleted	bit(1)	YES		b'0'	
+
+
+
+## 表: t_subject
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+name	varchar(255)	NO		NULL	
+level	int	YES		NULL	
+level_name	varchar(255)	YES		NULL	
+item_order	int	YES		NULL	
+deleted	bit(1)	YES		b'0'	
+
+
+
+## 表: t_task_exam
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+title	varchar(255)	YES		NULL	
+grade_level	int	YES		NULL	
+frame_text_content_id	int	YES		NULL	
+create_user	int	YES		NULL	
+create_time	datetime	YES		NULL	
+deleted	bit(1)	YES		b'0'	
+create_user_name	varchar(255)	YES		NULL	
+
+
+
+## 表: t_task_exam_customer_answer
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+task_exam_id	int	YES		NULL	
+create_user	int	YES		NULL	
+create_time	datetime	YES		NULL	
+text_content_id	int	YES		NULL	
+
+
+
+## 表: t_text_content
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+content	text	YES		NULL	
+create_time	datetime	YES		NULL	
+
+
+
+## 表: t_user
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+user_uuid	varchar(36)	YES		NULL	
+user_name	varchar(255)	NO		NULL	
+password	varchar(255)	NO		NULL	
+real_name	varchar(255)	YES		NULL	
+age	int	YES		NULL	
+sex	int	YES		NULL	
+birth_day	datetime	YES		NULL	
+user_level	int	YES		NULL	
+phone	varchar(255)	YES		NULL	
+role	int	YES		NULL	
+status	int	YES		NULL	
+image_path	varchar(255)	YES		NULL	
+create_time	datetime	YES		NULL	
+modify_time	datetime	YES		NULL	
+last_active_time	datetime	YES		NULL	
+deleted	bit(1)	YES		b'0'	
+wx_open_id	varchar(255)	YES		NULL	
+
+
+
+## 表: t_user_event_log
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+user_id	int	YES		NULL	
+user_name	varchar(255)	YES		NULL	
+real_name	varchar(255)	YES		NULL	
+content	text	YES		NULL	
+create_time	datetime	YES		NULL	
+
+
+
+## 表: t_user_token
+
+Field	Type	Null	Key	Default	Extra
+id	int	NO	PRI	NULL	auto_increment
+token	varchar(36)	YES		NULL	
+user_id	int	YES		NULL	
+wx_open_id	varchar(255)	YES		NULL	
+create_time	datetime	YES		NULL	
+end_time	datetime	YES		NULL	
+user_name	varchar(255)	YES		NULL	
+
+

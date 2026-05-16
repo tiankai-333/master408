@@ -8,11 +8,6 @@
         <el-input v-model="queryParam.content" clearable></el-input>
       </el-form-item>
 
-      <el-form-item label="年级：">
-        <el-select v-model="queryParam.level" placeholder="年级"  @change="levelChange" clearable>
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="学科：">
         <el-select v-model="queryParam.subjectId" clearable>
           <el-option v-for="item in subjectFilter" :key="item.id" :value="item.id"
@@ -27,10 +22,14 @@
       <el-form-item>
         <el-button type="primary" @click="submitForm">查询</el-button>
         <el-popover placement="bottom" trigger="click">
-          <el-button type="warning" size="mini" v-for="item in editUrlEnum" :key="item.key"
-                     @click="$router.push({path:item.value})">{{item.name}}
-          </el-button>
-          <el-button slot="reference" type="primary" class="link-left">添加</el-button>
+          <template #default>
+            <el-button type="warning" size="mini" v-for="item in editUrlEnum" :key="item.key"
+                       @click="router.push({path:item.value})">{{item.name}}
+            </el-button>
+          </template>
+          <template #reference>
+            <el-button type="primary" class="link-left">添加</el-button>
+          </template>
         </el-popover>
       </el-form-item>
     </el-form>
@@ -43,119 +42,125 @@
       <el-table-column prop="difficult" label="难度" width="60px"/>
       <el-table-column prop="createTime" label="创建时间" width="160px"/>
       <el-table-column label="操作" align="center" width="220px">
-        <template slot-scope="{row}">
+        <template #default="{row}">
           <el-button size="mini"   @click="showQuestion(row)">预览</el-button>
           <el-button size="mini"  @click="editQuestion(row)">编辑</el-button>
           <el-button size="mini"  type="danger" @click="deleteQuestion(row)" class="link-left">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParam.pageIndex" :limit.sync="queryParam.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParam.pageIndex" v-model:limit="queryParam.pageSize"
                 @pagination="search"/>
-    <el-dialog :visible.sync="questionShow.dialog" style="width: 100%;height: 100%">
+    <el-dialog v-model="questionShow.dialog" style="width: 100%;height: 100%">
       <QuestionShow :qType="questionShow.qType" :question="questionShow.question" :qLoading="questionShow.loading"/>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import { mapGetters, mapState, mapActions } from 'vuex'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { reactive, ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import Pagination from '@/components/Pagination'
-import QuestionShow from './components/Show'
+import QuestionShow from './components/Show.vue'
 import questionApi from '@/api/question'
+import { useEnumItemStore } from '@/stores/enumItem'
+import { useExamStore } from '@/stores/exam'
 
-export default {
-  components: { Pagination, QuestionShow },
-  data () {
-    return {
-      queryParam: {
-        id: null,
-        questionType: null,
-        level: null,
-        subjectId: null,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      subjectFilter: null,
-      listLoading: true,
-      tableData: [],
-      total: 0,
-      questionShow: {
-        qType: 0,
-        dialog: false,
-        question: null,
-        loading: false
-      }
-    }
-  },
-  created () {
-    this.initSubject()
-    this.search()
-  },
-  methods: {
-    submitForm () {
-      this.queryParam.pageIndex = 1
-      this.search()
-    },
-    search () {
-      this.listLoading = true
-      questionApi.pageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    levelChange () {
-      this.queryParam.subjectId = null
-      this.subjectFilter = this.subjects.filter(data => data.level === this.queryParam.level)
-    },
-    addQuestion () {
-      this.$router.push('/exam/question/edit/singleChoice')
-    },
-    showQuestion (row) {
-      let _this = this
-      this.questionShow.dialog = true
-      this.questionShow.loading = true
-      questionApi.select(row.id).then(re => {
-        _this.questionShow.qType = re.response.questionType
-        _this.questionShow.question = re.response
-        _this.questionShow.loading = false
-      })
-    },
-    editQuestion (row) {
-      let url = this.enumFormat(this.editUrlEnum, row.questionType)
-      this.$router.push({ path: url, query: { id: row.id } })
-    },
-    deleteQuestion (row) {
-      let _this = this
-      questionApi.deleteQuestion(row.id).then(re => {
-        if (re.code === 1) {
-          _this.search()
-          _this.$message.success(re.message)
-        } else {
-          _this.$message.error(re.message)
-        }
-      })
-    },
-    questionTypeFormatter (row, column, cellValue, index) {
-      return this.enumFormat(this.questionType, cellValue)
-    },
-    subjectFormatter (row, column, cellValue, index) {
-      return this.subjectEnumFormat(cellValue)
-    },
-    ...mapActions('exam', { initSubject: 'initSubject' })
-  },
-  computed: {
-    ...mapGetters('enumItem', ['enumFormat']),
-    ...mapState('enumItem', {
-      questionType: state => state.exam.question.typeEnum,
-      editUrlEnum: state => state.exam.question.editUrlEnum,
-      levelEnum: state => state.user.levelEnum
-    }),
-    ...mapGetters('exam', ['subjectEnumFormat']),
-    ...mapState('exam', { subjects: state => state.subjects })
-  }
+const router = useRouter()
+const enumItemStore = useEnumItemStore()
+const examStore = useExamStore()
+
+const queryParam = reactive({
+  id: null,
+  questionType: null,
+  subjectId: null,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const subjectFilter = ref(null)
+const listLoading = ref(true)
+const tableData = ref([])
+const total = ref(0)
+
+const questionShow = reactive({
+  qType: 0,
+  dialog: false,
+  question: null,
+  loading: false
+})
+
+const questionType = computed(() => [
+  { key: 1, value: '单选题' },
+  { key: 2, value: '多选题' },
+  { key: 3, value: '填空题' },
+  { key: 4, value: '判断题' },
+  { key: 5, value: '简答题' }
+])
+
+const editUrlEnum = computed(() => [
+  { key: 1, name: '单选题', value: '/exam/question/edit/single-choice' },
+  { key: 2, name: '多选题', value: '/exam/question/edit/multiple-choice' },
+  { key: 3, name: '填空题', value: '/exam/question/edit/gap-filling' },
+  { key: 4, name: '判断题', value: '/exam/question/edit/true-false' },
+  { key: 5, name: '简答题', value: '/exam/question/edit/short-answer' }
+])
+const search = () => {
+  listLoading.value = true
+  questionApi.pageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+
+
+const showQuestion = (row) => {
+  questionShow.dialog = true
+  questionShow.loading = true
+  questionApi.select(row.id).then(re => {
+    questionShow.qType = re.response.questionType
+    questionShow.question = re.response
+    questionShow.loading = false
+  })
+}
+
+const editQuestion = (row) => {
+  const url = enumItemStore.enumFormat(editUrlEnum.value, row.questionType)
+  router.push({ path: url, query: { id: row.id } })
+}
+
+const deleteQuestion = (row) => {
+  questionApi.deleteQuestion(row.id).then(re => {
+    if (re.code === 1) {
+      search()
+      ElMessage.success(re.message)
+    } else {
+      ElMessage.error(re.message)
+    }
+  })
+}
+
+const questionTypeFormatter = (row, column, cellValue) => {
+  return enumItemStore.enumFormat(questionType.value, cellValue)
+}
+
+const subjectFormatter = (row, column, cellValue) => {
+  return examStore.subjectEnumFormat(cellValue)
+}
+
+const submitForm = () => {
+  queryParam.pageIndex = 1
+  search()
+}
+
+onMounted(() => {
+  examStore.initSubject()
+  subjectFilter.value = examStore.subjects
+  search()
+})
 </script>

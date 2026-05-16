@@ -1,6 +1,5 @@
 <template>
   <div class="login-page">
-    <!-- decorative background blobs -->
     <div class="login-bg" aria-hidden="true">
       <span class="blob blob-1" />
       <span class="blob blob-2" />
@@ -23,7 +22,7 @@
         </div>
 
         <el-form
-          ref="loginForm"
+          ref="loginFormRef"
           :model="loginForm"
           :rules="loginRules"
           class="login-form"
@@ -45,26 +44,25 @@
             />
           </el-form-item>
 
-          <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+          <el-tooltip :model-value="capsTooltip" content="Caps lock is On" placement="right" manual>
             <el-form-item prop="password" class="form-item">
               <span class="svg-container" aria-hidden="true">
                 <svg-icon icon-class="password" />
               </span>
               <el-input
-                :key="passwordType"
-                ref="password"
+                ref="passwordInputRef"
                 v-model="loginForm.password"
-                :type="passwordType"
+                :type="showPassword ? '' : 'password'"
                 placeholder="密码"
                 name="password"
                 tabindex="2"
                 auto-complete="on"
-                @keyup.native="checkCapslock"
+                @keyup="checkCapslock"
                 @blur="capsTooltip = false"
-                @keyup.enter.native="handleLogin"
+                @keyup.enter="handleLogin"
               />
-              <span class="show-pwd" @click="showPwd">
-                <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+              <span class="show-pwd" @click="togglePassword">
+                <svg-icon :icon-class="showPassword ? 'eye-open' : 'eye'" />
               </span>
             </el-form-item>
           </el-tooltip>
@@ -77,7 +75,7 @@
             :loading="loading"
             type="primary"
             class="login-btn"
-            @click.native.prevent="handleLogin"
+            @click="handleLogin"
           >
             登 录
           </el-button>
@@ -87,111 +85,101 @@
   </div>
 </template>
 
-<script>
-import { mapMutations } from 'vuex'
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import loginApi from '@/api/login'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
-export default {
-  name: 'Login',
-  data () {
-    const validateUsername = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('用户名不能少于5个字符'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 5) {
-        callback(new Error('密码不能少于5个字符'))
-      } else {
-        callback()
-      }
-    }
-    return {
-      loginForm: {
-        userName: '',
-        password: '',
-        remember: false
-      },
-      loginRules: {
-        userName: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
-      },
-      passwordType: 'password',
-      capsTooltip: false,
-      loading: false,
-      showDialog: false
-    }
-  },
-  created () {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
-  mounted () {
-    if (this.loginForm.userName === '') {
-      this.$refs.userName.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
-    }
-  },
-  destroyed () {
-    // window.removeEventListener('storage', this.afterQRScan)
-  },
-  methods: {
-    checkCapslock ({ shiftKey, key } = {}) {
-      if (key && key.length === 1) {
-        // eslint-disable-next-line no-mixed-operators
-        if (shiftKey && (key >= 'a' && key <= 'z') || !shiftKey && (key >= 'A' && key <= 'Z')) {
-          this.capsTooltip = true
-        } else {
-          this.capsTooltip = false
-        }
-      }
-      if (key === 'CapsLock' && this.capsTooltip === true) {
-        this.capsTooltip = false
-      }
-    },
-    showPwd () {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
-    handleLogin () {
-      let _this = this
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          loginApi.login(this.loginForm).then(function (result) {
-            if (result && result.code === 1) {
-              _this.setUserName(_this.loginForm.userName)
-              _this.$router.push({ path: '/' })
-            } else {
-              _this.loading = false
-              _this.$message({
-                message: result.message,
-                type: 'error'
-              })
-            }
-          }).catch(function (reason) {
-            _this.loading = false
-          })
-        } else {
-          return false
-        }
-      })
-    },
-    ...mapMutations('user', ['setUserName'])
+const userStore = useUserStore()
+const router = useRouter()
+
+const loginFormRef = ref(null)
+const loginForm = reactive({
+  userName: '',
+  password: '',
+  remember: false
+})
+
+const showPassword = ref(false)
+const capsTooltip = ref(false)
+const loading = ref(false)
+const passwordInputRef = ref(null)
+
+const validateUsername = (rule, value, callback) => {
+  if (value.length < 5) {
+    callback(new Error('用户名不能少于5个字符'))
+  } else {
+    callback()
   }
 }
+
+const validatePassword = (rule, value, callback) => {
+  if (value.length < 6) {
+    callback(new Error('密码不能少于6个字符'))
+  } else {
+    callback()
+  }
+}
+
+const loginRules = {
+  userName: [{ required: true, trigger: 'blur', validator: validateUsername }],
+  password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+}
+
+const checkCapslock = (event) => {
+  const { key, shiftKey } = event
+  if (key && key.length === 1) {
+    if (shiftKey && (key >= 'a' && key <= 'z') || !shiftKey && (key >= 'A' && key <= 'Z')) {
+      capsTooltip.value = true
+    } else {
+      capsTooltip.value = false
+    }
+  }
+  if (key === 'CapsLock') {
+    capsTooltip.value = !capsTooltip.value
+  }
+}
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const handleLogin = async () => {
+  if (!loginFormRef.value) return
+
+  try {
+    const valid = await loginFormRef.value.validate()
+    if (valid) {
+      loading.value = true
+      const result = await loginApi.login(loginForm)
+      if (result && result.code === 1) {
+        userStore.setUserName(loginForm.userName)
+        router.push({ path: '/' })
+      } else {
+        loading.value = false
+        ElMessage.error(result.message || '登录失败')
+      }
+    }
+  } catch (error) {
+    loading.value = false
+    console.error('登录验证失败:', error)
+  }
+}
+
+onMounted(() => {
+  if (loginForm.userName === '') {
+    const userNameInput = document.querySelector('input[name="userName"]')
+    userNameInput?.focus()
+  } else if (loginForm.password === '') {
+    const passwordInput = document.querySelector('input[name="password"]')
+    passwordInput?.focus()
+  }
+})
 </script>
 
 <style lang="scss">
-/* Reset Element-UI input styles inside login to match light card */
 .login-page {
   .login-form {
     .el-input {
@@ -398,7 +386,7 @@ export default {
   justify-content: space-between;
   margin: 8px 2px 20px;
 
-  ::v-deep .el-checkbox__label {
+  :deep(.el-checkbox__label) {
     font-size: 13px;
     color: #475569;
   }

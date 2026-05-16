@@ -151,8 +151,12 @@
     select
     <include refid="Base_Column_List" />
     from t_task_exam
-    where deleted=0
-    and grade_level = #{gradeLevel,jdbcType=INTEGER}
+    <where>
+      and deleted=0
+      <if test="_parameter != null">
+        and grade_level = #{gradeLevel,jdbcType=INTEGER}
+      </if>
+    </where>
   </select>
 
 </mapper>

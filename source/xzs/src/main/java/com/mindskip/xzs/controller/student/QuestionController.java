@@ -1,5 +1,7 @@
 package com.mindskip.xzs.controller.student;
 
+import com.mindskip.xzs.ai.AnalysisService;
+import com.mindskip.xzs.ai.PromptTemplate;
 import com.mindskip.xzs.base.BaseApiController;
 import com.mindskip.xzs.base.RestResponse;
 import com.mindskip.xzs.service.QuestionService;
@@ -18,10 +20,12 @@ public class QuestionController extends BaseApiController {
     private static final Logger logger = LoggerFactory.getLogger(QuestionController.class);
 
     private final QuestionService questionService;
+    private final AnalysisService analysisService;
 
     @Autowired
-    public QuestionController(QuestionService questionService) {
+    public QuestionController(QuestionService questionService, AnalysisService analysisService) {
         this.questionService = questionService;
+        this.analysisService = analysisService;
     }
 
     @RequestMapping(value = "/analyze-image", method = RequestMethod.POST)
@@ -45,22 +49,33 @@ public class QuestionController extends BaseApiController {
             String questionContent = requestData.get("questionContent");
             String options = requestData.get("options");
             String correctAnswer = requestData.get("correctAnswer");
+            String style = requestData.getOrDefault("style", "default");
             
-            logger.info("开始分析题目 - 类型: {}, 内容长度: {}", questionType, questionContent != null ? questionContent.length() : 0);
+            logger.info("开始分析题目 - 类型: {}, 风格: {}, 内容长度: {}", questionType, style, questionContent != null ? questionContent.length() : 0);
             
             if (questionContent == null || questionContent.trim().isEmpty()) {
                 logger.warn("题目内容为空");
                 return RestResponse.fail(2, "题目内容不能为空");
             }
             
-            String result = questionService.analyzeQuestion(questionType, questionContent, options, correctAnswer);
+            StringBuilder questionFull = new StringBuilder();
+            questionFull.append("题目类型：").append(questionType).append("\n");
+            questionFull.append("题目内容：").append(questionContent).append("\n");
+            if (options != null && !options.trim().isEmpty()) {
+                questionFull.append("选项：\n").append(options).append("\n");
+            }
+            if (correctAnswer != null && !correctAnswer.trim().isEmpty()) {
+                questionFull.append("正确答案：").append(correctAnswer).append("\n");
+            }
+            
+            String result = analysisService.analyzeWithAI(style, questionFull.toString(), null);
             
             if (result == null || result.trim().isEmpty()) {
                 logger.warn("AI返回结果为空");
                 return RestResponse.fail(2, "AI分析结果为空，请稍后重试");
             }
             
-            logger.info("题目分析完成 - 结果长度: {}", result.length());
+            logger.info("题目分析完成 - 风格: {}, 结果长度: {}", style, result.length());
             logger.debug("题目分析结果: {}", result);
             
             return RestResponse.ok(result);

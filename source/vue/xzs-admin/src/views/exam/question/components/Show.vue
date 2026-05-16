@@ -35,28 +35,21 @@
     <div v-else>
     </div>
   </div>
-
 </template>
 
-<script>
-export default {
-  name: 'QuestionShow',
-  props: {
-    question: {
-      type: Object,
-      default: function () {
-        return {}
-      }
-    },
-    qLoading: {
-      type: Boolean,
-      default: false
-    },
-    qType: {
-      type: Number,
-      default: 0
-    }
+<script setup>
+defineProps({
+  question: {
+    type: Object,
+    default: () => ({})
   },
-  methods: {}
-}
+  qLoading: {
+    type: Boolean,
+    default: false
+  },
+  qType: {
+    type: Number,
+    default: 0
+  }
+})
 </script>

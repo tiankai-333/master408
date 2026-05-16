@@ -8,23 +8,20 @@
   </section>
 </template>
 
-<script>
-export default {
-  name: 'AppMain',
-  computed: {
-    cachedViews () {
-      return this.$store.state.tagsView.cachedViews
-    },
-    key () {
-      return this.$route.path
-    }
-  }
-}
+<script setup>
+import { computed } from 'vue'
+import { useTagsViewStore } from '@/stores/tagsView'
+
+const tagsViewStore = useTagsViewStore()
+const cachedViews = computed(() => tagsViewStore.cachedViews)
+
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const key = computed(() => route.path)
 </script>
 
 <style lang="scss" scoped>
   .app-main {
-    /* 50= navbar  50  */
     min-height: calc(100vh - 50px);
     width: 100%;
     position: relative;
@@ -37,7 +34,6 @@ export default {
 
   .hasTagsView {
     .app-main {
-      /* 84 = navbar + tags-view = 50 + 34 */
       min-height: calc(100vh - 84px);
     }
 
@@ -48,7 +44,6 @@ export default {
 </style>
 
 <style lang="scss">
-  // fix css style bug in open el-dialog
   .el-popup-parent--hidden {
     .fixed-header {
       padding-right: 15px;

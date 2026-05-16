@@ -1,0 +1,46 @@
+{
+  "base_url": "https://www.csgraduates.com",
+  "subjects": {
+    "data_structure": {
+      "name": "数据结构",
+      "path": "/data_structure/",
+      "chapters": [
+        {"name": "绪论", "path": "/data_structure/basic/"},
+        {"name": "线性表", "path": "/data_structure/linearlist/"},
+        {"name": "线性数据结构", "path": "/data_structure/array/"},
+        {"name": "字符串", "path": "/data_structure/strings/"},
+        {"name": "树与二叉树", "path": "/data_structure/tree/"},
+        {"name": "图", "path": "/data_structure/graph/"},
+        {"name": "查找", "path": "/data_structure/search/"},
+        {"name": "排序", "path": "/data_structure/sort/"}
+      ]
+    }
+  },
+  "exam_years": [
+    {"year": "2011", "path": "/study_methods/408quiz/2011/"},
+    {"year": "2012", "path": "/study_methods/408quiz/2012/"},
+    {"year": "2013", "path": "/study_methods/408quiz/2013/"},
+    {"year": "2014", "path": "/study_methods/408quiz/2014/"},
+    {"year": "2015", "path": "/study_methods/408quiz/2015/"},
+    {"year": "2016", "path": "/study_methods/408quiz/2016/"},
+    {"year": "2017", "path": "/study_methods/408quiz/2017/"},
+    {"year": "2018", "path": "/study_methods/408quiz/2018/"},
+    {"year": "2019", "path": "/study_methods/408quiz/2019/"},
+    {"year": "2020", "path": "/study_methods/408quiz/2020/"},
+    {"year": "2021", "path": "/study_methods/408quiz/2021/"},
+    {"year": "2022", "path": "/study_methods/408quiz/2022/"},
+    {"year": "2023", "path": "/study_methods/408quiz/2023/"},
+    {"year": "2024", "path": "/study_methods/408quiz/2024/"}
+  ],
+  "crawl_settings": {
+    "delay_seconds": 1,
+    "max_retries": 3,
+    "timeout_seconds": 30,
+    "respect_robots_txt": true
+  },
+  "output": {
+    "knowledge_base": "data/knowledge_base.json",
+    "exam_papers": "data/exam_papers.json",
+    "content_directory": "data/content"
+  }
+}
