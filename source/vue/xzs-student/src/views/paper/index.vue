@@ -2,68 +2,22 @@
   <div class="paper-container">
     <div class="paper-header">
       <div class="header-icon">
-        <i class="el-icon-document-copy"></i>
+        <el-icon><Document /></el-icon>
       </div>
       <h2>试卷中心</h2>
       <p>选择科目和试卷类型，开始答题</p>
     </div>
 
     <div class="paper-content">
-      <el-tabs tab-position="left" v-model="tabId" @tab-click="subjectChange" class="subject-tabs">
-        <el-tab-pane :label="item.name" :key="item.id" :name="item.id" v-for="item in subjectList">
+      <el-tabs tab-position="left" v-model="tabId" @tab-click="tabChange" class="subject-tabs">
+        <el-tab-pane label="408综合" :name="'0'" key="0">
           <div class="tab-content">
-            <div class="toolbar">
-              <div class="paper-type-filter">
-                <el-radio-group v-model="queryParam.paperType" size="medium" @change="paperTypeChange">
-                  <el-radio-button v-for="item in paperTypeEnum" :key="item.key" :label="item.key">
-                    <i class="el-icon-notebook-2"></i>
-                    {{item.value}}
-                  </el-radio-button>
-                </el-radio-group>
-              </div>
-            </div>
-
-            <el-table
-              v-loading="listLoading"
-              :data="tableData"
-              fit
-              highlight-current-row
-              class="paper-table"
-              :header-cell-style="{ background: '#f8f9fa', color: '#1f2f3d', fontWeight: '600' }"
-            >
-              <el-table-column prop="id" label="序号" width="100">
-                <template slot-scope="{row, $index}">
-                  <span class="row-index">{{ $index + 1 }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="name" label="试卷名称">
-                <template slot-scope="{row}">
-                  <div class="paper-name">
-                    <i class="el-icon-document"></i>
-                    <span>{{ row.name }}</span>
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column align="right" width="150">
-                <template slot-scope="{row}">
-                  <router-link target="_blank" :to="{path:'/do',query:{id:row.id}}">
-                    <el-button type="primary" size="small" icon="el-icon-video-play" class="start-btn">
-                      开始答题
-                    </el-button>
-                  </router-link>
-                </template>
-              </el-table-column>
-            </el-table>
-
-            <pagination
-              v-show="total>0"
-              :total="total"
-              :background="false"
-              :page.sync="queryParam.pageIndex"
-              :limit.sync="queryParam.pageSize"
-              @pagination="search"
-              class="custom-pagination"
-            />
+            <paper-table :data="tableData" :loading="listLoading" :total="total" :query-param="queryParam" @search="search" />
+          </div>
+        </el-tab-pane>
+        <el-tab-pane v-for="item in subjectList" :label="item.name" :key="item.id" :name="String(item.id)">
+          <div class="tab-content">
+            <paper-table :data="tableData" :loading="listLoading" :total="total" :query-param="queryParam" @search="search" />
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -71,67 +25,49 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import Pagination from '@/components/Pagination'
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
 import examPaperApi from '@/api/examPaper'
 import subjectApi from '@/api/subject'
+import PaperTable from './components/PaperTable.vue'
 
-export default {
-  components: { Pagination },
-  data () {
-    return {
-      queryParam: {
-        paperType: 1,
-        subjectId: 0,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      tabId: '',
-      listLoading: true,
-      subjectList: [],
-      tableData: [],
-      total: 0
-    }
-  },
-  created () {
-    this.initSubject()
-  },
-  methods: {
-    initSubject () {
-      let _this = this
-      subjectApi.list().then(re => {
-        _this.subjectList = re.response
-        let subjectId = _this.subjectList[0].id
-        _this.queryParam.subjectId = subjectId
-        _this.tabId = subjectId.toString()
-        _this.search()
-      })
-    },
-    search () {
-      this.listLoading = true
-      examPaperApi.pageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    paperTypeChange (val) {
-      this.search()
-    },
-    subjectChange (tab, event) {
-      this.queryParam.subjectId = Number(this.tabId)
-      this.search()
-    }
-  },
-  computed: {
-    ...mapState('enumItem', {
-      paperTypeEnum: state => state.exam.examPaper.paperTypeEnum
-    })
-  }
+const tabId = ref('0')
+const listLoading = ref(true)
+const subjectList = ref([])
+const tableData = ref([])
+const total = ref(0)
+
+const queryParam = reactive({
+  paperType: 1,
+  subjectId: null,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const search = () => {
+  listLoading.value = true
+  examPaperApi.pageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+const tabChange = () => {
+  const id = Number(tabId.value)
+  queryParam.subjectId = id === 0 ? null : id
+  queryParam.pageIndex = 1
+  search()
+}
+
+onMounted(() => {
+  subjectApi.list().then(re => {
+    subjectList.value = re.response || []
+    search()
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -159,7 +95,7 @@ export default {
     align-items: center;
     justify-content: center;
 
-    i {
+    .el-icon {
       font-size: 36px;
       color: #fff;
     }
@@ -186,27 +122,23 @@ export default {
 }
 
 .subject-tabs {
-  height: 100%;
-
-  ::v-deep .el-tabs__header {
+  :deep(.el-tabs__header) {
     background: #f8f9fa;
     border-radius: 12px;
     padding: 15px 0;
     margin-right: 30px;
   }
 
-  ::v-deep .el-tabs__item {
+  :deep(.el-tabs__item) {
     height: 50px;
     line-height: 50px;
     font-size: 15px;
     color: #606266;
     padding: 0 30px;
     transition: all 0.3s;
-
     &:hover {
       color: #667eea;
     }
-
     &.is-active {
       color: #667eea;
       background: rgba(102, 126, 234, 0.1);
@@ -214,11 +146,11 @@ export default {
     }
   }
 
-  ::v-deep .el-tabs__nav-wrap::after {
+  :deep(.el-tabs__nav-wrap::after) {
     display: none;
   }
 
-  ::v-deep .el-tabs__content {
+  :deep(.el-tabs__content) {
     padding: 0;
   }
 }
@@ -227,71 +159,11 @@ export default {
   padding: 0 10px;
 }
 
-.toolbar {
-  margin-bottom: 25px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 10px;
-}
-
-.paper-type-filter {
-  display: flex;
-  justify-content: flex-start;
-
-  ::v-deep .el-radio-group {
-    display: flex;
-    gap: 10px;
-  }
-
-  ::v-deep .el-radio-button {
-    border-radius: 8px;
-    overflow: hidden;
-
-    &:first-child {
-      border-radius: 8px;
-    }
-
-    &:last-child {
-      border-radius: 8px;
-    }
-
-    .el-radio-button__inner {
-      border: none;
-      background: #fff;
-      color: #606266;
-      font-size: 14px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      transition: all 0.3s;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-      i {
-        margin-right: 6px;
-      }
-
-      &:hover {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
-      }
-    }
-  }
-
-  ::v-deep .el-radio-button__orig-radio:checked + .el-radio-button__inner {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-  }
-}
-
 .paper-table {
   border-radius: 10px;
   overflow: hidden;
 
-  ::v-deep .el-table__header {
-    border-radius: 10px;
-  }
-
-  ::v-deep .el-table__body {
+  :deep(.el-table__body) {
     tr {
       transition: all 0.3s;
 
@@ -322,7 +194,7 @@ export default {
     display: flex;
     align-items: center;
 
-    i {
+    .el-icon {
       margin-right: 10px;
       color: #667eea;
       font-size: 18px;
@@ -341,7 +213,7 @@ export default {
     padding: 8px 20px;
     font-size: 13px;
 
-    i {
+    .el-icon {
       margin-right: 5px;
     }
 
@@ -357,7 +229,7 @@ export default {
   padding: 20px 0;
   text-align: center;
 
-  ::v-deep .el-pagination {
+  :deep(.el-pagination) {
     display: inline-flex;
     gap: 10px;
 
@@ -409,24 +281,6 @@ export default {
 
   .paper-content {
     padding: 15px;
-  }
-
-  .subject-tabs {
-    ::v-deep .el-tabs__header {
-      margin-right: 15px;
-    }
-
-    ::v-deep .el-tabs__item {
-      font-size: 14px;
-      padding: 0 20px;
-    }
-  }
-
-  .paper-type-filter {
-    ::v-deep .el-radio-button__inner {
-      padding: 8px 12px;
-      font-size: 13px;
-    }
   }
 }
 </style>

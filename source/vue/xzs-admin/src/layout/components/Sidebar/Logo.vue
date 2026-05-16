@@ -2,32 +2,29 @@
   <div class="sidebar-logo-container" :class="{'collapse':collapse}">
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
-        <img :src="require('@/assets/logo.png')" class="sidebar-logo">
-        <h1  class="sidebar-title">{{ title }} </h1>
+        <img :src="logoUrl" class="sidebar-logo">
+        <h1 class="sidebar-title">{{ title }} </h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
-        <img :src="require('@/assets/logo.png')" class="sidebar-logo">
+        <img :src="logoUrl" class="sidebar-logo">
         <h1 class="sidebar-title">{{ title }} </h1>
       </router-link>
     </transition>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SidebarLogo',
-  props: {
-    collapse: {
-      type: Boolean,
-      required: true
-    }
-  },
-  data () {
-    return {
-      title: '408master'
-    }
+<script setup>
+import { ref } from 'vue'
+import logoUrl from '@/assets/logo.png'
+
+defineProps({
+  collapse: {
+    type: Boolean,
+    required: true
   }
-}
+})
+
+const title = ref('408master')
 </script>
 
 <style lang="scss" scoped>

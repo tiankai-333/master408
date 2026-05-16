@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.AiAdjustmentLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.ai.AiAdjustmentLog">
+        <id column="id" property="id"/>
+        <result column="template_id" property="templateId"/>
+        <result column="style" property="style"/>
+        <result column="adjustment_type" property="adjustmentType"/>
+        <result column="before_content" property="beforeContent"/>
+        <result column="after_content" property="afterContent"/>
+        <result column="adjustment_reason" property="adjustmentReason"/>
+        <result column="adjustment_details" property="adjustmentDetails"/>
+        <result column="test_result" property="testResult"/>
+        <result column="test_question" property="testQuestion"/>
+        <result column="test_feedback" property="testFeedback"/>
+        <result column="rating" property="rating"/>
+        <result column="status" property="status"/>
+        <result column="approver_id" property="approverId"/>
+        <result column="approve_time" property="approveTime"/>
+        <result column="approve_comment" property="approveComment"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="ip_address" property="ipAddress"/>
+    </resultMap>
+
+    <select id="selectLogs" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_adjustment_log 
+        WHERE 1=1
+        <if test="templateId != null">
+            AND template_id = #{templateId}
+        </if>
+        <if test="style != null and style != ''">
+            AND style = #{style}
+        </if>
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_ai_adjustment_log WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiAdjustmentLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_ai_adjustment_log (
+            template_id, style, adjustment_type, before_content, after_content,
+            adjustment_reason, adjustment_details, test_result, test_question,
+            test_feedback, rating, status, approver_id, approve_time,
+            approve_comment, create_user, create_time, ip_address
+        ) VALUES (
+            #{templateId}, #{style}, #{adjustmentType}, #{beforeContent}, #{afterContent},
+            #{adjustmentReason}, #{adjustmentDetails}, #{testResult}, #{testQuestion},
+            #{testFeedback}, #{rating}, #{status}, #{approverId}, #{approveTime},
+            #{approveComment}, #{createUser}, #{createTime}, #{ipAddress}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.mindskip.xzs.domain.ai.AiAdjustmentLog">
+        UPDATE t_ai_adjustment_log SET
+            status = #{status},
+            approver_id = #{approverId},
+            approve_time = #{approveTime},
+            approve_comment = #{approveComment}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM t_ai_adjustment_log WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -1,66 +1,87 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParam" ref="queryForm" :inline="true">
-      <el-form-item label="发送者用户名：">
-        <el-input v-model="queryParam.sendUserName"></el-input>
+      <el-form-item label="标题：">
+        <el-input v-model="queryParam.title" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">查询</el-button>
+        <router-link :to="{path:'/message/send'}" class="link-left">
+          <el-button type="primary">发送消息</el-button>
+        </router-link>
       </el-form-item>
     </el-form>
-
     <el-table v-loading="listLoading" :data="tableData" border fit highlight-current-row style="width: 100%">
-      <el-table-column prop="id" label="Id"  width="100" />
-      <el-table-column prop="title" label="标题" show-overflow-tooltip/>
-      <el-table-column prop="content" label="内容" show-overflow-tooltip />
-      <el-table-column prop="sendUserName" label="发送人"  width="100" />
-      <el-table-column prop="receives" label="接收人"  show-overflow-tooltip />
-      <el-table-column prop="readCount" label="已读数" width="70" />
-      <el-table-column prop="receiveUserCount" label="接收人数" width="100" />
-      <el-table-column prop="createTime" label="创建时间" width="160px"/>
+      <el-table-column prop="id" label="Id" width="80px"/>
+      <el-table-column prop="title" label="标题"/>
+      <el-table-column prop="sendTime" label="发送时间" width="160px"/>
+      <el-table-column label="操作" align="center" width="160px">
+        <template #default="{row}">
+          <el-button size="mini" @click="showDetail(row)">详情</el-button>
+        </template>
+      </el-table-column>
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="queryParam.pageIndex" :limit.sync="queryParam.pageSize"
+    <pagination v-show="total>0" :total="total" v-model:page="queryParam.pageIndex" v-model:limit="queryParam.pageSize"
                 @pagination="search"/>
+    <el-dialog v-model="detailDialog.show" title="消息详情">
+      <div v-loading="detailDialog.loading">
+        <h3>{{ detailDialog.data.title }}</h3>
+        <div v-html="detailDialog.data.content"></div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
-<script>
-
+<script setup>
+import { reactive, ref, onMounted } from 'vue'
 import Pagination from '@/components/Pagination'
 import messageApi from '@/api/message'
 
-export default {
-  components: { Pagination },
-  data () {
-    return {
-      queryParam: {
-        sendUserName: null,
-        pageIndex: 1,
-        pageSize: 10
-      },
-      listLoading: true,
-      tableData: [],
-      total: 0
-    }
-  },
-  created () {
-    this.search()
-  },
-  methods: {
-    search () {
-      this.listLoading = true
-      messageApi.pageList(this.queryParam).then(data => {
-        const re = data.response
-        this.tableData = re.list
-        this.total = re.total
-        this.queryParam.pageIndex = re.pageNum
-        this.listLoading = false
-      })
-    },
-    submitForm () {
-      this.queryParam.pageIndex = 1
-      this.search()
-    }
+const queryParam = reactive({
+  title: null,
+  pageIndex: 1,
+  pageSize: 10
+})
+
+const listLoading = ref(true)
+const tableData = ref([])
+const total = ref(0)
+
+const detailDialog = reactive({
+  show: false,
+  loading: false,
+  data: {
+    title: '',
+    content: ''
   }
+})
+
+const search = () => {
+  listLoading.value = true
+  messageApi.pageList(queryParam).then(data => {
+    const re = data.response
+    tableData.value = re.list
+    total.value = re.total
+    queryParam.pageIndex = re.pageNum
+    listLoading.value = false
+  })
 }
+
+const showDetail = (row) => {
+  detailDialog.show = true
+  detailDialog.loading = true
+  messageApi.select(row.id).then(re => {
+    detailDialog.data = re.response
+    detailDialog.loading = false
+  })
+}
+
+const submitForm = () => {
+  queryParam.pageIndex = 1
+  search()
+}
+
+onMounted(() => {
+  search()
+})
 </script>

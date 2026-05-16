@@ -119,6 +119,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
     public QuestionEditRequestVM getQuestionEditRequestVM(Integer questionId) {
         //题目映射
         Question question = questionMapper.selectByPrimaryKey(questionId);
+        if (question == null) {
+            return null;
+        }
         return getQuestionEditRequestVM(question);
     }
 

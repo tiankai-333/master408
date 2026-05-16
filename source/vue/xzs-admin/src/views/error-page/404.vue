@@ -11,22 +11,16 @@
         <div class="bullshit__oops">OOPS!</div>
         <div class="bullshit__headline">{{ message }}</div>
         <div class="bullshit__info">请检查你的访问地址是否正确, 或点击下面按钮返回主页.</div>
-        <a href="" class="bullshit__return-home">返回主页</a>
+        <router-link to="/" class="bullshit__return-home">返回主页</router-link>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from 'vue'
 
-export default {
-  name: 'Page404',
-  computed: {
-    message () {
-      return '页面未找到...'
-    }
-  }
-}
+const message = computed(() => '页面未找到...')
 </script>
 
 <style lang="scss" scoped>
@@ -209,6 +203,7 @@ export default {
       animation-duration: 0.5s;
       animation-delay: 0.3s;
       animation-fill-mode: forwards;
+      text-decoration: none;
     }
     @keyframes slideUp {
       0% {

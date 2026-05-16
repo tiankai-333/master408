@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2024年408真题 - 题目编辑器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 32px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .controls {
+            padding: 20px 32px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+        
+        .question-list {
+            width: 280px;
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        
+        .question-item {
+            padding: 16px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+        
+        .question-item:hover {
+            background: #e9ecef;
+        }
+        
+        .question-item.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .question-item .q-num {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .question-item .q-type {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .main-content {
+            display: flex;
+        }
+        
+        .editor-panel {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            height: calc(100vh - 200px);
+        }
+        
+        .image-panel {
+            width: 500px;
+            border-left: 1px solid #e0e0e0;
+            padding: 20px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            height: calc(100vh - 200px);
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .options-container {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .option-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .option-item .option-label {
+            width: 40px;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .option-item input {
+            flex: 1;
+        }
+        
+        .question-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            color: #2d3748;
+        }
+        
+        .status-bar {
+            padding: 16px 32px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .progress {
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 2024年408真题 - 题目编辑器</h1>
+            <p>加载 parsed_questions.json 文件，编辑题目内容、答案和解析</p>
+        </div>
+        
+        <div class="controls">
+            <div class="file-input-wrapper">
+                <button class="btn btn-primary">📂 加载题目数据</button>
+                <input type="file" id="fileInput" accept=".json">
+            </div>
+            <button class="btn btn-success" onclick="saveData()">💾 保存数据</button>
+            <button class="btn btn-secondary" onclick="exportSQL()">📄 导出 SQL</button>
+            <span style="margin-left: auto; color: #4a5568;" id="loadStatus">请先加载题目数据</span>
+        </div>
+        
+        <div class="main-content">
+            <div class="question-list" id="questionList">
+                <div style="padding: 20px; color: #718096; text-align: center;">
+                    请先加载题目数据
+                </div>
+            </div>
+            
+            <div class="editor-panel" id="editorPanel">
+                <div style="color: #718096; text-align: center; padding: 60px 20px;">
+                    <h3>👈 请从左侧选择题目进行编辑</h3>
+                </div>
+            </div>
+            
+            <div class="image-panel" id="imagePanel">
+                <div style="color: #718096; text-align: center; padding: 60px 20px;">
+                    题目图片将显示在这里
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="progress" id="progressText">共 0 道题目</div>
+            <div style="color: #718096; font-size: 12px;">提示：编辑后请及时保存</div>
+        </div>
+    </div>
+    
+    <script>
+        let questions = [];
+        let currentQuestionIndex = -1;
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    questions = JSON.parse(event.target.result);
+                    renderQuestionList();
+                    document.getElementById('loadStatus').textContent = `已加载 ${questions.length} 道题目`;
+                    document.getElementById('progressText').textContent = `共 ${questions.length} 道题目`;
+                } catch (error) {
+                    alert('文件解析失败：' + error.message);
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        });
+        
+        function renderQuestionList() {
+            const listEl = document.getElementById('questionList');
+            listEl.innerHTML = '';
+            
+            const typeMap = {
+                1: '单选题',
+                2: '多选题',
+                3: '判断题',
+                4: '填空题',
+                5: '简答题'
+            };
+            
+            const subjectMap = {
+                101: '数据结构',
+                104: '计算机组成原理',
+                107: '操作系统',
+                110: '计算机网络'
+            };
+            
+            questions.forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'question-item';
+                item.innerHTML = `
+                    <div class="q-num">第 ${q.id - 2000} 题</div>
+                    <div class="q-type">${typeMap[q.question_type]} · ${subjectMap[q.subject_id]}</div>
+                `;
+                item.onclick = () => selectQuestion(index);
+                listEl.appendChild(item);
+            });
+        }
+        
+        function selectQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questions[index];
+            
+            document.querySelectorAll('.question-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+            
+            renderEditor(q);
+            renderImage(q);
+        }
+        
+        function renderEditor(q) {
+            const panel = document.getElementById('editorPanel');
+            
+            const typeMap = {
+                1: '单选题',
+                2: '多选题',
+                5: '简答题'
+            };
+            
+            let optionsHtml = '';
+            if (q.question_type === 1 || q.question_type === 2) {
+                const options = q.text_content.questionItemObjects || [];
+                optionsHtml = `
+                    <div class="section-title">📋 选项</div>
+                    <div class="options-container">
+                        ${options.map((opt, i) => `
+                            <div class="option-item">
+                                <div class="option-label">${opt.prefix}</div>
+                                <input type="text" value="${escapeHtml(opt.content)}" 
+                                    onchange="updateOption(${i}, 'content', this.value)">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            panel.innerHTML = `
+                <div class="section-title">📝 基本信息</div>
+                
+                <div class="form-group">
+                    <label>题目类型</label>
+                    <select onchange="updateQuestion('question_type', parseInt(this.value))">
+                        <option value="1" ${q.question_type === 1 ? 'selected' : ''}>单选题</option>
+                        <option value="5" ${q.question_type === 5 ? 'selected' : ''}>简答题</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>分值</label>
+                    <input type="number" value="${q.score}" 
+                        onchange="updateQuestion('score', parseInt(this.value))">
+                </div>
+                
+                <div class="form-group">
+                    <label>难度 (1-5)</label>
+                    <input type="number" min="1" max="5" value="${q.difficult}" 
+                        onchange="updateQuestion('difficult', parseInt(this.value))">
+                </div>
+                
+                <div class="form-group">
+                    <label>正确答案</label>
+                    <input type="text" value="${escapeHtml(q.correct)}" 
+                        onchange="updateQuestion('correct', this.value)">
+                </div>
+                
+                <div class="section-title">📖 题目内容</div>
+                
+                <div class="form-group">
+                    <label>题目描述</label>
+                    <textarea onchange="updateTextContent('titleContent', this.value)">${escapeHtml(q.text_content.titleContent)}</textarea>
+                </div>
+                
+                ${optionsHtml}
+                
+                <div class="section-title">💡 答案解析</div>
+                
+                <div class="form-group">
+                    <label>解析内容</label>
+                    <textarea onchange="updateTextContent('analyze', this.value)">${escapeHtml(q.text_content.analyze)}</textarea>
+                </div>
+            `;
+        }
+        
+        function renderImage(q) {
+            const panel = document.getElementById('imagePanel');
+            
+            if (q.text_content.imageBase64) {
+                panel.innerHTML = `
+                    <div class="section-title">🖼️ 题目图片</div>
+                    <p style="margin-bottom: 16px; font-size: 13px; color: #718096;">
+                        第 ${q.text_content.pageNum} 页 · ${q.text_content.imageFilename}
+                    </p>
+                    <img src="data:image/jpeg;base64,${q.text_content.imageBase64}" 
+                        class="question-image" alt="题目图片">
+                `;
+            } else {
+                panel.innerHTML = `
+                    <div style="color: #718096; text-align: center; padding: 60px 20px;">
+                        无图片数据
+                    </div>
+                `;
+            }
+        }
+        
+        function updateQuestion(key, value) {
+            if (currentQuestionIndex >= 0) {
+                questions[currentQuestionIndex][key] = value;
+            }
+        }
+        
+        function updateTextContent(key, value) {
+            if (currentQuestionIndex >= 0) {
+                questions[currentQuestionIndex].text_content[key] = value;
+            }
+        }
+        
+        function updateOption(index, key, value) {
+            if (currentQuestionIndex >= 0) {
+                questions[currentQuestionIndex].text_content.questionItemObjects[index][key] = value;
+            }
+        }
+        
+        function saveData() {
+            if (questions.length === 0) {
+                alert('请先加载题目数据');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(questions, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'parsed_questions.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function exportSQL() {
+            if (questions.length === 0) {
+                alert('请先加载题目数据');
+                return;
+            }
+            
+            let sql = '-- ============================================\n';
+            sql += '-- 2024年408真题 数据库导入脚本\n';
+            sql += '-- ============================================\n\n';
+            sql += 'USE xzs;\n\n';
+            sql += 'SET FOREIGN_KEY_CHECKS = 0;\n\n';
+            
+            sql += '-- ============================================\n';
+            sql += '-- 插入题目内容（t_text_content）\n';
+            sql += '-- ============================================\n';
+            
+            questions.forEach(q => {
+                const tc = JSON.parse(JSON.stringify(q.text_content));
+                delete tc.imageBase64;
+                delete tc.imageFilename;
+                delete tc.pageNum;
+                
+                const contentJson = JSON.stringify(tc).replace(/'/g, "''");
+                sql += `INSERT INTO t_text_content (id, content, create_time) VALUES (${q.text_content_id}, '${contentJson}', NOW());\n`;
+            });
+            
+            sql += '\n-- ============================================\n';
+            sql += '-- 插入题目记录（t_question）\n';
+            sql += '-- ============================================\n';
+            
+            questions.forEach(q => {
+                const correct = (q.correct || '').replace(/'/g, "''");
+                sql += `INSERT INTO t_question (id, question_type, subject_id, score, grade_level, difficult, correct, info_text_content_id, create_user, status, create_time, deleted) VALUES (${q.id}, ${q.question_type}, ${q.subject_id}, ${q.score}, ${q.grade_level}, ${q.difficult}, '${correct}', ${q.info_text_content_id}, ${q.create_user}, ${q.status}, NOW(), b'0');\n`;
+            });
+            
+            sql += '\nSET FOREIGN_KEY_CHECKS = 1;\n\n';
+            sql += 'SELECT "2024年408真题导入完成！" AS result;\n';
+            
+            const blob = new Blob([sql], { type: 'text/sql;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'insert_2024_questions.sql';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

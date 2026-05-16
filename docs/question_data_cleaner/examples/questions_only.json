@@ -1,0 +1,34 @@
+[
+  {
+    "id": 2001,
+    "question_num": 1,
+    "type": "choice",
+    "subject": "data_structure",
+    "titleContent": "若一个栈的输入序列为1,2,3,4,5，则下列序列中不可能是栈的输出序列的是（）",
+    "options": [
+      {"prefix": "A", "content": "2,3,4,1,5"},
+      {"prefix": "B", "content": "5,4,3,2,1"},
+      {"prefix": "C", "content": "2,4,3,5,1"},
+      {"prefix": "D", "content": "4,5,2,3,1"}
+    ],
+    "score": 2,
+    "difficult": 3,
+    "page_num": 4
+  },
+  {
+    "id": 2002,
+    "question_num": 2,
+    "type": "choice",
+    "subject": "data_structure",
+    "titleContent": "一棵3阶B树，除根节点外，每个节点的关键字个数最少为（）",
+    "options": [
+      {"prefix": "A", "content": "1"},
+      {"prefix": "B", "content": "2"},
+      {"prefix": "C", "content": "3"},
+      {"prefix": "D", "content": "4"}
+    ],
+    "score": 2,
+    "difficult": 3,
+    "page_num": 4
+  }
+]

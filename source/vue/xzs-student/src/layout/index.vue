@@ -3,126 +3,123 @@
     <el-header height="70" class="student-header">
       <div class="header-content">
         <div class="logo-section">
-          <a href="/">
+          <router-link to="/">
             <div class="logo-wrapper">
               <div class="logo-icon">
-                <i class="el-icon-education"></i>
+                <el-icon><Reading /></el-icon>
               </div>
               <div class="logo-text-container">
                 <span class="logo-main">master408</span>
                 <span class="logo-sub">智能考试系统</span>
               </div>
             </div>
-          </a>
+          </router-link>
         </div>
         <el-menu class="el-menu-title" mode="horizontal" :default-active="defaultUrl" :router="true">
           <el-menu-item index="/index">
-            <i class="el-icon-s-home"></i>
+            <el-icon><HomeFilled /></el-icon>
             首页
           </el-menu-item>
           <el-menu-item index="/paper/index">
-            <i class="el-icon-document"></i>
+            <el-icon><Document /></el-icon>
             试卷中心
           </el-menu-item>
           <el-menu-item index="/record/index">
-            <i class="el-icon-tickets"></i>
+            <el-icon><Tickets /></el-icon>
             考试记录
           </el-menu-item>
           <el-menu-item index="/question/index">
-            <i class="el-icon-warning"></i>
+            <el-icon><WarningFilled /></el-icon>
             错题本
           </el-menu-item>
           <el-menu-item index="/question/ai-analyze">
-            <i class="el-icon-search"></i>
+            <el-icon><Search /></el-icon>
             AI题目识别
           </el-menu-item>
           <el-menu-item index="/knowledge-graph/index">
-            <i class="el-icon-network"></i>
-            知识图谱
+            <el-icon><MagicStick /></el-icon>
+            408Master
           </el-menu-item>
         </el-menu>
         <div class="head-user">
           <el-dropdown trigger="click" placement="bottom-end">
-            <el-badge :is-dot="messageCount!==0">
-              <el-avatar class="el-dropdown-avatar" size="medium" :src="userInfo.imagePath === null ? require('@/assets/avatar.png') : userInfo.imagePath"></el-avatar>
+            <el-badge :is-dot="userStore.messageCount !== 0">
+              <el-avatar class="el-dropdown-avatar" size="medium" :src="userInfo.imagePath === null ? avatarDefault : userInfo.imagePath"></el-avatar>
             </el-badge>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click.native="$router.push({path:'/user/index'})">
-                <i class="el-icon-user"></i>个人中心
-              </el-dropdown-item>
-              <el-dropdown-item @click.native="$router.push({path:'/user/message'})">
-                <i class="el-icon-bell"></i>
-                <el-badge :value="messageCount" v-if="messageCount!==0">消息中心</el-badge>
-                <span v-if="messageCount===0">消息中心</span>
-              </el-dropdown-item>
-              <el-dropdown-item @click.native="logout" divided>
-                <i class="el-icon-switch-button"></i>退出
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="$router.push({ path: '/user/index' })">
+                  <el-icon><User /></el-icon>个人中心
+                </el-dropdown-item>
+                <el-dropdown-item @click="$router.push({ path: '/user/message' })">
+                  <el-icon><Bell /></el-icon>
+                  <el-badge :value="userStore.messageCount" v-if="userStore.messageCount !== 0">消息中心</el-badge>
+                  <span v-if="userStore.messageCount === 0">消息中心</span>
+                </el-dropdown-item>
+                <el-dropdown-item @click="logout" divided>
+                  <el-icon><SwitchButton /></el-icon>退出
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </div>
       </div>
     </el-header>
     <el-main class="student-main">
-      <router-view/>
+      <router-view />
     </el-main>
-
   </el-container>
 </template>
 
-<script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+<script setup>
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useUserStore } from '@/store/modules/user'
 import loginApi from '@/api/login'
 import userApi from '@/api/user'
-export default {
-  name: 'Layout',
-  data () {
-    return {
-      defaultUrl: '/index',
-      userInfo: {
-        imagePath: null
-      }
-    }
-  },
-  created () {
-    let _this = this
-    this.defaultUrl = this.routeSelect(this.$route.path)
-    this.getUserMessageInfo()
-    userApi.getCurrentUser().then(re => {
-      _this.userInfo = re.response
-    })
-  },
-  watch: {
-    $route (to, from) {
-      this.defaultUrl = this.routeSelect(to.path)
-    }
-  },
-  methods: {
-    routeSelect (path) {
-      let topPath = ['/', '/index', '/paper/index', '/record/index', '/question/index', '/knowledge-graph/index']
-      if (topPath.indexOf(path)) {
-        return path
-      }
-      return null
-    },
-    logout () {
-      let _this = this
-      loginApi.logout().then(function (result) {
-        if (result && result.code === 1) {
-          _this.clearLogin()
-          _this.$router.push({ path: '/login' })
-        }
-      })
-    },
-    ...mapActions('user', ['getUserMessageInfo']),
-    ...mapMutations('user', ['clearLogin'])
-  },
-  computed: {
-    ...mapState('user', {
-      messageCount: state => state.messageCount
-    })
+import avatarDefault from '@/assets/avatar.png'
+import {
+  Reading, HomeFilled, Document, Tickets, WarningFilled,
+  Search, Share, User, Bell, SwitchButton, MagicStick
+} from '@element-plus/icons-vue'
+
+const router = useRouter()
+const route = useRoute()
+const userStore = useUserStore()
+
+const defaultUrl = ref('/index')
+const userInfo = reactive({
+  imagePath: null
+})
+
+const routeSelect = (path) => {
+  const topPath = ['/', '/index', '/paper/index', '/record/index', '/question/index', '/question/ai-analyze', '/knowledge-graph/index']
+  if (topPath.indexOf(path) >= 0) {
+    return path
   }
+  return null
 }
+
+const logout = () => {
+  loginApi.logout().then(function (result) {
+    if (result && result.code === 1) {
+      userStore.clearLogin()
+      router.push({ path: '/login' })
+    }
+  })
+}
+
+onMounted(() => {
+  defaultUrl.value = routeSelect(route.path) || '/index'
+  userStore.getUserMessageInfo()
+  userApi.getCurrentUser().then(re => {
+    Object.assign(userInfo, re.response)
+  })
+})
+
+watch(() => route.path, (to) => {
+  defaultUrl.value = routeSelect(to) || '/index'
+})
 </script>
 
 <style lang="scss" scoped>
@@ -135,10 +132,7 @@ export default {
   background-size: 200% 200%;
   animation: gradient-shift 10s ease infinite;
   border-bottom: none !important;
-  box-shadow: 
-    0 4px 30px rgba(0, 0, 0, 0.3),
-    0 0 60px rgba(83, 52, 131, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 60px rgba(83, 52, 131, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
 
@@ -151,18 +145,6 @@ export default {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
     animation: shimmer 4s infinite;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
-    border-radius: 50%;
-    filter: blur(30px);
   }
 
   .header-content {
@@ -210,9 +192,9 @@ export default {
         box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
         animation: icon-pulse 3s ease-in-out infinite;
 
-        i {
+        .el-icon {
           font-size: 22px;
-          color: #1f2f3d;
+          color: #fff;
         }
       }
 
@@ -274,7 +256,7 @@ export default {
           width: 80%;
         }
 
-        i {
+        .el-icon {
           transform: scale(1.15);
           color: #a855f7;
         }
@@ -289,7 +271,7 @@ export default {
         }
       }
 
-      i {
+      .el-icon {
         margin-right: 10px;
         font-size: 18px;
         transition: transform 0.3s ease;
@@ -313,8 +295,7 @@ export default {
       }
     }
 
-    .el-badge__content {
-      background-color: #ff4757;
+    :deep(.el-badge__content) {
       animation: pulse 2s infinite;
     }
   }
@@ -329,11 +310,6 @@ export default {
 @keyframes shimmer {
   0% { left: -100%; }
   100% { left: 100%; }
-}
-
-@keyframes glow {
-  from { filter: drop-shadow(0 0 5px rgba(255,215,0,0.5)); }
-  to { filter: drop-shadow(0 0 15px rgba(255,215,0,0.8)); }
 }
 
 @keyframes pulse {
@@ -383,6 +359,5 @@ export default {
       margin: 10px 0 0;
     }
   }
-
 }
 </style>
