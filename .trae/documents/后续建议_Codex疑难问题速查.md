@@ -268,9 +268,41 @@ services:
 
 ## 当前待解决的阻塞项
 
-| # | 阻塞项                                | 影响范围          | 建议方案                                                             |
-| - | ---------------------------------- | ------------- | ---------------------------------------------------------------- |
-| 1 | 云端无法运行 embed\_questions.py（pip 超时） | RAG 向量全部 NULL | ① 宿主机暴露 MySQL 端口 → 宿主机运行脚本；② 或将 pymysql 预装到 Dockerfile           |
-| 2 | dev 分支合并未提交（冲突已解）                  | 代码未同步         | `git add README.md && git commit -m "Merge feature/ai into dev"` |
-| 3 | 17 个 tmp\_\*.py 临时文件残留             | 仓库污染          | `git rm tmp_*.py` 后提交清理                                          |
+> ✅ **2026-05-16 已修复**（commit `fix: make rag embedding setup reproducible`）
+
+| # | 阻塞项 | 状态 | 修复方案 |
+| - | ----- | ---- | ----- |
+| 1 | embed_questions.py 硬编码 API Key + 错误列名 | ✅ 已修复 | GLM_API_KEY → 仅环境变量；`q.question_title` → `q.title`；DB_CONFIG 读环境变量 |
+| 2 | pip 超时无法在容器内运行脚本 | ✅ 已修复 | 新增 `deploy/docker-compose.override-embed.yml`，宿主机连 127.0.0.1:3306 |
+| 3 | tmp_*.py 临时文件残留 | ✅ 已修复 | 14 个 tmp_*.py + crawler/__pycache__/ 已删除 |
+
+**新增文件**：
+| 文件 | 用途 |
+|------|------|
+| `ai/requirements.txt` | pymysql + requests 依赖声明 |
+| `deploy/docker-compose.override-embed.yml` | 临时暴露 MySQL 3306，仅 embedding/调试用 |
+
+**推荐运行路径**：
+```bash
+# 1. 安装依赖
+pip install -r ai/requirements.txt
+
+# 2. 执行 DDL（可重复执行）
+mysql -u root -p123456 xzs < database/05_rag_embeddings.sql
+
+# 3. 暴露 MySQL 端口（仅 embedding 使用，用完恢复）
+docker compose -f deploy/docker-compose.yml \
+               -f deploy/docker-compose.override-embed.yml \
+               up -d mysql
+
+# 4. 设置 API Key 并运行
+$env:GLM_API_KEY='your_glm_api_key'
+python ai/embed_questions.py
+
+# 5. 恢复 MySQL（移除端口暴露）
+docker compose -f deploy/docker-compose.yml \
+               -f deploy/docker-compose.override-embed.yml \
+               down mysql
+docker compose -f deploy/docker-compose.yml up -d mysql
+```
 
