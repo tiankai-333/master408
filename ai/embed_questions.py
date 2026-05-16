@@ -1,6 +1,6 @@
 """
 批量生成题目解析的向量嵌入（RAG Embedding）
-模型：GLM Embedding-2 (1536维)
+模型：GLM Embedding-2 (1024维)
 API：https://open.bigmodel.cn/api/paas/v4/embeddings
 
 使用方法：
