@@ -34,12 +34,38 @@
 | 分支 | 状态 | 说明 |
 |------|------|------|
 | `main` | ✅ 稳定 | 最新稳定版 |
-| `dev` | ⚠️ 开发中 | 开发整合分支 |
-| `feature/vue3-migration` | 🚀 进行中 | Vue2 到 Vue3 的完整迁移 |
+| `dev` | ✅ 稳定 | NPE修复 + 爬虫数据 + 年级清理 (已合并feature/crawler-and-exam-data) |
+| `feature/crawler-and-exam-data` | ✅ 已完成 | 408真题爬虫 + 数据库完整 + NPE全面防护 |
+| `feature/ai` | 🚀 进行中 | AI RAG 检索增强 + 4种Skill风格优化 + 已部署云端 |
+| `deploy/docker-infra` | 🛠️ 部署 | Docker 部署基础设施（三容器编排） |
 
 ---
 
 ## 更新日志
+
+### 最近更新（2026-05-16）— feature/crawler-and-exam-data 稳定版
+
+**NPE 全面防护 (5个Java文件, 10处修复)**
+- 🛡️ `QuestionAnswerController`：subject/textContent null保护 + JSON解析try-catch + select空值校验
+- 🛡️ `ExamPaperAnswerController`(student/admin)：subject/user null保护
+- 🛡️ `ExamUtil`：scoreToVM(null)→"-" secondToVM(null)→"-"
+- 🛡️ `QuestionServiceImpl`：getQuestionEditRequestVM null check
+- ✅ 考试记录和错题本页面不再报"系统内部错误"
+
+**408真题爬虫重构**
+- 🕷️ `crawler/crawl_all.py`：统一爬虫，正确解析题目/选项/答案/解析
+- 📊 `database/04_exam_data.sql`：735条text_content + 658道题 + 14套试卷
+- 📝 题目分值使用真题分值(6/7/10/12/13/15分×10)
+
+**年级(gradeLevel)字段废弃**
+- 🧹 管理员+学生端共18个文件移除年级UI组件
+- 📦 Admin枚举(enumItem.js)和Student Store移除levelEnum
+
+**数据库整洁**
+- 🗑️ 清理7个旧版数据库文件
+- 🔍 4项悬空引用检查全部通过（0 悬空）
+
+---
 
 ### 最近更新（2026-05-14）
 
