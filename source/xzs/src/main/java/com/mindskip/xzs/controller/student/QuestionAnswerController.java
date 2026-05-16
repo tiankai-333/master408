@@ -45,14 +45,20 @@ public class QuestionAnswerController extends BaseApiController {
         model.setCreateUser(getCurrentUser().getId());
         PageInfo<ExamPaperQuestionCustomerAnswer> pageInfo = examPaperQuestionCustomerAnswerService.studentPage(model);
         PageInfo<QuestionPageStudentResponseVM> page = PageInfoHelper.copyMap(pageInfo, q -> {
-            Subject subject = subjectService.selectById(q.getSubjectId());
             QuestionPageStudentResponseVM vm = modelMapper.map(q, QuestionPageStudentResponseVM.class);
             vm.setCreateTime(DateTimeUtil.dateFormat(q.getCreateTime()));
+            Subject subject = subjectService.selectById(q.getSubjectId());
+            vm.setSubjectName(subject != null ? subject.getName() : "未知");
             TextContent textContent = textContentService.selectById(q.getQuestionTextContentId());
-            QuestionObject questionObject = JsonUtil.toJsonObject(textContent.getContent(), QuestionObject.class);
-            String clearHtml = HtmlUtil.clear(questionObject.getTitleContent());
-            vm.setShortTitle(clearHtml);
-            vm.setSubjectName(subject.getName());
+            if (textContent != null && textContent.getContent() != null) {
+                try {
+                    QuestionObject questionObject = JsonUtil.toJsonObject(textContent.getContent(), QuestionObject.class);
+                    if (questionObject != null && questionObject.getTitleContent() != null) {
+                        vm.setShortTitle(HtmlUtil.clear(questionObject.getTitleContent()));
+                    }
+                } catch (Exception ignored) {
+                }
+            }
             return vm;
         });
         return RestResponse.ok(page);
@@ -63,8 +69,14 @@ public class QuestionAnswerController extends BaseApiController {
     public RestResponse<QuestionAnswerVM> select(@PathVariable Integer id) {
         QuestionAnswerVM vm = new QuestionAnswerVM();
         ExamPaperQuestionCustomerAnswer examPaperQuestionCustomerAnswer = examPaperQuestionCustomerAnswerService.selectById(id);
+        if (examPaperQuestionCustomerAnswer == null) {
+            return RestResponse.fail(2, "答题记录不存在");
+        }
         ExamPaperSubmitItemVM questionAnswerVM = examPaperQuestionCustomerAnswerService.examPaperQuestionCustomerAnswerToVM(examPaperQuestionCustomerAnswer);
         QuestionEditRequestVM questionVM = questionService.getQuestionEditRequestVM(examPaperQuestionCustomerAnswer.getQuestionId());
+        if (questionVM == null) {
+            return RestResponse.fail(2, "题目已被删除");
+        }
         vm.setQuestionVM(questionVM);
         vm.setQuestionAnswerVM(questionAnswerVM);
         return RestResponse.ok(vm);

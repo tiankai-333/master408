@@ -13,6 +13,19 @@ SUBJECT_MAP = {
     "计算机网络": 4,
 }
 
+# 408 真题综合应用题分值（存储时 × 10）
+# 各年份略有差异，这里使用最通用的分配方案；总分永远 70 分
+ESSAY_SCORES = {
+    41: 100,  # 数据结构 — 10 分
+    42: 150,  # 数据结构 — 15 分
+    43: 130,  # 计算机组成原理 — 13 分
+    44: 120,  # 计算机组成原理 — 12 分
+    45:  70,  # 操作系统 — 7 分
+    46:  70,  # 操作系统 — 7 分
+    47:  60,  # 计算机网络 — 6 分
+}
+CHOICE_SCORE = 20  # 选择题每题 2 分 × 10 = 20
+
 with open(BASE / "exam_questions.json", "r", encoding="utf-8") as f:
     questions = json.load(f)
 
@@ -24,11 +37,9 @@ for t in tags_list:
     key = (t["source"], t["question_no"])
     tags_map[key] = t["tags"]
 
-essays = []
 with open(BASE / "essay_questions.csv", "r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
-    for row in reader:
-        essays.append(row)
+    essays = list(reader)
 
 
 def esc(s):
@@ -37,47 +48,11 @@ def esc(s):
     return str(s).replace("\\", "\\\\").replace("'", "''").replace("\n", "\\n").replace("\r", "")
 
 
-def parse_options_from_analysis(analysis_text):
-    if not analysis_text:
-        return [], analysis_text
-    pattern = r'([A-D])[.、．:：]\s*'
-    matches = list(re.finditer(pattern, analysis_text))
-    if len(matches) < 2:
-        return [], analysis_text
-
-    options = []
-    for i, m in enumerate(matches):
-        prefix = m.group(1)
-        start = m.end()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(analysis_text)
-        content = analysis_text[start:end].strip()
-        stop_words = ['查看答案', '正确答案', '参考答案', '答案解析', '解析']
-        for sw in stop_words:
-            idx = content.find(sw)
-            if idx > 0:
-                content = content[:idx].strip()
-                break
-        if content:
-            options.append({
-                "prefix": prefix,
-                "content": content,
-                "itemUuid": str(uuid.uuid4())[:8]
-            })
-
-    if len(options) >= 2:
-        clean_analysis = analysis_text
-        for opt in reversed(options):
-            full_match = opt['prefix'] + re.escape(opt['content'][:20])
-            clean_analysis = re.sub(re.escape(opt['prefix']) + r'[.、．:：]\s*' + re.escape(opt['content']), '', clean_analysis, count=1)
-        return options, clean_analysis.strip()
-    return [], analysis_text
-
-
 def parse_options(options_text):
-    if not options_text:
+    if not options_text or not options_text.strip():
         return []
     items = []
-    for m in re.finditer(r'([A-D])[.、．:：]\s*(.*?)(?=[A-D][.、．:：]|查看答案|正确答案|$)', options_text, re.DOTALL):
+    for m in re.finditer(r'([A-D])[.、．:：]\s*(.*?)(?=[A-D][.、．:：]|$)', options_text, re.DOTALL):
         prefix = m.group(1)
         content = m.group(2).strip()
         if content:
@@ -89,16 +64,33 @@ def parse_options(options_text):
     return items
 
 
-def extract_title_and_options(question_text):
-    title = question_text
+def parse_options_from_analysis(analysis_text):
+    if not analysis_text:
+        return [], ""
+    pattern = r'([A-D])[.、．:：]\s*'
+    matches = list(re.finditer(pattern, analysis_text))
+    if len(matches) < 2:
+        return [], analysis_text
+
     options = []
-    m = re.search(r'^(.*?[）)。)])(.*)', question_text, re.DOTALL)
-    if m:
-        title = m.group(1).strip()
-        rest = m.group(2).strip()
-        if rest:
-            options = parse_options(rest)
-    return title, options
+    for i, m in enumerate(matches):
+        prefix = m.group(1)
+        start = m.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(analysis_text)
+        content = analysis_text[start:end].strip()
+        stop_words = ['查看答案', '正确答案', '参考答案', '答案解析', '解析', '折半查找']
+        for sw in stop_words:
+            idx = content.find(sw)
+            if idx > 0:
+                content = content[:idx].strip()
+                break
+        if content:
+            options.append({
+                "prefix": prefix,
+                "content": content,
+                "itemUuid": str(uuid.uuid4())[:8]
+            })
+    return options if len(options) >= 2 else [], ""
 
 
 def process_image_tags(text):
@@ -127,18 +119,13 @@ for q in questions:
     analysis = q.get("analysis", "")
     images = q.get("images", "")
 
-    option_items = []
-    if raw_options and raw_options.strip():
-        option_items = parse_options(raw_options)
-
-    if not option_items:
-        option_items, analysis = parse_options_from_analysis(analysis)
-
-    if not option_items:
-        title, option_items = extract_title_and_options(raw_title)
-
     title = process_image_tags(raw_title)
     analysis = process_image_tags(analysis)
+
+    option_items = parse_options(raw_options)
+
+    if not option_items:
+        option_items = parse_options_from_analysis(analysis)
 
     content_obj = {
         "titleContent": title,
@@ -154,13 +141,16 @@ for q in questions:
     has_code = "b'1'" if "```" in analysis else "b'0'"
 
     question_values.append(
-        f"(1, {subject_id}, 20, NULL, NULL, '{esc(answer)}', {tc_id}, 1, 1, b'0', "
+        f"(1, {subject_id}, {CHOICE_SCORE}, NULL, NULL, '{esc(answer)}', {tc_id}, 1, 1, b'0', "
         f"'{esc(title)}', NULL, '{esc(answer)}', '{esc(analysis)}', 2, '{esc(q['subject'])}', "
         f"'{source}', {year}, {qno}, '{esc(tags)}', '{esc(images)}', "
         f"NULL, NULL, 'html', {has_image}, {has_code})"
     )
     tc_id += 1
 
+# ============================================================
+# 大题（综合应用题）— 使用真题分值
+# ============================================================
 for e in essays:
     e["_db_id"] = tc_id
     year = int(e["year"])
@@ -173,6 +163,10 @@ for e in essays:
     answer = e.get("answer", "") or ""
     analysis = e.get("analysis", "") or ""
     images = e.get("images", "") or ""
+
+    # 真题分值，存储时 × 10
+    essay_score = ESSAY_SCORES.get(qno, 100)
+    e["_score"] = essay_score  # 保存到对象里稍后用
 
     title = process_image_tags(title)
     analysis = process_image_tags(analysis)
@@ -192,13 +186,16 @@ for e in essays:
     has_code = "b'1'" if "```" in analysis else "b'0'"
 
     question_values.append(
-        f"(5, {subject_id}, 100, NULL, NULL, NULL, {tc_id}, 1, 1, b'0', "
+        f"(5, {subject_id}, {essay_score}, NULL, NULL, NULL, {tc_id}, 1, 1, b'0', "
         f"'{esc(title)}', NULL, '{esc(answer)}', '{esc(analysis)}', 2, '{esc(e['subject'])}', "
         f"'{source}', {year}, {qno}, '{esc(tags)}', '{esc(images)}', "
         f"NULL, NULL, 'html', {has_image}, {has_code})"
     )
     tc_id += 1
 
+# ============================================================
+# 试卷框架 — 每题分值体现在 section 标题中
+# ============================================================
 paper_values = []
 
 for year in range(2011, 2025):
@@ -214,64 +211,98 @@ for year in range(2011, 2025):
     os_essays = [e for e in year_essays if e["subject"] == "操作系统"]
     cn_essays = [e for e in year_essays if e["subject"] == "计算机网络"]
 
+    choice_count = len(ds_choices) + len(co_choices) + len(os_choices) + len(cn_choices)
+
     sections = []
     sections.append({
-        "name": f"一、单项选择题（数据结构，1-{len(ds_choices)}题，每题2分）",
-        "questionItems": [{"id": q["_db_id"], "itemOrder": i+1} for i, q in enumerate(ds_choices)]
+        "name": f"一、单项选择题（数据结构，1-{len(ds_choices)}题，每题2分，共{len(ds_choices) * 2}分）",
+        "questionItems": [{"id": q["_db_id"], "itemOrder": i + 1} for i, q in enumerate(ds_choices)]
     })
     off = len(ds_choices)
     sections.append({
-        "name": f"二、单项选择题（计算机组成原理，{off+1}-{off+len(co_choices)}题，每题2分）",
-        "questionItems": [{"id": q["_db_id"], "itemOrder": off+i+1} for i, q in enumerate(co_choices)]
+        "name": f"二、单项选择题（计组，{off + 1}-{off + len(co_choices)}题，每题2分，共{len(co_choices) * 2}分）",
+        "questionItems": [{"id": q["_db_id"], "itemOrder": off + i + 1} for i, q in enumerate(co_choices)]
     })
     off += len(co_choices)
     sections.append({
-        "name": f"三、单项选择题（操作系统，{off+1}-{off+len(os_choices)}题，每题2分）",
-        "questionItems": [{"id": q["_db_id"], "itemOrder": off+i+1} for i, q in enumerate(os_choices)]
+        "name": f"三、单项选择题（操作系统，{off + 1}-{off + len(os_choices)}题，每题2分，共{len(os_choices) * 2}分）",
+        "questionItems": [{"id": q["_db_id"], "itemOrder": off + i + 1} for i, q in enumerate(os_choices)]
     })
     off += len(os_choices)
     sections.append({
-        "name": f"四、单项选择题（计算机网络，{off+1}-{off+len(cn_choices)}题，每题2分）",
-        "questionItems": [{"id": q["_db_id"], "itemOrder": off+i+1} for i, q in enumerate(cn_choices)]
+        "name": f"四、单项选择题（计算机网络，{off + 1}-{off + len(cn_choices)}题，每题2分，共{len(cn_choices) * 2}分）",
+        "questionItems": [{"id": q["_db_id"], "itemOrder": off + i + 1} for i, q in enumerate(cn_choices)]
     })
-    off += len(cn_choices)
+    off = choice_count
+
+    def essay_section_name(subject_label, essay_list, start_num):
+        if not essay_list:
+            return ""
+        score_parts = []
+        for idx, e in enumerate(essay_list):
+            qno = int(e["question_no"])
+            pts = ESSAY_SCORES.get(qno, 100) // 10
+            score_parts.append(f"{start_num + idx}题{pts}分")
+        total = sum(ESSAY_SCORES.get(int(e["question_no"]), 100) for e in essay_list) // 10
+        return f"、综合应用题（{subject_label}，" + "，".join(score_parts) + f"，共{total}分）"
+
+    roman = ["五", "六", "七", "八"]
+    ri = 0
+
     if ds_essays:
+        name = roman[ri] + essay_section_name("数据结构", ds_essays, off + 1)
+        ri += 1
         sections.append({
-            "name": f"五、综合应用题（数据结构，{off+1}-{off+len(ds_essays)}题，每题10分）",
-            "questionItems": [{"id": e["_db_id"], "itemOrder": off+i+1} for i, e in enumerate(ds_essays)]
+            "name": name,
+            "questionItems": [{"id": e["_db_id"], "itemOrder": off + i + 1} for i, e in enumerate(ds_essays)]
         })
         off += len(ds_essays)
+
     if co_essays:
+        name = roman[ri] + essay_section_name("计组", co_essays, off + 1)
+        ri += 1
         sections.append({
-            "name": f"六、综合应用题（计算机组成原理，{off+1}-{off+len(co_essays)}题，每题10分）",
-            "questionItems": [{"id": e["_db_id"], "itemOrder": off+i+1} for i, e in enumerate(co_essays)]
+            "name": name,
+            "questionItems": [{"id": e["_db_id"], "itemOrder": off + i + 1} for i, e in enumerate(co_essays)]
         })
         off += len(co_essays)
+
     if os_essays:
+        name = roman[ri] + essay_section_name("操作系统", os_essays, off + 1)
+        ri += 1
         sections.append({
-            "name": f"七、综合应用题（操作系统，{off+1}-{off+len(os_essays)}题，每题10分）",
-            "questionItems": [{"id": e["_db_id"], "itemOrder": off+i+1} for i, e in enumerate(os_essays)]
+            "name": name,
+            "questionItems": [{"id": e["_db_id"], "itemOrder": off + i + 1} for i, e in enumerate(os_essays)]
         })
         off += len(os_essays)
+
     if cn_essays:
+        name = roman[ri] + essay_section_name("计算机网络", cn_essays, off + 1)
+        ri += 1
         sections.append({
-            "name": f"八、综合应用题（计算机网络，{off+1}题，10分）",
-            "questionItems": [{"id": e["_db_id"], "itemOrder": off+1} for e in cn_essays]
+            "name": name,
+            "questionItems": [{"id": e["_db_id"], "itemOrder": off + i + 1} for i, e in enumerate(cn_essays)]
         })
 
     frame_json = json.dumps(sections, ensure_ascii=False)
     frame_json_esc = esc(frame_json)
     text_content_values.append(f"({tc_id}, '{frame_json_esc}', NOW())")
 
+    # 动态计算总分（不能写死 1500）
     total_q = len(year_questions) + len(year_essays)
+    total_score = (len(year_questions) * CHOICE_SCORE
+                   + sum(ESSAY_SCORES.get(int(e["question_no"]), 100) for e in year_essays))
 
     paper_values.append(
         f"('{year}年全国硕士研究生招生考试计算机学科专业基础综合试题', "
-        f"NULL, 1, NULL, 1500, {total_q}, 180, NULL, NULL, {tc_id}, 1, b'0', NULL, {year}, "
+        f"5, 1, NULL, {total_score}, {total_q}, 180, NULL, NULL, {tc_id}, 1, b'0', NULL, {year}, "
         f"'{year}年408计算机学科专业基础综合考试真题')"
     )
     tc_id += 1
 
+# ============================================================
+# 综合应用题 t_essay_question 备份表 — 也使用真题分值
+# ============================================================
 essay_values = []
 for e in essays:
     year = int(e["year"])
@@ -281,14 +312,19 @@ for e in essays:
     answer = e.get("answer", "") or ""
     analysis = e.get("analysis", "") or ""
     images = e.get("images", "") or ""
+    real_score = ESSAY_SCORES.get(qno, 100) // 10
     essay_values.append(
-        f"({subject_id}, {year}, {qno}, '{esc(title)}', 10, '{esc(answer)}', '{esc(analysis)}', '{esc(images)}')"
+        f"({subject_id}, {year}, {qno}, '{esc(title)}', {real_score}, '{esc(answer)}', '{esc(analysis)}', '{esc(images)}')"
     )
 
+# ============================================================
+# 输出 SQL
+# ============================================================
 sql_lines = []
 sql_lines.append("-- ============================================")
 sql_lines.append("-- 04_exam_data.sql")
 sql_lines.append("-- 从爬虫数据生成，匹配 01_init_structure.sql + 02_extend_fields.sql")
+sql_lines.append("-- 大题分值遵循 408 真题标准（×10 存储）")
 sql_lines.append("-- ============================================")
 sql_lines.append("")
 sql_lines.append("SET NAMES utf8mb4;")
@@ -301,7 +337,8 @@ sql_lines.append("INSERT INTO `t_subject` (`id`, `name`, `level`, `level_name`, 
 sql_lines.append("(1, '数据结构', 1, '408统考', 1, b'0'),")
 sql_lines.append("(2, '计算机组成原理', 1, '408统考', 2, b'0'),")
 sql_lines.append("(3, '操作系统', 1, '408统考', 3, b'0'),")
-sql_lines.append("(4, '计算机网络', 1, '408统考', 4, b'0');")
+sql_lines.append("(4, '计算机网络', 1, '408统考', 4, b'0'),")
+sql_lines.append("(5, '408计算机学科专业基础综合', 0, '408综合', 0, b'0');")
 sql_lines.append("")
 
 sql_lines.append("-- ============================================")
@@ -345,17 +382,32 @@ output = Path(__file__).parent.parent / "database" / "04_exam_data.sql"
 with open(output, "w", encoding="utf-8") as f:
     f.write("\n".join(sql_lines))
 
-with_options = sum(1 for q in questions if q.get("options") and q["options"].strip())
-from_analysis = sum(1 for q in questions if not (q.get("options") and q["options"].strip()) and len(parse_options_from_analysis(q.get("analysis", ""))[0]) >= 2)
-from_title = sum(1 for q in questions if not (q.get("options") and q["options"].strip()) and len(parse_options_from_analysis(q.get("analysis", ""))[0]) < 2 and re.search(r'[A-D][.、．:：]', q.get("question", "")))
-no_options = len(questions) - with_options - from_analysis - from_title
+# Stats
+with_options = sum(1 for q in questions if q.get("options", "").strip())
+without_options_from_fallback = sum(
+    1 for q in questions
+    if not (q.get("options", "").strip()) and parse_options_from_analysis(q.get("analysis", ""))
+)
+no_options_count = len(questions) - with_options
 
 print(f"生成完成: {output}")
 print(f"文本内容: {len(text_content_values)} 条")
-print(f"选择题: {len(questions)} 道")
+print(f"选择题: {len(questions)} 道（每题 {CHOICE_SCORE // 10} 分）")
 print(f"  - 有独立options字段: {with_options}")
-print(f"  - 从analysis解析出选项: {from_analysis}")
-print(f"  - 从题目文本解析出选项: {from_title}")
-print(f"  - 无选项: {no_options}")
-print(f"应用题: {len(essays)} 道")
-print(f"试卷: 14 份（总分固定150分）")
+print(f"  - 从analysis fallback提取: {without_options_from_fallback}")
+print(f"  - 无选项: {no_options_count}")
+print(f"综合应用题: {len(essays)} 道")
+score_summary = {}
+for e in essays:
+    qno = int(e["question_no"])
+    s = ESSAY_SCORES.get(qno, 100) // 10
+    if s not in score_summary:
+        score_summary[s] = 0
+    score_summary[s] += 1
+print(f"  分值分布: {dict(sorted(score_summary.items()))}")
+print(f"试卷: 14 份")
+for year in range(2011, 2016):
+    ye = [e for e in essays if int(e["year"]) == year]
+    total = sum(ESSAY_SCORES.get(int(e["question_no"]), 100) for e in ye) // 10
+    choice_total = 40 * 2
+    print(f"  {year}年: 选择{choice_total}分 + 大题{total}分 = {choice_total + total}分")

@@ -23,12 +23,6 @@ export const useEnumItemStore = defineStore('enumItem', () => {
       { key: 1, value: '学生' },
       { key: 2, value: '教师' },
       { key: 3, value: '管理员' }
-    ],
-    levelEnum: [
-      { key: 1, value: '大一' },
-      { key: 2, value: '大二' },
-      { key: 3, value: '大三' },
-      { key: 4, value: '大四' }
     ]
   })
 

@@ -1,11 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="form" ref="formRef" label-width="100px" v-loading="formLoading" :rules="rules">
-      <el-form-item label="年级：" prop="level" required>
-        <el-select v-model="form.level" placeholder="年级">
-          <el-option v-for="item in levelEnum" :key="item.key" :value="item.key" :label="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="学科名称：" prop="name" required>
         <el-input v-model="form.name"/>
       </el-form-item>
@@ -35,7 +30,6 @@ const tagsViewStore = useTagsViewStore()
 
 const form = reactive({
   id: null,
-  level: null,
   name: '',
   sort: 0
 })
@@ -43,12 +37,7 @@ const form = reactive({
 const formLoading = ref(false)
 const formRef = ref(null)
 
-const levelEnum = computed(() => enumItemStore.user.levelEnum)
-
 const rules = {
-  level: [
-    { required: true, message: '请选择年级', trigger: 'change' }
-  ],
   name: [
     { required: true, message: '请输入学科名称', trigger: 'blur' }
   ],
@@ -83,7 +72,6 @@ const resetForm = () => {
   formRef.value.resetFields()
   Object.assign(form, {
     id: null,
-    level: null,
     name: '',
     sort: 0
   })
