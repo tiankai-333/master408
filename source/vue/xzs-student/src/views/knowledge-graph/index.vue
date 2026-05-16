@@ -374,7 +374,47 @@ const switchStyle = (styleId) => {
   selectedStyle.value = styleId
   const styleNames = { default: '标准解析', feynman: '费曼风格', plato: '柏拉图式', 'first-principles': '第一性原理' }
   inputMessage.value = `请用${styleNames[styleId]}的风格帮我解析题目`
-  sendMessage()
+  sendAnalyzeMessage(styleId, inputMessage.value)
+}
+
+const sendAnalyzeMessage = async (styleId, question) => {
+  if (!question.trim()) return
+  
+  messages.value.push({ role: 'user', content: question })
+  inputMessage.value = ''
+  isTyping.value = true
+  
+  await nextTick()
+  scrollToBottom()
+  
+  try {
+    const response = await post('/api/student/ai/analyze', {
+      style: styleId,
+      question: question,
+      knowledgePoints: ''
+    })
+    
+    if (response.code === 1) {
+      const result = response.response
+      let content = result.analysis || ''
+      if (result.references && result.references.length > 0) {
+        content += '\n\n---\n📚 **参考来源（来自题库）**\n'
+        result.references.forEach((ref, idx) => {
+          content += `\n- [${ref.similarity}] ${ref.title}`
+        })
+      }
+      messages.value.push({ role: 'assistant', content: content })
+    } else {
+      messages.value.push({ role: 'assistant', content: '抱歉，AI分析暂时不可用：' + (response.message || '未知错误') })
+    }
+  } catch (error) {
+    console.error('AI分析失败:', error)
+    messages.value.push({ role: 'assistant', content: '抱歉，AI服务暂时不可用，请稍后重试。' })
+  } finally {
+    isTyping.value = false
+    await nextTick()
+    scrollToBottom()
+  }
 }
 
 onMounted(async () => {
