@@ -36,6 +36,7 @@ const listLoading = ref(true)
 const subjectList = ref([])
 const tableData = ref([])
 const total = ref(0)
+let searchSeq = 0
 
 const queryParam = reactive({
   paperType: 1,
@@ -45,12 +46,20 @@ const queryParam = reactive({
 })
 
 const search = () => {
+  const seq = ++searchSeq
   listLoading.value = true
-  examPaperApi.pageList(queryParam).then(data => {
+  tableData.value = []
+  examPaperApi.pageList({ ...queryParam }).then(data => {
+    if (seq !== searchSeq) return
     const re = data.response
-    tableData.value = re.list
-    total.value = re.total
-    queryParam.pageIndex = re.pageNum
+    tableData.value = re?.list || []
+    total.value = re?.total || 0
+    queryParam.pageIndex = re?.pageNum || queryParam.pageIndex
+    listLoading.value = false
+  }).catch(() => {
+    if (seq !== searchSeq) return
+    tableData.value = []
+    total.value = 0
     listLoading.value = false
   })
 }

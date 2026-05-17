@@ -23,7 +23,7 @@ public class SubjectController extends BaseApiController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public RestResponse list() {
         try {
-            List<Subject> subjects = subjectMapper.allSubject();
+            List<Subject> subjects = subjectMapper.getSubjectByLevel(1);
             return RestResponse.ok(subjects);
         } catch (Exception e) {
             e.printStackTrace();
