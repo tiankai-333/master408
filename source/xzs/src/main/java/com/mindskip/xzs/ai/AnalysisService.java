@@ -79,6 +79,13 @@ public class AnalysisService {
     }
 
     public String generatePrompt(String style, String question, String knowledgePoints, String referenceDocs) {
+        return generatePrompt(style, question, knowledgePoints, referenceDocs, "chat");
+    }
+
+    public String generatePrompt(String style, String question, String knowledgePoints, String referenceDocs, String taskType) {
+        if (isWorkbenchTask(taskType)) {
+            return buildWorkbenchPrompt(taskType, style, question, knowledgePoints, referenceDocs);
+        }
         PromptTemplate template = getTemplate(style);
         return template.formatUserPrompt(question, knowledgePoints, referenceDocs);
     }
@@ -88,8 +95,12 @@ public class AnalysisService {
     }
 
     public String analyzeWithAI(String style, String question, String knowledgePoints, String referenceDocs) throws Exception {
+        return analyzeWithAI(style, question, knowledgePoints, referenceDocs, "chat");
+    }
+
+    public String analyzeWithAI(String style, String question, String knowledgePoints, String referenceDocs, String taskType) throws Exception {
         PromptTemplate template = getTemplate(style);
-        String userPrompt = template.formatUserPrompt(question, knowledgePoints, referenceDocs);
+        String userPrompt = generatePrompt(style, question, knowledgePoints, referenceDocs, taskType);
         String systemPrompt = template.getSystemPrompt();
         String model = "glm-4.5-air";
         return callAiApi(systemPrompt, userPrompt, aiApiType, aiApiKey, aiApiUrl, model);
@@ -102,10 +113,88 @@ public class AnalysisService {
 
     public String analyzeWithCustomAI(String aiType, String apiKey, String apiUrl, String model, 
                                       String style, String question, String knowledgePoints, String referenceDocs) throws Exception {
+        return analyzeWithCustomAI(aiType, apiKey, apiUrl, model, style, question, knowledgePoints, referenceDocs, "chat");
+    }
+
+    public String analyzeWithCustomAI(String aiType, String apiKey, String apiUrl, String model, 
+                                      String style, String question, String knowledgePoints, String referenceDocs, String taskType) throws Exception {
         PromptTemplate template = getTemplate(style);
-        String userPrompt = template.formatUserPrompt(question, knowledgePoints, referenceDocs);
+        String userPrompt = generatePrompt(style, question, knowledgePoints, referenceDocs, taskType);
         String systemPrompt = template.getSystemPrompt();
         return callAiApi(systemPrompt, userPrompt, aiType, apiKey, apiUrl, model);
+    }
+
+    private boolean isWorkbenchTask(String taskType) {
+        return "explain".equals(taskType) || "exam".equals(taskType) || "practice".equals(taskType);
+    }
+
+    private String buildWorkbenchPrompt(String taskType, String style, String question, String knowledgePoints, String referenceDocs) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("你正在 408Master 的 AI 学习工作台中回答学生。请遵守：\n")
+            .append("1. 输出必须是标准 Markdown，不要把标题写成普通文本，不要把所有内容挤成一段。\n")
+            .append("2. 面向学生表达，不要暴露 RAG、向量检索、prompt、上下文注入等技术实现词。\n")
+            .append("3. 如果参考资料不足，要明确说明“不确定”，不要编造真题年份、题号或答案。\n")
+            .append("4. 讲解要围绕 408 的四科：数据结构、组成原理、操作系统、计算机网络。\n")
+            .append("5. 当前讲法：").append(styleName(style)).append("。\n\n");
+
+        if (knowledgePoints != null && !knowledgePoints.trim().isEmpty()) {
+            prompt.append("## 当前知识点\n").append(knowledgePoints.trim()).append("\n\n");
+        }
+
+        if (referenceDocs != null && !referenceDocs.trim().isEmpty()) {
+            prompt.append("## 可参考资料\n").append(referenceDocs.trim()).append("\n\n");
+        }
+
+        prompt.append("## 学生请求\n").append(question != null ? question.trim() : "").append("\n\n");
+
+        if ("practice".equals(taskType)) {
+            prompt.append("## 输出要求\n")
+                .append("请严格按以下顺序输出：\n")
+                .append("### 练习题\n")
+                .append("- 先给出完整题干。\n")
+                .append("- 如果是选择题，必须给出 A、B、C、D 四个选项。\n")
+                .append("- 题目必须能独立作答，不要一上来给答案。\n\n")
+                .append("### 请先作答\n")
+                .append("用一句话提醒学生先自己做，再看解析。\n\n")
+                .append("### 答案与解析\n")
+                .append("- 明确答案。\n")
+                .append("- 分步骤解释为什么。\n")
+                .append("- 对选择题逐项说明选项对错。\n\n")
+                .append("### 关联知识点\n")
+                .append("- 列出所属科目和 2-4 个核心考点。\n")
+                .append("- 给出一个变式练习方向。\n");
+        } else if ("exam".equals(taskType)) {
+            prompt.append("## 输出要求\n")
+                .append("请按以下结构输出：\n")
+                .append("### 真题考法\n说明这个知识点在 408 中通常怎么设问。\n\n")
+                .append("### 解题抓手\n给出读题时优先抓的关键词和条件。\n\n")
+                .append("### 典型题型示例\n给一个简短示例，必须先给题干或题型场景，再解释思路。\n\n")
+                .append("### 易错点\n列出 2-3 个常见误区。\n\n")
+                .append("### 复习建议\n给出下一步练习建议。\n");
+        } else {
+            prompt.append("## 输出要求\n")
+                .append("请按以下结构输出：\n")
+                .append("### 核心定义\n用准确但易懂的话解释概念。\n\n")
+                .append("### 为什么重要\n说明它在 408 中解决什么问题。\n\n")
+                .append("### 常见考法\n列出 3 个常见设问方式。\n\n")
+                .append("### 易错提醒\n列出 2-3 个易错点。\n\n")
+                .append("### 小练习\n最后给一个 1 分钟小问题，让学生可以立刻练习。\n");
+        }
+
+        return prompt.toString();
+    }
+
+    private String styleName(String style) {
+        if ("feynman".equals(style)) {
+            return "费曼学习法，用白话、类比和反问帮助理解";
+        }
+        if ("first-principles".equals(style)) {
+            return "第一性原理，从定义和基本约束推导";
+        }
+        if ("plato".equals(style)) {
+            return "柏拉图式对话，用层层追问启发思考";
+        }
+        return "常规解析，结构清楚、考点明确";
     }
 
     private String callAiApi(String systemPrompt, String userPrompt, String aiType, 

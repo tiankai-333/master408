@@ -46,8 +46,9 @@ public class AIAnalysisController {
         String style = request.getOrDefault("style", "default");
         String question = request.get("question");
         String knowledgePoints = request.get("knowledgePoints");
+        String taskType = request.getOrDefault("taskType", "chat");
 
-        String prompt = analysisService.generatePrompt(style, question, knowledgePoints);
+        String prompt = analysisService.generatePrompt(style, question, knowledgePoints, null, taskType);
         PromptTemplate template = analysisService.getTemplate(style);
 
         Map<String, String> result = new HashMap<>();
@@ -62,11 +63,12 @@ public class AIAnalysisController {
     public RestResponse<Map<String, Object>> analyzeWithAI(@RequestBody Map<String, Object> request) {
         try {
             String style = (String) request.getOrDefault("style", "default");
+            String taskType = (String) request.getOrDefault("taskType", "chat");
             String question = (String) request.get("question");
             String knowledgePoints = (String) request.get("knowledgePoints");
 
-            logger.info("开始AI分析题目 - 风格: {}, 内容长度: {}", 
-                style, question != null ? question.length() : 0);
+            logger.info("开始AI分析 - 风格: {}, 任务: {}, 内容长度: {}", 
+                style, taskType, question != null ? question.length() : 0);
 
             if (question == null || question.trim().isEmpty()) {
                 logger.warn("题目内容为空");
@@ -95,14 +97,14 @@ public class AIAnalysisController {
             if (apiKey != null && !apiKey.trim().isEmpty()) {
                 logger.info("使用前端配置的AI - 类型: {}, 模型: {}", aiType, model);
                 aiResult = analysisService.analyzeWithCustomAI(
-                    aiType, apiKey, apiUrl, model, style, question, knowledgePoints, referenceDocs
+                    aiType, apiKey, apiUrl, model, style, question, knowledgePoints, referenceDocs, taskType
                 );
             } else {
                 logger.info("使用后端配置的默认AI");
-                aiResult = analysisService.analyzeWithAI(style, question, knowledgePoints, referenceDocs);
+                aiResult = analysisService.analyzeWithAI(style, question, knowledgePoints, referenceDocs, taskType);
             }
             
-            String prompt = analysisService.generatePrompt(style, question, knowledgePoints, referenceDocs);
+            String prompt = analysisService.generatePrompt(style, question, knowledgePoints, referenceDocs, taskType);
             PromptTemplate template = analysisService.getTemplate(style);
 
             Map<String, Object> result = new HashMap<>();
@@ -110,6 +112,7 @@ public class AIAnalysisController {
             result.put("prompt", prompt);
             result.put("systemPrompt", template.getSystemPrompt());
             result.put("style", style);
+            result.put("taskType", taskType);
             
             if (ragDocs != null && !ragDocs.isEmpty()) {
                 List<Map<String, Object>> references = ragDocs.stream().map(doc -> {
