@@ -41,7 +41,7 @@ const queryParam = reactive({
   paperType: 1,
   subjectId: null,
   pageIndex: 1,
-  pageSize: 10
+  pageSize: 20
 })
 
 const search = () => {
@@ -72,23 +72,24 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .paper-container {
-  background-color: #f5f7fa;
+  background: linear-gradient(180deg, #f7fbff 0%, #eef4f8 100%);
   min-height: calc(100vh - 70px);
-  padding: 30px;
+  padding: 22px;
 }
 
 .paper-header {
-  text-align: center;
-  margin-bottom: 40px;
-  padding: 40px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
+  max-width: 1500px;
+  margin: 0 auto 18px;
+  padding: 24px 28px;
+  background: linear-gradient(135deg, #13233f, #2554bc);
+  border-radius: 24px;
   color: #fff;
+  text-align: left;
 
   .header-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
+    width: 54px;
+    height: 54px;
+    margin: 0 0 14px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     display: flex;
@@ -115,10 +116,13 @@ onMounted(() => {
 }
 
 .paper-content {
+  max-width: 1500px;
+  margin: 0 auto;
   background: #fff;
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.08);
 }
 
 .subject-tabs {
@@ -133,15 +137,15 @@ onMounted(() => {
     height: 50px;
     line-height: 50px;
     font-size: 15px;
-    color: #606266;
+      color: #606266;
     padding: 0 30px;
     transition: all 0.3s;
     &:hover {
       color: #667eea;
     }
     &.is-active {
-      color: #667eea;
-      background: rgba(102, 126, 234, 0.1);
+      color: #1d4ed8;
+      background: #eff6ff;
       font-weight: 600;
     }
   }

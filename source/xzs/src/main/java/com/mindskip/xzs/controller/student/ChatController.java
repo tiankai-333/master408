@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,6 +27,9 @@ public class ChatController extends BaseApiController {
 
     @Autowired
     private SubjectService subjectService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Value("${ai.api.type:glm}")
     private String aiApiType;
@@ -169,17 +173,44 @@ public class ChatController extends BaseApiController {
     @RequestMapping(value = "/user/stats", method = RequestMethod.GET)
     public RestResponse<Map<String, Object>> getUserStats() {
         try {
+            Integer userId = getCurrentUser().getId();
             Map<String, Object> stats = new HashMap<>();
-            stats.put("totalQuestions", 156);
-            stats.put("accuracy", 72);
-            stats.put("weakPoints", 8);
-            
+
+            Map<String, Object> totalRow = jdbcTemplate.queryForMap(
+                    "SELECT COUNT(*) AS total_questions, " +
+                            "COALESCE(SUM(CASE WHEN do_right = TRUE THEN 1 ELSE 0 END), 0) AS correct_questions " +
+                            "FROM t_exam_paper_question_customer_answer WHERE create_user = ?",
+                    userId);
+            int totalQuestions = toInt(totalRow.get("total_questions"));
+            int correctQuestions = toInt(totalRow.get("correct_questions"));
+            stats.put("totalQuestions", totalQuestions);
+            stats.put("accuracy", totalQuestions == 0 ? 0 : Math.round(correctQuestions * 100.0 / totalQuestions));
+            stats.put("weakPoints", Math.max(0, totalQuestions - correctQuestions));
+
             List<Map<String, Object>> subjects = new ArrayList<>();
-            subjects.add(createSubjectStats("数据结构", 75));
-            subjects.add(createSubjectStats("组成原理", 62));
-            subjects.add(createSubjectStats("操作系统", 80));
-            subjects.add(createSubjectStats("计算机网络", 70));
-            
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                    "SELECT s.id, s.name, " +
+                            "COUNT(a.id) AS total_questions, " +
+                            "COALESCE(SUM(CASE WHEN a.do_right = TRUE THEN 1 ELSE 0 END), 0) AS correct_questions " +
+                            "FROM t_subject s " +
+                            "LEFT JOIN t_exam_paper_question_customer_answer a " +
+                            "  ON a.subject_id = s.id AND a.create_user = ? " +
+                            "WHERE s.deleted = FALSE AND s.id <> 5 " +
+                            "GROUP BY s.id, s.name, s.item_order " +
+                            "ORDER BY s.item_order",
+                    userId);
+            for (Map<String, Object> row : rows) {
+                int subjectTotal = toInt(row.get("total_questions"));
+                int subjectCorrect = toInt(row.get("correct_questions"));
+                Map<String, Object> subject = new HashMap<>();
+                subject.put("id", row.get("id"));
+                subject.put("name", row.get("name"));
+                subject.put("totalQuestions", subjectTotal);
+                subject.put("done", subjectTotal);
+                subject.put("accuracy", subjectTotal == 0 ? 0 : Math.round(subjectCorrect * 100.0 / subjectTotal));
+                subjects.add(subject);
+            }
+
             stats.put("subjects", subjects);
             
             logger.info("用户统计数据返回: 总题目={}, 正确率={}%", 
@@ -192,12 +223,18 @@ public class ChatController extends BaseApiController {
         }
     }
 
-    private Map<String, Object> createSubjectStats(String name, int accuracy) {
-        Map<String, Object> subject = new HashMap<>();
-        subject.put("id", new Random().nextInt(100) + 1);
-        subject.put("name", name);
-        subject.put("accuracy", accuracy);
-        return subject;
+    private int toInt(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     @RequestMapping(value = "/knowledge-graph", method = RequestMethod.GET)
