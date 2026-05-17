@@ -1,47 +1,40 @@
 <template>
-  <div class="knowledge-workspace">
-    <section class="workspace-hero">
+  <div class="study-workbench">
+    <section class="workbench-header">
       <div>
-        <span class="hero-kicker">408Master Knowledge Studio</span>
-        <h1>知识点目录与 RAG 学习链接</h1>
-        <p>
-          408 统考卷是综合试卷，但每道题仍然属于数据结构、组成原理、操作系统或计算机网络。
-          这里用目录替代杂乱图谱，把知识点、相关真题、AI 解析和模拟出题串成一条学习路径。
-        </p>
+        <span class="eyebrow">408Master AI Tutor</span>
+        <h1>AI 学习工作台</h1>
+        <p>选择右侧知识点，让 AI 结合知识库、真题和你的学习记录进行讲解、追问与练习。</p>
       </div>
-      <div class="hero-summary">
-        <div>
-          <strong>{{ userStats.totalQuestions }}</strong>
-          <span>已做题</span>
-        </div>
-        <div>
-          <strong>{{ userStats.accuracy }}%</strong>
-          <span>综合正确率</span>
-        </div>
-        <div>
-          <strong>{{ totalKnowledgePoints }}</strong>
-          <span>知识点</span>
-        </div>
+      <div class="header-actions">
+        <button @click="explainKnowledge">
+          <el-icon><MagicStick /></el-icon>
+          讲解当前知识点
+        </button>
+        <button @click="generatePractice">
+          <el-icon><Edit /></el-icon>
+          生成练习题
+        </button>
       </div>
     </section>
 
-    <div class="workspace-grid">
-      <aside class="left-panel">
-        <section class="panel-card accuracy-card">
+    <section class="workbench-grid">
+      <aside class="side-column">
+        <section class="panel-card">
           <div class="panel-title">
-            <div>
-              <span>Subject Accuracy</span>
-              <h2>分科正确率</h2>
-            </div>
-            <el-progress
-              type="dashboard"
-              :percentage="safePercent(userStats.accuracy)"
-              :width="78"
-              :stroke-width="8"
-              :color="progressColor"
-            />
+            <span>Learning Profile</span>
+            <h2>学习状态</h2>
           </div>
-
+          <div class="profile-summary">
+            <div>
+              <strong>{{ userStats.totalQuestions }}</strong>
+              <span>已做题</span>
+            </div>
+            <div>
+              <strong>{{ userStats.accuracy }}%</strong>
+              <span>综合正确率</span>
+            </div>
+          </div>
           <div class="subject-list">
             <button
               v-for="subject in normalizedSubjectStats"
@@ -51,188 +44,168 @@
               @click="selectSubject(subject)"
             >
               <span class="subject-dot" :style="{ backgroundColor: subject.color }"></span>
-              <span class="subject-main">
+              <span>
                 <strong>{{ subject.name }}</strong>
                 <em>{{ subject.done || 0 }} 题</em>
               </span>
-              <span class="subject-rate">{{ subject.accuracy }}%</span>
+              <b>{{ subject.accuracy }}%</b>
             </button>
           </div>
         </section>
 
-        <section class="panel-card skill-card">
-          <div class="panel-title compact">
-            <div>
-              <span>Default Skill</span>
-              <h2>AI 解析默认视角</h2>
-            </div>
+        <section class="panel-card">
+          <div class="panel-title">
+            <span>Default Skill</span>
+            <h2>默认讲法</h2>
           </div>
-
           <div class="skill-grid">
             <button
               v-for="skill in aiStyles"
               :key="skill.id"
-              class="skill-option"
+              class="skill-card"
               :class="{ active: selectedStyle === skill.id }"
               @click="setDefaultStyle(skill.id)"
             >
-              <span class="skill-icon">{{ skill.short }}</span>
+              <span>{{ skill.short }}</span>
               <strong>{{ skill.name }}</strong>
               <em>{{ skill.description }}</em>
             </button>
           </div>
-
-          <p class="skill-hint">
-            当前默认：{{ currentStyle.name }}。RAG 讲解和模拟出题会优先使用这个视角。
-          </p>
         </section>
       </aside>
 
-      <main class="catalog-panel panel-card">
-        <div class="catalog-toolbar">
+      <main class="chat-panel panel-card">
+        <div class="chat-heading">
           <div>
-            <span>Knowledge Catalog</span>
-            <h2>知识点目录</h2>
+            <span class="eyebrow">AI Conversation</span>
+            <h2>{{ selectedPointDetail.name || '先选择知识点，或直接提问' }}</h2>
+            <p>
+              当前讲法：{{ currentStyle.name }}
+              <template v-if="selectedPoint"> · {{ selectedPoint.subjectName }}</template>
+            </p>
+          </div>
+          <el-tag v-if="selectedPoint" effect="plain">{{ selectedPoint.subjectName }}</el-tag>
+        </div>
+
+        <div v-if="selectedPoint" class="context-card">
+          <div>
+            <strong>{{ selectedPointDetail.name || selectedPoint.name }}</strong>
+            <p>{{ selectedPointDetail.description || selectedPoint.description || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。' }}</p>
+          </div>
+          <div class="prompt-actions">
+            <button @click="explainKnowledge">结合知识库讲解</button>
+            <button @click="explainWithExam">结合真题讲解</button>
+            <button @click="generatePractice">生成练习题</button>
+          </div>
+        </div>
+
+        <div ref="messagesRef" class="chat-messages">
+          <div v-for="(msg, index) in messages" :key="index" :class="['message-bubble', msg.role]">
+            <div v-html="formatMessage(msg.content)"></div>
+          </div>
+          <div v-if="isTyping" class="typing-line">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <el-input
+            v-model="inputMessage"
+            type="textarea"
+            :rows="4"
+            placeholder="问一个 408 问题，或围绕当前知识点继续追问..."
+            @keydown.enter.ctrl="sendMessage"
+          />
+          <div class="input-footer">
+            <span>Ctrl + Enter 发送</span>
+            <el-button type="primary" :loading="isTyping" @click="sendMessage">发送</el-button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="catalog-column">
+        <section class="panel-card catalog-card">
+          <div class="catalog-title">
+            <div>
+              <span class="eyebrow">Knowledge Context</span>
+              <h2>知识目录</h2>
+            </div>
+            <strong>{{ totalKnowledgePoints }}</strong>
           </div>
           <el-input
             v-model="keyword"
             class="catalog-search"
-            placeholder="搜索知识点，例如 虚拟存储器"
+            placeholder="搜索知识点"
             clearable
           >
             <template #prefix>
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
-        </div>
 
-        <div v-loading="graphLoading" class="catalog-body">
-          <section
-            v-for="group in filteredGroups"
-            :key="group.name"
-            class="subject-section"
-          >
-            <button class="subject-heading" @click="toggleGroup(group.name)">
-              <span class="subject-dot" :style="{ backgroundColor: group.color }"></span>
-              <strong>{{ group.name }}</strong>
-              <em>{{ group.points.length }} 个知识点</em>
-              <el-icon :class="{ open: expandedGroups.includes(group.name) }"><ArrowDown /></el-icon>
-            </button>
-
-            <div v-show="expandedGroups.includes(group.name)" class="knowledge-list">
-              <article
-                v-for="point in group.points"
-                :key="point.id"
-                class="knowledge-link"
-                :class="{ active: selectedPoint && selectedPoint.rawId === point.rawId }"
-                @click="selectPoint(point)"
-              >
-                <div>
-                  <h3>{{ point.name }}</h3>
-                  <p>{{ point.description || '暂无描述，点击后可用 RAG 生成讲解和模拟题。' }}</p>
-                </div>
-                <span class="level-badge">L{{ point.level || 1 }}</span>
-              </article>
-            </div>
-          </section>
-
-          <el-empty v-if="!filteredGroups.length && !graphLoading" description="没有匹配的知识点" />
-        </div>
-      </main>
-
-      <aside class="right-panel">
-        <section class="panel-card detail-card">
-          <div class="panel-title compact">
-            <div>
-              <span>RAG Link</span>
-              <h2>{{ selectedPointDetail.name || '选择一个知识点' }}</h2>
-            </div>
-          </div>
-
-          <div v-if="selectedPointDetail.name" class="point-detail">
-            <el-tag effect="plain">{{ selectedPointDetail.subjectName || selectedSubjectName || '408 综合' }}</el-tag>
-            <p>{{ selectedPointDetail.description || selectedPoint?.description || '这个知识点还缺少详细描述，可以先用 RAG 讲解补充学习材料。' }}</p>
-
-            <div class="detail-links">
-              <button @click="askRagExplanation">
-                <el-icon><MagicStick /></el-icon>
-                RAG 讲解
+          <div v-loading="graphLoading" class="catalog-body">
+            <section v-for="group in filteredGroups" :key="group.name" class="subject-section">
+              <button class="subject-heading" @click="toggleGroup(group.name)">
+                <span class="subject-dot" :style="{ backgroundColor: group.color }"></span>
+                <strong>{{ group.name }}</strong>
+                <em>{{ group.points.length }}</em>
+                <el-icon :class="{ open: expandedGroups.includes(group.name) }"><ArrowDown /></el-icon>
               </button>
-              <button @click="generatePractice">
-                <el-icon><Edit /></el-icon>
-                模拟出题
-              </button>
-              <button @click="goAiAnalyze">
-                <el-icon><Search /></el-icon>
-                题目识别
-              </button>
-            </div>
-
-            <div class="related-block">
-              <h3>知识链接</h3>
-              <div v-if="childPoints.length" class="chip-list">
-                <button v-for="child in childPoints" :key="child.id" @click="selectPointByRawId(child.id)">
-                  {{ child.name }}
+              <div v-show="expandedGroups.includes(group.name)" class="knowledge-list">
+                <button
+                  v-for="point in group.points"
+                  :key="point.id"
+                  class="knowledge-item"
+                  :class="{ active: selectedPoint && selectedPoint.rawId === point.rawId }"
+                  @click="selectPoint(point)"
+                >
+                  <strong>{{ point.name }}</strong>
+                  <span>{{ point.description || '点击后加入 AI 对话上下文' }}</span>
                 </button>
               </div>
-              <p v-else>暂无下级知识点，可通过 RAG 讲解补足学习路径。</p>
-            </div>
-
-            <div class="related-block">
-              <h3>关联真题</h3>
-              <div v-if="relatedQuestions.length" class="question-list">
-                <div v-for="question in relatedQuestions" :key="question.id" class="question-row">
-                  <span>{{ question.title || question.name || `题目 #${question.id}` }}</span>
-                  <em>难度 {{ question.difficult || '-' }}</em>
-                </div>
-              </div>
-              <p v-else>暂无已关联真题，适合用“模拟出题”生成针对练习。</p>
-            </div>
-          </div>
-
-          <div v-else class="empty-detail">
-            <el-icon><Share /></el-icon>
-            <p>从中间目录选择知识点后，这里会显示 RAG 讲解、模拟出题和关联真题入口。</p>
+            </section>
+            <el-empty v-if="!filteredGroups.length && !graphLoading" description="没有匹配的知识点" />
           </div>
         </section>
 
-        <section class="panel-card ai-card">
-          <div class="panel-title compact">
-            <div>
-              <span>AI Workspace</span>
-              <h2>RAG 输出</h2>
-            </div>
+        <section class="panel-card related-card">
+          <div class="panel-title">
+            <span>Linked Practice</span>
+            <h2>相关上下文</h2>
           </div>
-          <div ref="messagesRef" class="ai-messages">
-            <div v-for="(msg, index) in messages" :key="index" :class="['ai-message', msg.role]">
-              <div v-html="formatMessage(msg.content)"></div>
+          <div class="related-block">
+            <h3>关联知识点</h3>
+            <div v-if="childPoints.length" class="chip-list">
+              <button v-for="child in childPoints" :key="child.id" @click="selectPointByRawId(child.id)">
+                {{ child.name }}
+              </button>
             </div>
-            <div v-if="isTyping" class="typing-line">
-              <span></span><span></span><span></span>
+            <p v-else>选择知识点后，这里会展示可继续学习的关联内容。</p>
+          </div>
+          <div class="related-block">
+            <h3>关联真题</h3>
+            <div v-if="relatedQuestions.length" class="question-list">
+              <div v-for="question in relatedQuestions" :key="question.id" class="question-row">
+                <span>{{ question.title || question.name || `题目 #${question.id}` }}</span>
+                <em>{{ question.difficult ? `难度 ${question.difficult}` : '真题' }}</em>
+              </div>
             </div>
+            <p v-else>暂无已关联真题，可以先让 AI 生成一题练习。</p>
           </div>
-          <div class="ai-input">
-            <el-input
-              v-model="inputMessage"
-              type="textarea"
-              :rows="3"
-              placeholder="围绕当前知识点继续追问..."
-              @keydown.enter.ctrl="sendMessage"
-            />
-            <el-button type="primary" :loading="isTyping" @click="sendMessage">
-              发送
-            </el-button>
-          </div>
+          <button class="analysis-link" @click="goAiAnalyze">
+            <el-icon><Search /></el-icon>
+            打开题目识别
+          </button>
         </section>
       </aside>
-    </div>
+    </section>
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowDown, Edit, MagicStick, Search, Share } from '@element-plus/icons-vue'
+import { ArrowDown, Edit, MagicStick, Search } from '@element-plus/icons-vue'
 import { get, post } from '@/utils/request'
 
 const router = useRouter()
@@ -274,12 +247,6 @@ const aiStyles = [
 ]
 
 const currentStyle = computed(() => aiStyles.find(item => item.id === selectedStyle.value) || aiStyles[0])
-
-const progressColor = computed(() => {
-  if (userStats.accuracy >= 80) return '#059669'
-  if (userStats.accuracy >= 60) return '#ea580c'
-  return '#dc2626'
-})
 
 const totalKnowledgePoints = computed(() => {
   return graphData.nodes.filter(node => normalizeType(node.type) === 'knowledge_point').length
@@ -423,7 +390,7 @@ const loadGraph = async () => {
       graphData.categories = response.response?.categories || []
       expandedGroups.value = groupedKnowledge.value.slice(0, 4).map(group => group.name)
       if (!selectedPoint.value && groupedKnowledge.value[0]?.points[0]) {
-        await selectPoint(groupedKnowledge.value[0].points[0])
+        await selectPoint(groupedKnowledge.value[0].points[0], false)
       }
     }
   } catch (error) {
@@ -465,7 +432,7 @@ const toggleGroup = (name) => {
   }
 }
 
-const selectPoint = async (point) => {
+const selectPoint = async (point, announce = true) => {
   selectedPoint.value = point
   Object.keys(selectedPointDetail).forEach(key => delete selectedPointDetail[key])
   relatedQuestions.value = []
@@ -487,6 +454,15 @@ const selectPoint = async (point) => {
       subjectName: point.subjectName
     })
   }
+
+  if (announce) {
+    messages.value.push({
+      role: 'assistant',
+      content: `已切换到「${point.name}」。你可以让我讲解定义、结合真题说明考法，或生成一题练习。`
+    })
+    await nextTick()
+    scrollToBottom()
+  }
 }
 
 const selectPointByRawId = async (id) => {
@@ -503,15 +479,27 @@ const setDefaultStyle = (styleId) => {
   localStorage.setItem('master408-default-skill', styleId)
 }
 
-const askRagExplanation = () => {
+const explainKnowledge = () => {
+  if (!selectedPoint.value) {
+    inputMessage.value = `请用${currentStyle.value.name}给我梳理 408 的一个高频知识点，并说明如何复习。`
+  } else {
+    inputMessage.value = `请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`
+  }
+  sendAnalyzeMessage(inputMessage.value)
+}
+
+const explainWithExam = () => {
   if (!selectedPoint.value) return
-  inputMessage.value = `请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，结合 RAG 知识库说明定义、常见考法和易错点。`
+  inputMessage.value = `请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`
   sendAnalyzeMessage(inputMessage.value)
 }
 
 const generatePractice = () => {
-  if (!selectedPoint.value) return
-  inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」模拟出一道统考风格题目，并给出答案、解析和对应学科。`
+  if (!selectedPoint.value) {
+    inputMessage.value = `请生成一道 408 统考风格练习题，并给出答案、解析和对应学科。`
+  } else {
+    inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题，并给出答案、解析和对应学科。`
+  }
   sendAnalyzeMessage(inputMessage.value)
 }
 
@@ -600,166 +588,168 @@ onMounted(async () => {
   await Promise.all([loadGraph(), loadUserStats()])
   messages.value.push({
     role: 'assistant',
-    content: `已进入 408Master 知识工作台。你可以先选一个知识点，再用默认 Skill「${currentStyle.value.name}」进行 RAG 讲解或模拟出题。`
+    content: `欢迎来到 AI 学习工作台。你可以从右侧选择知识点，或直接问我一个 408 问题。我会优先使用「${currentStyle.value.name}」来回答。`
   })
 })
 </script>
 
 <style lang="scss" scoped>
-.knowledge-workspace {
+.study-workbench {
   min-height: calc(100vh - 70px);
-  padding: 24px;
-  background:
-    radial-gradient(circle at 16% 12%, rgba(37, 99, 235, 0.12), transparent 28%),
-    radial-gradient(circle at 88% 8%, rgba(124, 58, 237, 0.1), transparent 30%),
-    linear-gradient(180deg, #f8fbff 0%, #edf3f8 100%);
+  padding: 22px;
+  background: linear-gradient(180deg, #f7fbff 0%, #eef4f8 100%);
   color: #172033;
 }
 
-.workspace-hero {
+.workbench-header {
+  max-width: 1500px;
+  margin: 0 auto 18px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  max-width: 1480px;
-  margin: 0 auto 22px;
-  padding: 28px 32px;
-  border-radius: 28px;
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 64, 175, 0.88)),
-    #172033;
+  gap: 18px;
+  align-items: center;
+  padding: 24px 28px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #13233f, #2554bc);
   color: #fff;
-  overflow: hidden;
 
   h1 {
-    margin: 8px 0 12px;
-    font-size: 36px;
+    margin: 6px 0 8px;
+    font-size: 32px;
     line-height: 1.2;
   }
 
   p {
-    max-width: 860px;
+    max-width: 760px;
     margin: 0;
-    color: rgba(255, 255, 255, 0.76);
-    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.7;
   }
 }
 
-.hero-kicker,
+.eyebrow,
 .panel-title span,
-.catalog-toolbar span {
-  color: #60a5fa;
+.catalog-title span {
+  color: #5b8cff;
   font-size: 12px;
   font-weight: 800;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
-.hero-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 110px);
-  gap: 12px;
-  align-self: center;
+.workbench-header .eyebrow {
+  color: #93c5fd;
+}
 
-  div {
-    padding: 16px;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.09);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-  }
+.header-actions {
+  display: flex;
+  gap: 10px;
 
-  strong {
-    display: block;
-    font-size: 28px;
-  }
-
-  span {
-    color: rgba(255, 255, 255, 0.68);
-    font-size: 13px;
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    cursor: pointer;
   }
 }
 
-.workspace-grid {
-  max-width: 1480px;
+.workbench-grid {
+  max-width: 1500px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr) 380px;
-  gap: 22px;
+  grid-template-columns: 290px minmax(0, 1fr) 360px;
+  gap: 18px;
   align-items: start;
 }
 
-.left-panel,
-.right-panel {
+.side-column,
+.catalog-column {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .panel-card {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  border-radius: 24px;
-  box-shadow: 0 18px 52px rgba(15, 23, 42, 0.08);
-}
-
-.accuracy-card,
-.skill-card,
-.detail-card,
-.ai-card,
-.catalog-panel {
-  padding: 22px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.08);
 }
 
 .panel-title,
-.catalog-toolbar {
+.catalog-title,
+.chat-heading {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
+  align-items: flex-start;
 
   h2 {
     margin: 4px 0 0;
-    font-size: 21px;
+    font-size: 20px;
   }
 }
 
-.panel-title.compact {
-  align-items: flex-start;
-  margin-bottom: 16px;
+.profile-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+
+  div {
+    padding: 14px;
+    border-radius: 14px;
+    background: #f2f7ff;
+  }
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    font-size: 24px;
+  }
+
+  span {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+  }
 }
 
-.subject-list {
+.subject-list,
+.catalog-body,
+.knowledge-list,
+.question-list {
   display: grid;
-  gap: 10px;
-  margin-top: 18px;
+  gap: 9px;
 }
 
 .subject-row {
-  width: 100%;
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) auto;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
-  padding: 12px;
+  width: 100%;
+  padding: 11px;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  border-radius: 14px;
   background: #f8fafc;
   text-align: left;
   cursor: pointer;
-  transition: 0.2s ease;
 
   &:hover,
   &.active {
     border-color: #93c5fd;
     background: #eff6ff;
   }
-}
-
-.subject-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.subject-main {
-  min-width: 0;
 
   strong,
   em {
@@ -767,45 +757,58 @@ onMounted(async () => {
   }
 
   strong {
-    color: #172033;
     font-size: 14px;
   }
 
   em {
-    margin-top: 3px;
     color: #64748b;
     font-size: 12px;
     font-style: normal;
   }
+
+  b {
+    font-size: 15px;
+  }
 }
 
-.subject-rate {
-  color: #172033;
-  font-weight: 800;
+.subject-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
 }
 
 .skill-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 9px;
+  margin-top: 14px;
 }
 
-.skill-option {
-  min-height: 118px;
-  padding: 14px;
+.skill-card {
+  min-height: 112px;
+  padding: 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 18px;
+  border-radius: 16px;
   background: #f8fafc;
   text-align: left;
   cursor: pointer;
-  transition: 0.2s ease;
 
   &:hover,
   &.active {
-    transform: translateY(-2px);
     border-color: #2563eb;
     background: #eff6ff;
     box-shadow: 0 12px 28px rgba(37, 99, 235, 0.12);
+  }
+
+  span {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    font-weight: 800;
   }
 
   strong,
@@ -814,268 +817,94 @@ onMounted(async () => {
   }
 
   strong {
-    margin: 10px 0 6px;
-    color: #172033;
+    margin: 10px 0 5px;
+    font-size: 14px;
   }
 
   em {
     color: #64748b;
     font-size: 12px;
     font-style: normal;
-    line-height: 1.5;
+    line-height: 1.45;
   }
 }
 
-.skill-icon {
+.chat-panel {
+  min-height: 780px;
   display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  color: #fff;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  font-weight: 800;
+  grid-template-rows: auto auto minmax(360px, 1fr) auto;
 }
 
-.skill-hint {
-  margin: 14px 0 0;
-  color: #64748b;
-  font-size: 13px;
-  line-height: 1.6;
+.chat-heading {
+  margin-bottom: 14px;
+
+  p {
+    margin: 5px 0 0;
+    color: #64748b;
+  }
 }
 
-.catalog-panel {
-  min-height: 760px;
-}
-
-.catalog-toolbar {
-  margin-bottom: 18px;
-}
-
-.catalog-search {
-  max-width: 360px;
-}
-
-.catalog-body {
+.context-card {
   display: grid;
   gap: 14px;
-}
-
-.subject-section {
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #fff;
-}
-
-.subject-heading {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 12px auto 1fr auto;
-  gap: 10px;
-  align-items: center;
+  margin-bottom: 14px;
   padding: 16px;
-  border: 0;
-  background: #f8fafc;
-  text-align: left;
-  cursor: pointer;
+  border: 1px solid #bfdbfe;
+  border-radius: 18px;
+  background: #eff6ff;
 
   strong {
-    color: #172033;
-    font-size: 16px;
-  }
-
-  em {
-    color: #64748b;
-    font-size: 13px;
-    font-style: normal;
-  }
-
-  .el-icon {
-    transition: transform 0.2s ease;
-  }
-
-  .el-icon.open {
-    transform: rotate(180deg);
-  }
-}
-
-.knowledge-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 14px;
-}
-
-.knowledge-link {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  min-height: 126px;
-  padding: 16px;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  background: #ffffff;
-  cursor: pointer;
-  transition: 0.2s ease;
-
-  &:hover,
-  &.active {
-    border-color: #60a5fa;
-    box-shadow: 0 14px 32px rgba(37, 99, 235, 0.12);
-    transform: translateY(-2px);
-  }
-
-  h3 {
-    margin: 0 0 8px;
-    font-size: 16px;
-    color: #172033;
+    font-size: 17px;
   }
 
   p {
-    margin: 0;
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.65;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
-.level-badge {
-  align-self: start;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #dbeafe;
-  color: #1d4ed8;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.point-detail {
-  p {
+    margin: 7px 0 0;
     color: #475569;
-    line-height: 1.8;
+    line-height: 1.7;
   }
 }
 
-.detail-links {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin: 18px 0;
-
-  button {
-    min-height: 72px;
-    border: 0;
-    border-radius: 16px;
-    color: #fff;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    font-weight: 800;
-    cursor: pointer;
-  }
-
-  .el-icon {
-    display: block;
-    margin: 0 auto 6px;
-    font-size: 20px;
-  }
-}
-
-.related-block {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid #e2e8f0;
-
-  h3 {
-    margin: 0 0 12px;
-    font-size: 16px;
-  }
-
-  p {
-    margin: 0;
-    color: #64748b;
-    font-size: 13px;
-  }
-}
-
-.chip-list {
+.prompt-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 
   button {
-    padding: 7px 10px;
-    border: 1px solid #bfdbfe;
+    padding: 8px 12px;
+    border: 1px solid #93c5fd;
     border-radius: 999px;
     color: #1d4ed8;
-    background: #eff6ff;
+    background: #fff;
     cursor: pointer;
   }
 }
 
-.question-list {
-  display: grid;
-  gap: 8px;
-}
-
-.question-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px;
-  border-radius: 12px;
-  background: #f8fafc;
-  color: #334155;
-
-  em {
-    color: #64748b;
-    font-style: normal;
-  }
-}
-
-.empty-detail {
-  min-height: 280px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  color: #64748b;
-
-  .el-icon {
-    font-size: 48px;
-    color: #93c5fd;
-  }
-}
-
-.ai-card {
-  min-height: 420px;
-}
-
-.ai-messages {
-  max-height: 260px;
+.chat-messages {
+  min-height: 360px;
+  max-height: 520px;
   overflow-y: auto;
-  display: grid;
-  gap: 10px;
-  padding: 4px 4px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 4px 16px;
 }
 
-.ai-message {
-  padding: 12px 14px;
-  border-radius: 16px;
+.message-bubble {
+  max-width: 82%;
+  padding: 14px 16px;
+  border-radius: 18px;
   color: #334155;
-  background: #f8fafc;
-  line-height: 1.7;
-  font-size: 13px;
+  background: #f1f5f9;
+  line-height: 1.75;
 
   &.user {
+    align-self: flex-end;
     color: #fff;
     background: linear-gradient(135deg, #2563eb, #7c3aed);
   }
 
-  :deep(strong) {
-    color: #1d4ed8;
+  &.assistant {
+    align-self: flex-start;
   }
 
   :deep(code) {
@@ -1102,15 +931,191 @@ onMounted(async () => {
   span:nth-child(3) { animation-delay: 0.3s; }
 }
 
-.ai-input {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
+.chat-input {
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.input-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+
+  span {
+    color: #94a3b8;
+    font-size: 12px;
+  }
 
   .el-button {
-    justify-self: end;
     border-radius: 999px;
   }
+}
+
+.catalog-title {
+  align-items: center;
+  margin-bottom: 12px;
+
+  strong {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    color: #1d4ed8;
+    background: #dbeafe;
+  }
+}
+
+.catalog-search {
+  margin-bottom: 12px;
+}
+
+.catalog-body {
+  max-height: 560px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.subject-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.subject-heading {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto auto;
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  padding: 13px;
+  border: 0;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+
+  em {
+    color: #64748b;
+    font-style: normal;
+  }
+
+  .el-icon {
+    transition: transform 0.2s ease;
+  }
+
+  .el-icon.open {
+    transform: rotate(180deg);
+  }
+}
+
+.knowledge-list {
+  padding: 10px;
+}
+
+.knowledge-item {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &.active {
+    border-color: #60a5fa;
+    background: #eff6ff;
+  }
+
+  strong,
+  span {
+    display: block;
+  }
+
+  strong {
+    font-size: 14px;
+  }
+
+  span {
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.related-block {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  button {
+    padding: 7px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    cursor: pointer;
+  }
+}
+
+.question-row {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f8fafc;
+
+  span {
+    color: #334155;
+    line-height: 1.5;
+  }
+
+  em {
+    color: #64748b;
+    font-size: 12px;
+    font-style: normal;
+  }
+}
+
+.analysis-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  cursor: pointer;
 }
 
 @keyframes typing {
@@ -1119,57 +1124,48 @@ onMounted(async () => {
 }
 
 @media screen and (max-width: 1280px) {
-  .workspace-grid {
+  .workbench-grid {
     grid-template-columns: 280px minmax(0, 1fr);
   }
 
-  .right-panel {
+  .catalog-column {
     grid-column: 1 / -1;
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media screen and (max-width: 900px) {
-  .knowledge-workspace {
-    padding: 16px;
+  .study-workbench {
+    padding: 14px;
   }
 
-  .workspace-hero,
-  .workspace-grid,
-  .right-panel {
+  .workbench-header,
+  .workbench-grid,
+  .catalog-column {
     grid-template-columns: 1fr;
   }
 
-  .hero-summary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .knowledge-list,
-  .skill-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .catalog-toolbar {
-    align-items: stretch;
+  .header-actions,
+  .prompt-actions {
     flex-direction: column;
   }
 
-  .catalog-search {
-    max-width: none;
+  .message-bubble {
+    max-width: 94%;
   }
 }
 
 @media screen and (max-width: 560px) {
-  .workspace-hero {
-    padding: 22px;
+  .workbench-header {
+    padding: 20px;
 
     h1 {
       font-size: 28px;
     }
   }
 
-  .hero-summary,
-  .detail-links {
+  .profile-summary,
+  .skill-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -44,7 +44,7 @@
         <div class="head-user">
           <el-dropdown trigger="click" placement="bottom-end">
             <el-badge :is-dot="userStore.messageCount !== 0">
-              <el-avatar class="el-dropdown-avatar" size="medium" :src="userInfo.imagePath === null ? avatarDefault : userInfo.imagePath"></el-avatar>
+              <el-avatar class="el-dropdown-avatar" size="default" :src="userInfo.imagePath === null ? avatarDefault : userInfo.imagePath"></el-avatar>
             </el-badge>
             <template #dropdown>
               <el-dropdown-menu>
