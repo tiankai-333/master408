@@ -27,7 +27,7 @@ public class EducationController extends BaseApiController {
 
     @RequestMapping(value = "/subject/list", method = RequestMethod.POST)
     public RestResponse<List<SubjectVM>> list() {
-        List<Subject> subjects = subjectService.allSubject();
+        List<Subject> subjects = subjectService.getSubjectByLevel(1);
         List<SubjectVM> subjectVMS = subjects.stream().map(d -> {
             SubjectVM subjectVM = modelMapper.map(d, SubjectVM.class);
             subjectVM.setId(String.valueOf(d.getId()));

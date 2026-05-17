@@ -160,7 +160,7 @@
                   @click="selectPoint(point)"
                 >
                   <strong>{{ point.name }}</strong>
-                  <span>{{ point.description || '点击后加入 AI 对话上下文' }}</span>
+                  <span>{{ knowledgeSummary(point.description) || '点击后加入 AI 对话上下文' }}</span>
                 </button>
               </div>
             </section>
@@ -268,7 +268,7 @@ const activeContextTitle = computed(() => {
 
 const activeContextDescription = computed(() => {
   if (contextMode.value === 'knowledge' && selectedPoint.value) {
-    return selectedPointDetail.description || selectedPoint.value.description || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。'
+    return cleanKnowledgeDescription(selectedPointDetail.description || selectedPoint.value.description) || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。'
   }
   if (contextMode.value === 'question' && questionContext.value) {
     return questionContext.value
@@ -330,7 +330,7 @@ const groupedKnowledge = computed(() => {
         rawId: parseKnowledgeId(node.id),
         name: node.name,
         level: node.level,
-        description: node.description,
+        description: cleanKnowledgeDescription(node.description),
         category: node.category,
         subjectName: groupName
       })
@@ -409,6 +409,37 @@ const safePercent = (value) => {
   const number = Number(value || 0)
   if (Number.isNaN(number)) return 0
   return Math.max(0, Math.min(100, Math.round(number)))
+}
+
+const cleanKnowledgeDescription = (text) => {
+  const raw = String(text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/`(.*?)`/g, '$1')
+
+  const lines = raw.split('\n')
+    .map(line => line.trim())
+    .filter(line => {
+      if (!line) return false
+      if (/^[A-E]$/i.test(line)) return false
+      if (/^\d{1,3}$/.test(line)) return false
+      if (/^mindmap$/i.test(line)) return false
+      if (/^root\(\(/i.test(line)) return false
+      if (/^[A-Za-z]\d+$/.test(line)) return false
+      if (/^[A-Za-z0-9_]+->[A-Za-z0-9_]+$/.test(line)) return false
+      return true
+    })
+
+  return lines.join(' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([，。；：、,.!?])/g, '$1')
+    .trim()
+}
+
+const knowledgeSummary = (text, limit = 92) => {
+  const value = cleanKnowledgeDescription(text)
+  return value.length > limit ? `${value.slice(0, limit)}...` : value
 }
 
 const normalizeType = (type) => {
@@ -510,7 +541,7 @@ const getCurrentTarget = (preferDraft = true) => {
 
 const getKnowledgeText = () => {
   if (contextMode.value !== 'knowledge' || !selectedPoint.value) return ''
-  return `${selectedPoint.value.name}\n${selectedPoint.value.description || selectedPointDetail.description || ''}`
+  return `${selectedPoint.value.name}\n${cleanKnowledgeDescription(selectedPointDetail.description || selectedPoint.value.description)}`
 }
 
 const selectPoint = async (point, announce = true) => {
@@ -526,6 +557,7 @@ const selectPoint = async (point, announce = true) => {
     if (response.code === 1) {
       Object.assign(selectedPointDetail, response.response || {})
       selectedPointDetail.subjectName = selectedPointDetail.subjectName || point.subjectName
+      selectedPointDetail.description = cleanKnowledgeDescription(selectedPointDetail.description)
       relatedQuestions.value = response.response?.relatedQuestions || []
       childPoints.value = response.response?.children || []
     }
