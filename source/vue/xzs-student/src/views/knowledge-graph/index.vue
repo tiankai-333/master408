@@ -4,12 +4,12 @@
       <div>
         <span class="eyebrow">408Master AI Tutor</span>
         <h1>AI 学习工作台</h1>
-        <p>选择右侧知识点，让 AI 结合知识库、真题和你的学习记录进行讲解、追问与练习。</p>
+        <p>先粘贴题目，或从右侧选择知识点，AI 会围绕当前上下文进行讲解、追问与练习。</p>
       </div>
       <div class="header-actions">
         <button @click="explainKnowledge">
           <el-icon><MagicStick /></el-icon>
-          讲解当前知识点
+          讲解当前上下文
         </button>
         <button @click="generatePractice">
           <el-icon><Edit /></el-icon>
@@ -78,19 +78,19 @@
         <div class="chat-heading">
           <div>
             <span class="eyebrow">AI Conversation</span>
-            <h2>{{ selectedPointDetail.name || '先选择知识点，或直接提问' }}</h2>
+            <h2>{{ activeContextTitle }}</h2>
             <p>
               当前讲法：{{ currentStyle.name }}
-              <template v-if="selectedPoint"> · {{ selectedPoint.subjectName }}</template>
+              <template v-if="activeContextTag"> · {{ activeContextTag }}</template>
             </p>
           </div>
-          <el-tag v-if="selectedPoint" effect="plain">{{ selectedPoint.subjectName }}</el-tag>
+          <el-tag v-if="activeContextTag" effect="plain">{{ activeContextTag }}</el-tag>
         </div>
 
-        <div v-if="selectedPoint" class="context-card">
+        <div v-if="hasActiveContext" class="context-card">
           <div>
-            <strong>{{ selectedPointDetail.name || selectedPoint.name }}</strong>
-            <p>{{ selectedPointDetail.description || selectedPoint.description || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。' }}</p>
+            <strong>{{ activeContextTitle }}</strong>
+            <p>{{ activeContextDescription }}</p>
           </div>
           <div class="prompt-actions">
             <button @click="explainKnowledge">结合知识库讲解</button>
@@ -156,7 +156,7 @@
                   v-for="point in group.points"
                   :key="point.id"
                   class="knowledge-item"
-                  :class="{ active: selectedPoint && selectedPoint.rawId === point.rawId }"
+                  :class="{ active: contextMode === 'knowledge' && selectedPoint && selectedPoint.rawId === point.rawId }"
                   @click="selectPoint(point)"
                 >
                   <strong>{{ point.name }}</strong>
@@ -180,7 +180,7 @@
                 {{ child.name }}
               </button>
             </div>
-            <p v-else>选择知识点后，这里会展示可继续学习的关联内容。</p>
+            <p v-else>右侧点击知识点后，这里会展示可继续学习的关联内容。</p>
           </div>
           <div class="related-block">
             <h3>关联真题</h3>
@@ -190,7 +190,7 @@
                 <em>{{ question.difficult ? `难度 ${question.difficult}` : '真题' }}</em>
               </div>
             </div>
-            <p v-else>暂无已关联真题，可以先让 AI 生成一题练习。</p>
+            <p v-else>点击知识点后会显示已关联真题；直接提交题目时，AI 会优先围绕题目本身回答。</p>
           </div>
           <button class="analysis-link" @click="goAiAnalyze">
             <el-icon><Search /></el-icon>
@@ -214,6 +214,8 @@ const graphLoading = ref(false)
 const keyword = ref('')
 const selectedStyle = ref(localStorage.getItem('master408-default-skill') || 'default')
 const selectedSubjectName = ref('全部')
+const contextMode = ref('none')
+const questionContext = ref('')
 const selectedPoint = ref(null)
 const selectedPointDetail = reactive({})
 const relatedQuestions = ref([])
@@ -247,6 +249,41 @@ const aiStyles = [
 ]
 
 const currentStyle = computed(() => aiStyles.find(item => item.id === selectedStyle.value) || aiStyles[0])
+
+const hasActiveContext = computed(() => {
+  return (contextMode.value === 'knowledge' && selectedPoint.value) ||
+    (contextMode.value === 'question' && questionContext.value)
+})
+
+const activeContextTitle = computed(() => {
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+    return selectedPointDetail.name || selectedPoint.value.name
+  }
+  if (contextMode.value === 'question' && questionContext.value) {
+    return '当前题目 / 问题'
+  }
+  return '先输入题目，或从右侧选择知识点'
+})
+
+const activeContextDescription = computed(() => {
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+    return selectedPointDetail.description || selectedPoint.value.description || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。'
+  }
+  if (contextMode.value === 'question' && questionContext.value) {
+    return questionContext.value
+  }
+  return ''
+})
+
+const activeContextTag = computed(() => {
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+    return selectedPoint.value.subjectName
+  }
+  if (contextMode.value === 'question' && questionContext.value) {
+    return '题目上下文'
+  }
+  return ''
+})
 
 const totalKnowledgePoints = computed(() => {
   return graphData.nodes.filter(node => normalizeType(node.type) === 'knowledge_point').length
@@ -389,9 +426,6 @@ const loadGraph = async () => {
       graphData.links = response.response?.links || []
       graphData.categories = response.response?.categories || []
       expandedGroups.value = groupedKnowledge.value.slice(0, 4).map(group => group.name)
-      if (!selectedPoint.value && groupedKnowledge.value[0]?.points[0]) {
-        await selectPoint(groupedKnowledge.value[0].points[0], false)
-      }
     }
   } catch (error) {
     graphData.nodes = []
@@ -432,7 +466,35 @@ const toggleGroup = (name) => {
   }
 }
 
+const clearKnowledgeContext = () => {
+  selectedPoint.value = null
+  Object.keys(selectedPointDetail).forEach(key => delete selectedPointDetail[key])
+  relatedQuestions.value = []
+  childPoints.value = []
+}
+
+const setQuestionContext = (question) => {
+  contextMode.value = 'question'
+  questionContext.value = question
+  clearKnowledgeContext()
+}
+
+const getCurrentTarget = () => {
+  const draft = inputMessage.value.trim()
+  if (draft) return draft
+  if (contextMode.value === 'question' && questionContext.value) return questionContext.value
+  if (contextMode.value === 'knowledge' && selectedPoint.value) return selectedPoint.value.name
+  return ''
+}
+
+const getKnowledgeText = () => {
+  if (contextMode.value !== 'knowledge' || !selectedPoint.value) return ''
+  return `${selectedPoint.value.name}\n${selectedPoint.value.description || selectedPointDetail.description || ''}`
+}
+
 const selectPoint = async (point, announce = true) => {
+  contextMode.value = 'knowledge'
+  questionContext.value = ''
   selectedPoint.value = point
   Object.keys(selectedPointDetail).forEach(key => delete selectedPointDetail[key])
   relatedQuestions.value = []
@@ -480,25 +542,43 @@ const setDefaultStyle = (styleId) => {
 }
 
 const explainKnowledge = () => {
-  if (!selectedPoint.value) {
-    inputMessage.value = `请用${currentStyle.value.name}给我梳理 408 的一个高频知识点，并说明如何复习。`
-  } else {
+  const target = getCurrentTarget()
+  const hasDraft = Boolean(inputMessage.value.trim())
+  if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
     inputMessage.value = `请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`
+  } else if (target) {
+    inputMessage.value = `请用${currentStyle.value.name}结合知识库讲解下面这道题或问题：\n${target}`
+    setQuestionContext(target)
+  } else {
+    inputMessage.value = `请用${currentStyle.value.name}给我梳理 408 的一个高频知识点，并说明如何复习。`
   }
   sendAnalyzeMessage(inputMessage.value, 'explain')
 }
 
 const explainWithExam = () => {
-  if (!selectedPoint.value) return
-  inputMessage.value = `请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`
+  const target = getCurrentTarget()
+  const hasDraft = Boolean(inputMessage.value.trim())
+  if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
+    inputMessage.value = `请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`
+  } else if (target) {
+    inputMessage.value = `请结合 408 真题讲解下面这道题或问题，指出考点、解题抓手和易错点：\n${target}`
+    setQuestionContext(target)
+  } else {
+    inputMessage.value = '请举一个 408 真题风格场景，说明常见考法和解题抓手。'
+  }
   sendAnalyzeMessage(inputMessage.value, 'exam')
 }
 
 const generatePractice = () => {
-  if (!selectedPoint.value) {
-    inputMessage.value = `请生成一道 408 统考风格练习题。`
-  } else {
+  const target = getCurrentTarget()
+  const hasDraft = Boolean(inputMessage.value.trim())
+  if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
     inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`
+  } else if (target) {
+    inputMessage.value = `请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n${target}`
+    setQuestionContext(target)
+  } else {
+    inputMessage.value = '请生成一道 408 统考风格练习题。'
   }
   sendAnalyzeMessage(inputMessage.value, 'practice')
 }
@@ -508,17 +588,17 @@ const goAiAnalyze = () => {
 }
 
 const sendMessage = () => {
-  if (!inputMessage.value.trim()) return
-  sendAnalyzeMessage(inputMessage.value.trim(), 'chat')
+  const question = inputMessage.value.trim()
+  if (!question) return
+  setQuestionContext(question)
+  sendAnalyzeMessage(question, 'chat')
 }
 
 const sendAnalyzeMessage = async (question, taskType = 'chat') => {
   if (!question.trim()) return
 
   const userQuestion = question.trim()
-  const knowledgeText = selectedPoint.value
-    ? `${selectedPoint.value.name}\n${selectedPoint.value.description || selectedPointDetail.description || ''}`
-    : ''
+  const knowledgeText = getKnowledgeText()
 
   messages.value.push({ role: 'user', content: userQuestion })
   inputMessage.value = ''
@@ -558,8 +638,8 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
 }
 
 const fallbackAnswer = (question) => {
-  const pointName = selectedPoint.value?.name || '当前知识点'
-  return `当前 AI 服务暂时不可用，但可以先按 ${currentStyle.value.name} 的思路学习「${pointName}」：
+  const contextName = contextMode.value === 'knowledge' && selectedPoint.value ? selectedPoint.value.name : '当前题目 / 问题'
+  return `当前 AI 服务暂时不可用，但可以先按 ${currentStyle.value.name} 的思路学习「${contextName}」：
 
 1. 先确认它属于哪一科以及常见题型。
 2. 再把定义、约束条件和典型公式写清楚。
@@ -673,7 +753,7 @@ onMounted(async () => {
   await Promise.all([loadGraph(), loadUserStats()])
   messages.value.push({
     role: 'assistant',
-    content: `欢迎来到 AI 学习工作台。你可以从右侧选择知识点，或直接问我一个 408 问题。我会优先使用「${currentStyle.value.name}」来回答。`
+    content: `欢迎来到 AI 学习工作台。页面不会默认绑定知识点；你可以先粘贴题目，也可以从右侧知识目录手动选择上下文。我会优先使用「${currentStyle.value.name}」来回答。`
   })
 })
 </script>
