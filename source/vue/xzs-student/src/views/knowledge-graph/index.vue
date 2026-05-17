@@ -7,13 +7,13 @@
         <p>先粘贴题目，或从右侧选择知识点，AI 会围绕当前上下文进行讲解、追问与练习。</p>
       </div>
       <div class="header-actions">
-        <button @click="explainKnowledge">
+        <button @click="draftLearningProfile">
           <el-icon><MagicStick /></el-icon>
-          讲解当前上下文
+          生成学习画像
         </button>
-        <button @click="generatePractice">
+        <button @click="draftTargetedPractice">
           <el-icon><Edit /></el-icon>
-          生成练习题
+          生成针对练习
         </button>
       </div>
     </section>
@@ -92,11 +92,6 @@
             <strong>{{ activeContextTitle }}</strong>
             <p>{{ activeContextDescription }}</p>
           </div>
-          <div class="prompt-actions">
-            <button @click="explainKnowledge">结合知识库讲解</button>
-            <button @click="explainWithExam">结合真题讲解</button>
-            <button @click="generatePractice">生成练习题</button>
-          </div>
         </div>
 
         <div ref="messagesRef" class="chat-messages">
@@ -118,7 +113,12 @@
           />
           <div class="input-footer">
             <span>Ctrl + Enter 发送</span>
-            <el-button type="primary" :loading="isTyping" @click="sendMessage">发送</el-button>
+            <div class="send-actions">
+              <button @click="explainKnowledge">结合知识库讲解</button>
+              <button @click="explainWithExam">结合真题讲解</button>
+              <button @click="generatePractice">生成练习题</button>
+              <el-button type="primary" :loading="isTyping" @click="sendMessage">发送</el-button>
+            </div>
           </div>
         </div>
       </main>
@@ -185,10 +185,10 @@
           <div class="related-block">
             <h3>关联真题</h3>
             <div v-if="relatedQuestions.length" class="question-list">
-              <div v-for="question in relatedQuestions" :key="question.id" class="question-row">
+              <button v-for="question in relatedQuestions" :key="question.id" class="question-row" @click="draftRelatedQuestion(question)">
                 <span>{{ question.title || question.name || `题目 #${question.id}` }}</span>
-                <em>{{ question.difficult ? `难度 ${question.difficult}` : '真题' }}</em>
-              </div>
+                <em>{{ question.source || question.difficult ? `${question.source || '真题'} · 难度 ${question.difficult || '-'}` : '点击加入输入框' }}</em>
+              </button>
             </div>
             <p v-else>点击知识点后会显示已关联真题；直接提交题目时，AI 会优先围绕题目本身回答。</p>
           </div>
@@ -221,6 +221,7 @@ const selectedPointDetail = reactive({})
 const relatedQuestions = ref([])
 const childPoints = ref([])
 const inputMessage = ref('')
+const draftTaskType = ref('chat')
 const isTyping = ref(false)
 const messages = ref([])
 const messagesRef = ref(null)
@@ -290,7 +291,7 @@ const totalKnowledgePoints = computed(() => {
 })
 
 const groupedKnowledge = computed(() => {
-  const categoryNames = graphData.categories.map(item => item.name)
+  const categoryNames = graphData.categories.map(item => typeof item === 'string' ? item : item.name)
   const subjectNodes = graphData.nodes.filter(node => normalizeType(node.type) === 'subject')
   const groups = new Map()
 
@@ -314,6 +315,7 @@ const groupedKnowledge = computed(() => {
 
   graphData.nodes
     .filter(node => normalizeType(node.type) === 'knowledge_point')
+    .filter(node => isUsefulKnowledgeName(node.name))
     .forEach(node => {
       const groupName = categoryNames[node.category] || findSubjectNameByLink(node.id) || '未分类'
       if (!groups.has(groupName)) {
@@ -360,6 +362,14 @@ const filteredGroups = computed(() => {
     }))
     .filter(group => group.points.length)
 })
+
+const isUsefulKnowledgeName = (name) => {
+  const value = String(name || '').trim()
+  if (!value) return false
+  if (/^[a-e]{3,}$/i.test(value)) return false
+  if (/^([a-zA-Z][,，、\s]*){3,}$/.test(value) && /[,，、\s]/.test(value)) return false
+  return true
+}
 
 const normalizedSubjectStats = computed(() => {
   const statItems = (userStats.subjects || []).map((item, index) => ({
@@ -425,7 +435,7 @@ const loadGraph = async () => {
       graphData.nodes = response.response?.nodes || []
       graphData.links = response.response?.links || []
       graphData.categories = response.response?.categories || []
-      expandedGroups.value = groupedKnowledge.value.slice(0, 4).map(group => group.name)
+      expandedGroups.value = []
     }
   } catch (error) {
     graphData.nodes = []
@@ -453,9 +463,6 @@ const loadUserStats = async () => {
 
 const selectSubject = (subject) => {
   selectedSubjectName.value = subject.name
-  if (subject.name !== '全部' && !expandedGroups.value.includes(subject.name)) {
-    expandedGroups.value = [...expandedGroups.value, subject.name]
-  }
 }
 
 const toggleGroup = (name) => {
@@ -517,14 +524,7 @@ const selectPoint = async (point, announce = true) => {
     })
   }
 
-  if (announce) {
-    messages.value.push({
-      role: 'assistant',
-      content: `已切换到「${point.name}」。你可以让我讲解定义、结合真题说明考法，或生成一题练习。`
-    })
-    await nextTick()
-    scrollToBottom()
-  }
+  if (announce) await nextTick()
 }
 
 const selectPointByRawId = async (id) => {
@@ -541,46 +541,61 @@ const setDefaultStyle = (styleId) => {
   localStorage.setItem('master408-default-skill', styleId)
 }
 
+const draftPrompt = (content, taskType = 'chat') => {
+  inputMessage.value = content
+  draftTaskType.value = taskType
+}
+
 const explainKnowledge = () => {
   const target = getCurrentTarget()
   const hasDraft = Boolean(inputMessage.value.trim())
   if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
-    inputMessage.value = `请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`
+    draftPrompt(`请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`, 'explain')
   } else if (target) {
-    inputMessage.value = `请用${currentStyle.value.name}结合知识库讲解下面这道题或问题：\n${target}`
+    draftPrompt(`请用${currentStyle.value.name}结合知识库讲解下面这道题或问题：\n${target}`, 'explain')
     setQuestionContext(target)
   } else {
-    inputMessage.value = `请用${currentStyle.value.name}给我梳理 408 的一个高频知识点，并说明如何复习。`
+    draftPrompt(`请用${currentStyle.value.name}给我梳理 408 的一个高频知识点，并说明如何复习。`, 'explain')
   }
-  sendAnalyzeMessage(inputMessage.value, 'explain')
 }
 
 const explainWithExam = () => {
   const target = getCurrentTarget()
   const hasDraft = Boolean(inputMessage.value.trim())
   if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
-    inputMessage.value = `请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`
+    draftPrompt(`请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`, 'exam')
   } else if (target) {
-    inputMessage.value = `请结合 408 真题讲解下面这道题或问题，指出考点、解题抓手和易错点：\n${target}`
+    draftPrompt(`请结合 408 真题讲解下面这道题或问题，指出考点、解题抓手和易错点：\n${target}`, 'exam')
     setQuestionContext(target)
   } else {
-    inputMessage.value = '请举一个 408 真题风格场景，说明常见考法和解题抓手。'
+    draftPrompt('请举一个 408 真题风格场景，说明常见考法和解题抓手。', 'exam')
   }
-  sendAnalyzeMessage(inputMessage.value, 'exam')
 }
 
 const generatePractice = () => {
   const target = getCurrentTarget()
   const hasDraft = Boolean(inputMessage.value.trim())
   if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
-    inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`
+    draftPrompt(`请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`, 'practice')
   } else if (target) {
-    inputMessage.value = `请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n${target}`
+    draftPrompt(`请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n${target}`, 'practice')
     setQuestionContext(target)
   } else {
-    inputMessage.value = '请生成一道 408 统考风格练习题。'
+    draftPrompt('请生成一道 408 统考风格练习题。', 'practice')
   }
-  sendAnalyzeMessage(inputMessage.value, 'practice')
+}
+
+const draftLearningProfile = () => {
+  draftPrompt(`请根据我的学习状态、做题记录、错题和薄弱学科，生成一份 408 学习画像。要求包括：\n1. 当前整体水平判断\n2. 四门科目的掌握情况\n3. 最值得优先补的知识点\n4. 接下来一周的复习安排`, 'chat')
+}
+
+const draftTargetedPractice = () => {
+  draftPrompt(`请根据我的错题、薄弱知识点和近期做题情况，生成一组针对性 408 练习题。要求优先使用真题风格，覆盖薄弱科目，并给出答案与解析。`, 'practice')
+}
+
+const draftRelatedQuestion = (question) => {
+  const title = question.title || question.name || `题目 #${question.id}`
+  draftPrompt(`请结合这道关联真题讲解考点、解题步骤和易错点：\n${title}`, 'exam')
 }
 
 const goAiAnalyze = () => {
@@ -590,8 +605,12 @@ const goAiAnalyze = () => {
 const sendMessage = () => {
   const question = inputMessage.value.trim()
   if (!question) return
-  setQuestionContext(question)
-  sendAnalyzeMessage(question, 'chat')
+  const taskType = draftTaskType.value || 'chat'
+  if (!(contextMode.value === 'knowledge' && selectedPoint.value && taskType !== 'chat')) {
+    setQuestionContext(question)
+  }
+  draftTaskType.value = 'chat'
+  sendAnalyzeMessage(question, taskType)
 }
 
 const sendAnalyzeMessage = async (question, taskType = 'chat') => {
@@ -1029,21 +1048,6 @@ onMounted(async () => {
   }
 }
 
-.prompt-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  button {
-    padding: 8px 12px;
-    border: 1px solid #93c5fd;
-    border-radius: 999px;
-    color: #1d4ed8;
-    background: #fff;
-    cursor: pointer;
-  }
-}
-
 .chat-messages {
   min-height: 360px;
   max-height: 520px;
@@ -1151,6 +1155,23 @@ onMounted(async () => {
 
   .el-button {
     border-radius: 999px;
+  }
+}
+
+.send-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+
+  button {
+    min-height: 32px;
+    padding: 0 11px;
+    border: 1px solid #93c5fd;
+    border-radius: 999px;
+    color: #1d4ed8;
+    background: #fff;
+    cursor: pointer;
   }
 }
 
@@ -1288,9 +1309,18 @@ onMounted(async () => {
 .question-row {
   display: grid;
   gap: 4px;
+  width: 100%;
   padding: 10px;
+  border: 1px solid transparent;
   border-radius: 12px;
   background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+  }
 
   span {
     color: #334155;
@@ -1347,8 +1377,10 @@ onMounted(async () => {
   }
 
   .header-actions,
-  .prompt-actions {
+  .send-actions,
+  .input-footer {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .message-bubble {

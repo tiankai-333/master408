@@ -10,6 +10,7 @@ mysql -u root -p xzs < database/current/02_extend_fields.sql
 mysql -u root -p xzs < database/current/04_exam_data.sql
 mysql -u root -p xzs < database/current/05_rag_embeddings.sql
 mysql -u root -p xzs < database/current/06_ai_knowledge_rag.sql
+mysql -u root -p xzs < database/current/07_demo_student_learning_data.sql
 ```
 
 ## 文件说明
@@ -21,5 +22,6 @@ mysql -u root -p xzs < database/current/06_ai_knowledge_rag.sql
 | `04_exam_data.sql` | 题目、试卷、用户、科目等数据。 |
 | `05_rag_embeddings.sql` | 题目内容 embedding 字段。 |
 | `06_ai_knowledge_rag.sql` | AI 知识库、RAG 字段、学生画像、学习事件、Skill 反馈。 |
+| `07_demo_student_learning_data.sql` | `231310423` 测试账号默认做题记录，用于学习状态、做题记录和错题本演示。 |
 
 408 知识点页面数据不在 SQL 中直接全量展开，使用 `crawler/knowledge_crawler.py --skip-crawl --import-db --clear-existing` 从 `crawler/data/knowledge_pages.json` 导入。

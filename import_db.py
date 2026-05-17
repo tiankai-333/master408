@@ -10,9 +10,12 @@ DB_CONFIG = {
 }
 
 sql_files = [
-    "database/01_init_structure.sql",
-    "database/02_extend_fields.sql",
-    "database/04_exam_data.sql",
+    "database/current/01_init_structure.sql",
+    "database/current/02_extend_fields.sql",
+    "database/current/04_exam_data.sql",
+    "database/current/05_rag_embeddings.sql",
+    "database/current/06_ai_knowledge_rag.sql",
+    "database/current/07_demo_student_learning_data.sql",
 ]
 
 conn = pymysql.connect(**DB_CONFIG)

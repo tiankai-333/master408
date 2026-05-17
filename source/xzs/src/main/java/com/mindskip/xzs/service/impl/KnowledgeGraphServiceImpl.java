@@ -10,6 +10,7 @@ import com.mindskip.xzs.repository.QuestionMapper;
 import com.mindskip.xzs.repository.SubjectMapper;
 import com.mindskip.xzs.service.KnowledgeGraphService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,16 +22,19 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
     private final QuestionKnowledgePointMapper questionKnowledgePointMapper;
     private final QuestionMapper questionMapper;
     private final SubjectMapper subjectMapper;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public KnowledgeGraphServiceImpl(KnowledgePointMapper knowledgePointMapper,
                                      QuestionKnowledgePointMapper questionKnowledgePointMapper,
                                      QuestionMapper questionMapper,
-                                     SubjectMapper subjectMapper) {
+                                     SubjectMapper subjectMapper,
+                                     JdbcTemplate jdbcTemplate) {
         this.knowledgePointMapper = knowledgePointMapper;
         this.questionKnowledgePointMapper = questionKnowledgePointMapper;
         this.questionMapper = questionMapper;
         this.subjectMapper = subjectMapper;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -194,12 +198,12 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         for (QuestionKnowledgePoint qkp : qkps) {
             Question question = questionMapper.selectByPrimaryKey(qkp.getQuestionId());
             if (question != null) {
-                Map<String, Object> questionMap = new HashMap<>();
-                questionMap.put("id", question.getId());
-                questionMap.put("questionType", question.getQuestionType());
-                questionMap.put("difficult", question.getDifficult());
+                Map<String, Object> questionMap = buildQuestionSummary(question);
                 questionList.add(questionMap);
             }
+        }
+        if (questionList.isEmpty()) {
+            questionList.addAll(findFallbackQuestions(kp));
         }
         result.put("relatedQuestions", questionList);
 
@@ -242,10 +246,97 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                 map.put("questionType", question.getQuestionType());
                 map.put("difficult", question.getDifficult());
                 map.put("subjectId", question.getSubjectId());
+                map.putAll(loadQuestionDisplayFields(question.getId()));
                 result.add(map);
             }
         }
 
         return result;
+    }
+
+    private Map<String, Object> buildQuestionSummary(Question question) {
+        Map<String, Object> questionMap = new HashMap<>();
+        questionMap.put("id", question.getId());
+        questionMap.put("questionType", question.getQuestionType());
+        questionMap.put("difficult", question.getDifficult());
+        questionMap.put("subjectId", question.getSubjectId());
+        questionMap.putAll(loadQuestionDisplayFields(question.getId()));
+        return questionMap;
+    }
+
+    private Map<String, Object> loadQuestionDisplayFields(Integer questionId) {
+        Map<String, Object> result = new HashMap<>();
+        if (questionId == null) return result;
+        try {
+            Map<String, Object> row = jdbcTemplate.queryForMap(
+                    "SELECT title_text, source, source_year, source_question_no " +
+                            "FROM t_question WHERE id = ?",
+                    questionId);
+            String title = trimToLength((String) row.get("title_text"), 72);
+            if (title == null || title.isEmpty()) {
+                title = "真题 #" + questionId;
+            }
+            result.put("title", title);
+            Object year = row.get("source_year");
+            Object no = row.get("source_question_no");
+            String source = year != null ? year + "年408真题" : String.valueOf(row.getOrDefault("source", "408真题"));
+            if (no != null) {
+                source += " 第" + no + "题";
+            }
+            result.put("source", source);
+        } catch (Exception e) {
+            result.put("title", "真题 #" + questionId);
+            result.put("source", "408真题");
+        }
+        return result;
+    }
+
+    private List<Map<String, Object>> findFallbackQuestions(KnowledgePoint kp) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (kp == null || kp.getSubjectId() == null) return result;
+        String keyword = "%" + kp.getName() + "%";
+        try {
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                    "SELECT id, question_type, difficult, subject_id, title_text, source, source_year, source_question_no " +
+                            "FROM t_question " +
+                            "WHERE deleted = FALSE AND subject_id = ? " +
+                            "  AND (knowledge_point LIKE ? OR title_text LIKE ? OR analysis_text LIKE ?) " +
+                            "ORDER BY source_year DESC, source_question_no ASC, id ASC LIMIT 8",
+                    kp.getSubjectId(), keyword, keyword, keyword);
+            if (rows.isEmpty()) {
+                rows = jdbcTemplate.queryForList(
+                        "SELECT id, question_type, difficult, subject_id, title_text, source, source_year, source_question_no " +
+                                "FROM t_question WHERE deleted = FALSE AND subject_id = ? " +
+                                "ORDER BY source_year DESC, source_question_no ASC, id ASC LIMIT 5",
+                        kp.getSubjectId());
+            }
+            for (Map<String, Object> row : rows) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", row.get("id"));
+                item.put("questionType", row.get("question_type"));
+                item.put("difficult", row.get("difficult"));
+                item.put("subjectId", row.get("subject_id"));
+                String title = trimToLength((String) row.get("title_text"), 72);
+                item.put("title", title == null || title.isEmpty() ? "真题 #" + row.get("id") : title);
+                Object year = row.get("source_year");
+                Object no = row.get("source_question_no");
+                String source = year != null ? year + "年408真题" : String.valueOf(row.getOrDefault("source", "408真题"));
+                if (no != null) {
+                    source += " 第" + no + "题";
+                }
+                item.put("source", source);
+                result.add(item);
+            }
+        } catch (Exception e) {
+            return result;
+        }
+        return result;
+    }
+
+    private String trimToLength(String text, int maxLength) {
+        if (text == null) return "";
+        String normalized = text.replaceAll("\\s+", " ").trim();
+        if (normalized.length() <= maxLength) return normalized;
+        return normalized.substring(0, maxLength) + "...";
     }
 }

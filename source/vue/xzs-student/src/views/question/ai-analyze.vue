@@ -157,22 +157,22 @@ const parseQuestionItem = (item) => {
 </script>
 
 <style lang="scss" scoped>
-.ai-analyze-container { min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; }
-.ai-header { text-align: center; color: #fff; margin-bottom: 40px;
-  .ai-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+.ai-analyze-container { min-height: calc(100vh - 70px); background: linear-gradient(180deg, #f7fbff 0%, #eef4f8 100%); padding: 22px; }
+.ai-header { max-width: 1500px; margin: 0 auto 18px; padding: 24px 28px; background: linear-gradient(135deg, #13233f, #2554bc); border-radius: 24px; color: #fff; text-align: left;
+  .ai-icon { width: 54px; height: 54px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 0 14px;
     .el-icon { font-size: 40px; }
   }
   h1 { font-size: 32px; font-weight: 700; margin: 0 0 10px; }
   p { font-size: 16px; opacity: 0.9; margin: 0; }
 }
-.ai-content { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-.upload-section { background: #fff; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+.ai-content { max-width: 1500px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.upload-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 16px 44px rgba(15,23,42,0.08); }
 .upload-area { border: 3px dashed #ddd; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #fafafa;
   &:hover { border-color: #667eea; background: #f5f7fa; }
   &.is-dragover { border-color: #667eea; background: #eef1f8; transform: scale(1.02); }
 }
 .file-input { display: none; }
-.upload-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;
+.upload-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;
   .el-icon { font-size: 30px; color: #fff; }
 }
 .upload-text { font-size: 16px; font-weight: 500; color: #333; margin: 0 0 8px; }
@@ -181,12 +181,12 @@ const parseQuestionItem = (item) => {
   h3 { font-size: 16px; font-weight: 600; color: #333; margin: 0 0 15px; }
   .preview-image { max-width: 100%; max-height: 300px; border-radius: 8px; object-fit: contain; border: 1px solid #eee; }
 }
-.result-section { background: #fff; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+.result-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 24px; box-shadow: 0 16px 44px rgba(15,23,42,0.08); display: flex; flex-direction: column; }
 .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0;
   h2 { font-size: 20px; font-weight: 600; color: #333; margin: 0; }
 }
 .result-content { flex: 1; max-height: 600px; overflow-y: auto; }
-.result-count { display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: #fff; font-size: 14px; font-weight: 500; margin-bottom: 20px;
+.result-count { display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 8px; color: #fff; font-size: 14px; font-weight: 500; margin-bottom: 20px;
   .el-icon { margin-right: 8px; }
 }
 .result-card { background: #fafafa; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #e8e8e8; position: relative;

@@ -201,23 +201,23 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.question-error-container { background-color: #f5f7fa; min-height: calc(100vh - 70px); padding: 30px; }
+.question-error-container { background: linear-gradient(180deg, #f7fbff 0%, #eef4f8 100%); min-height: calc(100vh - 70px); padding: 22px; }
 .question-error-header {
-  text-align: center; margin-bottom: 40px; padding: 40px 0;
-  background: linear-gradient(135deg, #f59f5f 0%, #ff6b6b 100%); border-radius: 16px; color: #fff;
-  .header-icon { width: 80px; height: 80px; margin: 0 auto 20px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  max-width: 1500px; margin: 0 auto 18px; padding: 24px 28px;
+  background: linear-gradient(135deg, #13233f, #2554bc); border-radius: 24px; color: #fff; text-align: left;
+  .header-icon { width: 54px; height: 54px; margin: 0 0 14px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;
     .el-icon { font-size: 36px; color: #fff; }
   }
   h2 { font-size: 32px; font-weight: 700; margin: 0 0 10px; }
   p { font-size: 16px; opacity: 0.9; margin: 0; }
 }
-.question-error-content { max-width: 1400px; margin: 0 auto; }
-.question-list-card, .question-detail-card { border: none; border-radius: 16px; overflow: hidden; height: 100%;
+.question-error-content { max-width: 1500px; margin: 0 auto; }
+.question-list-card, .question-detail-card { border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; height: 100%; box-shadow: 0 16px 44px rgba(15, 23, 42, 0.08);
   .card-header { display: flex; align-items: center; font-size: 18px; font-weight: 600; color: #1f2f3d;
-    .el-icon { margin-right: 10px; color: #f59f5f; font-size: 20px; }
+    .el-icon { margin-right: 10px; color: #2563eb; font-size: 20px; }
     .ai-analyze-wrapper { margin-left: auto; display: flex; align-items: center; gap: 10px; }
     .style-select { width: 160px; }
-    .ai-analyze-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 20px;
+    .ai-analyze-btn { background: linear-gradient(135deg, #2563eb, #7c3aed); border: none; border-radius: 20px;
       &:hover { opacity: 0.9; transform: translateY(-2px); }
       .el-icon { margin-right: 5px; color: #fff; font-size: 14px; }
     }
@@ -245,12 +245,12 @@ onMounted(() => {
     }
     .el-pager li { border-radius: 8px; background: #fff; border: 1px solid #dcdfe6; margin: 0 3px; transition: all 0.3s;
       &:hover { color: #f59f5f; border-color: #f59f5f; }
-      &.active { background: linear-gradient(135deg, #f59f5f 0%, #ff6b6b 100%); color: #fff; border-color: #f59f5f; }
+      &.active { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border-color: #2563eb; }
     }
   }
 }
 .ai-analysis-section { margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e8e8e8;
-  .ai-analysis-header { display: flex; align-items: center; margin-bottom: 15px; padding: 10px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: #fff; font-weight: 600;
+  .ai-analysis-header { display: flex; align-items: center; margin-bottom: 15px; padding: 10px 15px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 8px; color: #fff; font-weight: 600;
     .el-icon { margin-right: 8px; font-size: 18px; }
   }
   .ai-analysis-content { padding: 0 5px;

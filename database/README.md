@@ -22,6 +22,7 @@
 | 3 | `current/04_exam_data.sql` | 2011-2024 真题、试卷、用户、科目等基础数据。 |
 | 4 | `current/05_rag_embeddings.sql` | `t_text_content.embedding` 字段。 |
 | 5 | `current/06_ai_knowledge_rag.sql` | AI 知识库向量字段、学生画像、学习事件、Skill 反馈、方法论摘要。 |
+| 6 | `current/07_demo_student_learning_data.sql` | `231310423` 测试账号默认做题记录，便于部署后立即展示学习状态、做题记录和错题本。 |
 
 推荐命令：
 
@@ -33,6 +34,7 @@ mysql -u root -p xzs < database/current/02_extend_fields.sql
 mysql -u root -p xzs < database/current/04_exam_data.sql
 mysql -u root -p xzs < database/current/05_rag_embeddings.sql
 mysql -u root -p xzs < database/current/06_ai_knowledge_rag.sql
+mysql -u root -p xzs < database/current/07_demo_student_learning_data.sql
 ```
 
 也可以使用根目录脚本：
@@ -82,6 +84,7 @@ SELECT COUNT(*) AS knowledge_points FROM knowledge_point;
 | 综合应用题 | 98 道 |
 | 科目 | 数据结构、组成原理、操作系统、计算机网络、408 综合 |
 | 常用用户 | `admin`、`student`、`teacher`、`231310423` |
+| 测试学习记录 | `231310423` 默认 20 条答题明细，覆盖四门科目 |
 | AI 知识库 | 方法论摘要由 SQL 写入，408 知识点由爬虫导入 |
 
 ## 核心表说明
