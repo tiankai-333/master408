@@ -485,22 +485,22 @@ const explainKnowledge = () => {
   } else {
     inputMessage.value = `请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`
   }
-  sendAnalyzeMessage(inputMessage.value)
+  sendAnalyzeMessage(inputMessage.value, 'explain')
 }
 
 const explainWithExam = () => {
   if (!selectedPoint.value) return
   inputMessage.value = `请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`
-  sendAnalyzeMessage(inputMessage.value)
+  sendAnalyzeMessage(inputMessage.value, 'exam')
 }
 
 const generatePractice = () => {
   if (!selectedPoint.value) {
-    inputMessage.value = `请生成一道 408 统考风格练习题，并给出答案、解析和对应学科。`
+    inputMessage.value = `请生成一道 408 统考风格练习题。`
   } else {
-    inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题，并给出答案、解析和对应学科。`
+    inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`
   }
-  sendAnalyzeMessage(inputMessage.value)
+  sendAnalyzeMessage(inputMessage.value, 'practice')
 }
 
 const goAiAnalyze = () => {
@@ -509,10 +509,10 @@ const goAiAnalyze = () => {
 
 const sendMessage = () => {
   if (!inputMessage.value.trim()) return
-  sendAnalyzeMessage(inputMessage.value.trim())
+  sendAnalyzeMessage(inputMessage.value.trim(), 'chat')
 }
 
-const sendAnalyzeMessage = async (question) => {
+const sendAnalyzeMessage = async (question, taskType = 'chat') => {
   if (!question.trim()) return
 
   const userQuestion = question.trim()
@@ -530,6 +530,7 @@ const sendAnalyzeMessage = async (question) => {
   try {
     const response = await post('/api/student/ai/analyze', {
       style: selectedStyle.value,
+      taskType,
       question: userQuestion,
       knowledgePoints: knowledgeText
     })
@@ -569,13 +570,97 @@ const fallbackAnswer = (question) => {
 
 const formatMessage = (content) => {
   if (!content) return ''
-  return String(content)
+  return renderMarkdown(String(content))
+}
+
+const escapeHtml = (text) => {
+  return String(text)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>')
+}
+
+const renderInlineMarkdown = (text) => {
+  return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
+}
+
+const renderMarkdown = (content) => {
+  const lines = content.replace(/\r\n/g, '\n').split('\n')
+  const html = []
+  let inList = false
+  let inCode = false
+  const codeLines = []
+
+  const closeList = () => {
+    if (inList) {
+      html.push('</ul>')
+      inList = false
+    }
+  }
+
+  lines.forEach(line => {
+    if (line.trim().startsWith('```')) {
+      if (inCode) {
+        html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`)
+        codeLines.length = 0
+        inCode = false
+      } else {
+        closeList()
+        inCode = true
+      }
+      return
+    }
+
+    if (inCode) {
+      codeLines.push(line)
+      return
+    }
+
+    const trimmed = line.trim()
+    if (!trimmed) {
+      closeList()
+      return
+    }
+
+    const heading = trimmed.match(/^(#{1,4})\s+(.+)$/)
+    if (heading) {
+      closeList()
+      const level = Math.min(heading[1].length + 2, 5)
+      html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`)
+      return
+    }
+
+    const listItem = trimmed.match(/^[-*]\s+(.+)$/)
+    if (listItem) {
+      if (!inList) {
+        html.push('<ul>')
+        inList = true
+      }
+      html.push(`<li>${renderInlineMarkdown(listItem[1])}</li>`)
+      return
+    }
+
+    const numberedItem = trimmed.match(/^\d+\.\s+(.+)$/)
+    if (numberedItem) {
+      if (!inList) {
+        html.push('<ul>')
+        inList = true
+      }
+      html.push(`<li>${renderInlineMarkdown(numberedItem[1])}</li>`)
+      return
+    }
+
+    closeList()
+    html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`)
+  })
+
+  closeList()
+  if (inCode) {
+    html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`)
+  }
+  return html.join('')
 }
 
 const scrollToBottom = () => {
@@ -905,6 +990,42 @@ onMounted(async () => {
 
   &.assistant {
     align-self: flex-start;
+  }
+
+  :deep(h3),
+  :deep(h4),
+  :deep(h5) {
+    margin: 12px 0 8px;
+    color: #172033;
+    line-height: 1.35;
+  }
+
+  :deep(h3:first-child),
+  :deep(h4:first-child),
+  :deep(h5:first-child),
+  :deep(p:first-child) {
+    margin-top: 0;
+  }
+
+  :deep(p) {
+    margin: 8px 0;
+  }
+
+  :deep(ul) {
+    margin: 8px 0;
+    padding-left: 20px;
+  }
+
+  :deep(li) {
+    margin: 5px 0;
+  }
+
+  :deep(pre) {
+    overflow-x: auto;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: #e2e8f0;
   }
 
   :deep(code) {
