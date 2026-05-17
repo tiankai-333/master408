@@ -17,6 +17,7 @@ sql_files = [
     "database/current/06_ai_knowledge_rag.sql",
     "database/current/07_demo_student_learning_data.sql",
     "database/current/08_clean_knowledge_display_noise.sql",
+    "database/current/09_rename_legacy_brand_logs.sql",
 ]
 
 conn = pymysql.connect(**DB_CONFIG)
