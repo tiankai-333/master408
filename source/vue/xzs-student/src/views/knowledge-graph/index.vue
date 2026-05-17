@@ -486,9 +486,23 @@ const setQuestionContext = (question) => {
   clearKnowledgeContext()
 }
 
-const getCurrentTarget = () => {
+const stripDraftInstruction = (text) => {
+  return text
+    .replace(/^请用.+?结合知识库讲解下面这道题或问题：\n/, '')
+    .replace(/^请结合 408 真题讲解下面这道题或问题，指出考点、解题抓手和易错点：\n/, '')
+    .replace(/^请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n/, '')
+    .replace(/^请结合这道关联真题讲解考点、解题步骤和易错点：\n/, '')
+    .trim()
+}
+
+const getCurrentTarget = (preferDraft = true) => {
   const draft = inputMessage.value.trim()
-  if (draft) return draft
+  if (!preferDraft) {
+    if (contextMode.value === 'question' && questionContext.value) return questionContext.value
+    if (contextMode.value === 'knowledge' && selectedPoint.value) return selectedPoint.value.name
+    return stripDraftInstruction(draft)
+  }
+  if (draft) return stripDraftInstruction(draft)
   if (contextMode.value === 'question' && questionContext.value) return questionContext.value
   if (contextMode.value === 'knowledge' && selectedPoint.value) return selectedPoint.value.name
   return ''
@@ -547,9 +561,8 @@ const draftPrompt = (content, taskType = 'chat') => {
 }
 
 const explainKnowledge = () => {
-  const target = getCurrentTarget()
-  const hasDraft = Boolean(inputMessage.value.trim())
-  if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
+  const target = getCurrentTarget(false)
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
     draftPrompt(`请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`, 'explain')
   } else if (target) {
     draftPrompt(`请用${currentStyle.value.name}结合知识库讲解下面这道题或问题：\n${target}`, 'explain')
@@ -560,9 +573,8 @@ const explainKnowledge = () => {
 }
 
 const explainWithExam = () => {
-  const target = getCurrentTarget()
-  const hasDraft = Boolean(inputMessage.value.trim())
-  if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
+  const target = getCurrentTarget(false)
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
     draftPrompt(`请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`, 'exam')
   } else if (target) {
     draftPrompt(`请结合 408 真题讲解下面这道题或问题，指出考点、解题抓手和易错点：\n${target}`, 'exam')
@@ -573,9 +585,8 @@ const explainWithExam = () => {
 }
 
 const generatePractice = () => {
-  const target = getCurrentTarget()
-  const hasDraft = Boolean(inputMessage.value.trim())
-  if (contextMode.value === 'knowledge' && selectedPoint.value && !hasDraft) {
+  const target = getCurrentTarget(false)
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
     draftPrompt(`请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`, 'practice')
   } else if (target) {
     draftPrompt(`请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n${target}`, 'practice')
@@ -606,7 +617,9 @@ const sendMessage = () => {
   const question = inputMessage.value.trim()
   if (!question) return
   const taskType = draftTaskType.value || 'chat'
-  if (!(contextMode.value === 'knowledge' && selectedPoint.value && taskType !== 'chat')) {
+  const hasStableContext = (contextMode.value === 'knowledge' && selectedPoint.value) ||
+    (contextMode.value === 'question' && questionContext.value)
+  if (!(taskType !== 'chat' && hasStableContext)) {
     setQuestionContext(question)
   }
   draftTaskType.value = 'chat'
