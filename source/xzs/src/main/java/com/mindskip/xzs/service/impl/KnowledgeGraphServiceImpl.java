@@ -269,10 +269,11 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         if (questionId == null) return result;
         try {
             Map<String, Object> row = jdbcTemplate.queryForMap(
-                    "SELECT title_text, source, source_year, source_question_no " +
-                            "FROM t_question WHERE id = ?",
+                    "SELECT q.title_text, JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')) AS content_title, " +
+                            "q.source, q.source_year, q.source_question_no " +
+                            "FROM t_question q LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id WHERE q.id = ?",
                     questionId);
-            String title = trimToLength((String) row.get("title_text"), 72);
+            String title = trimToLength(firstText(row.get("title_text"), row.get("content_title")), 72);
             if (title == null || title.isEmpty()) {
                 title = "真题 #" + questionId;
             }
@@ -294,19 +295,38 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
     private List<Map<String, Object>> findFallbackQuestions(KnowledgePoint kp) {
         List<Map<String, Object>> result = new ArrayList<>();
         if (kp == null || kp.getSubjectId() == null) return result;
-        String keyword = "%" + kp.getName() + "%";
+        List<String> keywords = buildQuestionSearchKeywords(kp);
         try {
-            List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                    "SELECT id, question_type, difficult, subject_id, title_text, source, source_year, source_question_no " +
-                            "FROM t_question " +
-                            "WHERE deleted = FALSE AND subject_id = ? " +
-                            "  AND (knowledge_point LIKE ? OR title_text LIKE ? OR analysis_text LIKE ?) " +
-                            "ORDER BY source_year DESC, source_question_no ASC, id ASC LIMIT 8",
-                    kp.getSubjectId(), keyword, keyword, keyword);
+            List<Object> params = new ArrayList<>();
+            params.add(kp.getSubjectId());
+            StringBuilder matchSql = new StringBuilder();
+            for (String keyword : keywords) {
+                if (matchSql.length() > 0) {
+                    matchSql.append(" OR ");
+                }
+                matchSql.append("(q.tags LIKE ? OR q.knowledge_point LIKE ? OR q.title_text LIKE ? OR q.analysis_text LIKE ? OR tc.content LIKE ?)");
+                String like = "%" + keyword + "%";
+                params.add(like);
+                params.add(like);
+                params.add(like);
+                params.add(like);
+                params.add(like);
+            }
+            List<Map<String, Object>> rows = matchSql.length() == 0 ? Collections.emptyList() : jdbcTemplate.queryForList(
+                    "SELECT q.id, q.question_type, q.difficult, q.subject_id, q.title_text, " +
+                            "JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')) AS content_title, " +
+                            "q.source, q.source_year, q.source_question_no, q.tags " +
+                            "FROM t_question q LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id " +
+                            "WHERE q.deleted = FALSE AND q.subject_id = ? AND (" + matchSql + ") " +
+                            "ORDER BY CASE WHEN q.tags LIKE ? THEN 0 ELSE 1 END, q.source_year DESC, q.source_question_no ASC, q.id ASC LIMIT 8",
+                    appendExactTagParam(params, kp.getName()).toArray());
             if (rows.isEmpty()) {
                 rows = jdbcTemplate.queryForList(
-                        "SELECT id, question_type, difficult, subject_id, title_text, source, source_year, source_question_no " +
-                                "FROM t_question WHERE deleted = FALSE AND subject_id = ? " +
+                        "SELECT q.id, q.question_type, q.difficult, q.subject_id, q.title_text, " +
+                                "JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')) AS content_title, " +
+                                "q.source, q.source_year, q.source_question_no " +
+                                "FROM t_question q LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id " +
+                                "WHERE q.deleted = FALSE AND q.subject_id = ? " +
                                 "ORDER BY source_year DESC, source_question_no ASC, id ASC LIMIT 5",
                         kp.getSubjectId());
             }
@@ -316,7 +336,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                 item.put("questionType", row.get("question_type"));
                 item.put("difficult", row.get("difficult"));
                 item.put("subjectId", row.get("subject_id"));
-                String title = trimToLength((String) row.get("title_text"), 72);
+                String title = trimToLength(firstText(row.get("title_text"), row.get("content_title")), 72);
                 item.put("title", title == null || title.isEmpty() ? "真题 #" + row.get("id") : title);
                 Object year = row.get("source_year");
                 Object no = row.get("source_question_no");
@@ -331,6 +351,61 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
             return result;
         }
         return result;
+    }
+
+    private List<Object> appendExactTagParam(List<Object> params, String name) {
+        List<Object> values = new ArrayList<>(params);
+        values.add("%" + (name == null ? "" : name) + "%");
+        return values;
+    }
+
+    private List<String> buildQuestionSearchKeywords(KnowledgePoint kp) {
+        LinkedHashSet<String> keywords = new LinkedHashSet<>();
+        addKeyword(keywords, kp.getName());
+        try {
+            for (KnowledgePoint child : knowledgePointMapper.findByParentId(kp.getId())) {
+                addKeyword(keywords, child.getName());
+            }
+        } catch (Exception e) {
+            // 子知识点只用于增强召回，失败时退回名称匹配。
+        }
+
+        Map<String, String[]> aliases = new HashMap<>();
+        aliases.put("查找", new String[]{"顺序查找", "分块查找", "折半查找", "二叉排序树", "平衡二叉树", "B树", "B+树", "散列表", "哈希表", "平均查找长度"});
+        aliases.put("进程管理", new String[]{"进程", "线程", "进程状态", "进程控制块", "进程同步", "进程互斥", "信号量", "管程", "死锁", "处理机调度", "CPU调度"});
+        aliases.put("线性表", new String[]{"顺序表", "链表", "单链表", "双链表"});
+        aliases.put("树与二叉树", new String[]{"二叉树", "树", "森林", "哈夫曼树", "哈夫曼编码", "线索二叉树", "完全二叉树"});
+        aliases.put("图", new String[]{"邻接矩阵", "邻接表", "DFS", "BFS", "拓扑排序", "关键路径", "最小生成树", "最短路径"});
+        aliases.put("排序", new String[]{"排序算法", "插入排序", "希尔排序", "快速排序", "归并排序", "堆排序", "基数排序"});
+        aliases.put("传输层", new String[]{"TCP", "UDP", "拥塞控制", "流量控制", "可靠传输", "三次握手", "四次挥手"});
+
+        for (Map.Entry<String, String[]> entry : aliases.entrySet()) {
+            if (kp.getName() != null && kp.getName().contains(entry.getKey())) {
+                for (String alias : entry.getValue()) {
+                    addKeyword(keywords, alias);
+                }
+            }
+        }
+        return new ArrayList<>(keywords);
+    }
+
+    private void addKeyword(Set<String> keywords, String keyword) {
+        if (keyword == null) return;
+        String normalized = keyword.trim().replaceAll("\\s+", "");
+        if (normalized.length() >= 2) {
+            keywords.add(normalized);
+        }
+    }
+
+    private String firstText(Object... values) {
+        for (Object value : values) {
+            if (value == null) continue;
+            String text = String.valueOf(value).trim();
+            if (!text.isEmpty() && !"null".equalsIgnoreCase(text)) {
+                return text;
+            }
+        }
+        return "";
     }
 
     private String trimToLength(String text, int maxLength) {

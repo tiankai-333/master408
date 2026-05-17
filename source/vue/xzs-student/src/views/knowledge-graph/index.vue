@@ -226,6 +226,7 @@ const isTyping = ref(false)
 const messages = ref([])
 const messagesRef = ref(null)
 const expandedGroups = ref([])
+let selectPointSeq = 0
 
 const graphData = reactive({
   nodes: [],
@@ -545,6 +546,7 @@ const getKnowledgeText = () => {
 }
 
 const selectPoint = async (point, announce = true) => {
+  const seq = ++selectPointSeq
   contextMode.value = 'knowledge'
   questionContext.value = ''
   selectedPoint.value = point
@@ -554,6 +556,7 @@ const selectPoint = async (point, announce = true) => {
 
   try {
     const response = await get('/api/student/knowledge-graph/knowledge-point/' + point.rawId)
+    if (seq !== selectPointSeq) return
     if (response.code === 1) {
       Object.assign(selectedPointDetail, response.response || {})
       selectedPointDetail.subjectName = selectedPointDetail.subjectName || point.subjectName
@@ -562,6 +565,7 @@ const selectPoint = async (point, announce = true) => {
       childPoints.value = response.response?.children || []
     }
   } catch (error) {
+    if (seq !== selectPointSeq) return
     Object.assign(selectedPointDetail, {
       id: point.rawId,
       name: point.name,
@@ -817,7 +821,7 @@ onMounted(async () => {
   await Promise.all([loadGraph(), loadUserStats()])
   messages.value.push({
     role: 'assistant',
-    content: `欢迎来到 AI 学习工作台。页面不会默认绑定知识点；你可以先粘贴题目，也可以从右侧知识目录手动选择上下文。我会优先使用「${currentStyle.value.name}」来回答。`
+    content: '欢迎来到 AI 学习工作台。页面不会默认绑定知识点；你可以先粘贴题目，也可以从右侧知识目录手动选择上下文。'
   })
 })
 </script>
