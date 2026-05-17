@@ -1,211 +1,437 @@
 <template>
-  <div class="master-container">
-    <div class="master-header">
-      <div class="avatar-circle">
-        <el-icon><MagicStick /></el-icon>
+  <div class="knowledge-workspace">
+    <section class="workspace-hero">
+      <div>
+        <span class="hero-kicker">408Master Knowledge Studio</span>
+        <h1>知识点目录与 RAG 学习链接</h1>
+        <p>
+          408 统考卷是综合试卷，但每道题仍然属于数据结构、组成原理、操作系统或计算机网络。
+          这里用目录替代杂乱图谱，把知识点、相关真题、AI 解析和模拟出题串成一条学习路径。
+        </p>
       </div>
-      <div class="header-info">
-        <h2>408Master</h2>
-        <p>你的专属考研408智能导师</p>
-      </div>
-      <div class="header-stats">
-        <div class="stat-item">
-          <span class="stat-value">{{ userStats.totalQuestions }}</span>
-          <span class="stat-label">总做题</span>
+      <div class="hero-summary">
+        <div>
+          <strong>{{ userStats.totalQuestions }}</strong>
+          <span>已做题</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ userStats.accuracy }}%</span>
-          <span class="stat-label">正确率</span>
+        <div>
+          <strong>{{ userStats.accuracy }}%</strong>
+          <span>综合正确率</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-value">{{ userStats.weakPoints }}</span>
-          <span class="stat-label">薄弱点</span>
+        <div>
+          <strong>{{ totalKnowledgePoints }}</strong>
+          <span>知识点</span>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="master-content">
-      <div class="left-panel">
-        <el-card class="profile-card" shadow="hover">
-          <template #header>
-            <div class="card-header"><el-icon><User /></el-icon><span>学习状态</span></div>
-          </template>
-          <div class="profile-content">
-            <div class="accuracy-bar">
-              <div class="bar-label">正确率</div>
-              <el-progress :percentage="userStats.accuracy" :color="progressColor" :stroke-width="10" />
+    <div class="workspace-grid">
+      <aside class="left-panel">
+        <section class="panel-card accuracy-card">
+          <div class="panel-title">
+            <div>
+              <span>Subject Accuracy</span>
+              <h2>分科正确率</h2>
             </div>
-            <div class="subject-stats">
-              <div v-for="subject in subjectStats" :key="subject.id" class="subject-item">
-                <span class="subject-name">{{ subject.name }}</span>
-                <el-progress :percentage="subject.accuracy" :stroke-width="8" />
-              </div>
+            <el-progress
+              type="dashboard"
+              :percentage="safePercent(userStats.accuracy)"
+              :width="78"
+              :stroke-width="8"
+              :color="progressColor"
+            />
+          </div>
+
+          <div class="subject-list">
+            <button
+              v-for="subject in normalizedSubjectStats"
+              :key="subject.id || subject.name"
+              class="subject-row"
+              :class="{ active: selectedSubjectName === subject.name }"
+              @click="selectSubject(subject)"
+            >
+              <span class="subject-dot" :style="{ backgroundColor: subject.color }"></span>
+              <span class="subject-main">
+                <strong>{{ subject.name }}</strong>
+                <em>{{ subject.done || 0 }} 题</em>
+              </span>
+              <span class="subject-rate">{{ subject.accuracy }}%</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-card skill-card">
+          <div class="panel-title compact">
+            <div>
+              <span>Default Skill</span>
+              <h2>AI 解析默认视角</h2>
             </div>
           </div>
-        </el-card>
 
-        <el-card class="quick-actions" shadow="hover">
-          <template #header>
-            <div class="card-header"><el-icon><MagicStick /></el-icon><span>快捷工具</span></div>
-          </template>
-          <div class="action-buttons">
-            <el-button type="primary" size="small" class="action-btn" @click="quickAction('analyze')">
+          <div class="skill-grid">
+            <button
+              v-for="skill in aiStyles"
+              :key="skill.id"
+              class="skill-option"
+              :class="{ active: selectedStyle === skill.id }"
+              @click="setDefaultStyle(skill.id)"
+            >
+              <span class="skill-icon">{{ skill.short }}</span>
+              <strong>{{ skill.name }}</strong>
+              <em>{{ skill.description }}</em>
+            </button>
+          </div>
+
+          <p class="skill-hint">
+            当前默认：{{ currentStyle.name }}。RAG 讲解和模拟出题会优先使用这个视角。
+          </p>
+        </section>
+      </aside>
+
+      <main class="catalog-panel panel-card">
+        <div class="catalog-toolbar">
+          <div>
+            <span>Knowledge Catalog</span>
+            <h2>知识点目录</h2>
+          </div>
+          <el-input
+            v-model="keyword"
+            class="catalog-search"
+            placeholder="搜索知识点，例如 虚拟存储器"
+            clearable
+          >
+            <template #prefix>
               <el-icon><Search /></el-icon>
-              <span>题目解析</span>
-            </el-button>
-            <el-button type="success" size="small" class="action-btn" @click="quickAction('practice')">
-              <el-icon><Edit /></el-icon>
-              <span>生成练习</span>
-            </el-button>
-            <el-button type="warning" size="small" class="action-btn" @click="quickAction('review')">
-              <el-icon><Document /></el-icon>
-              <span>错题回顾</span>
-            </el-button>
-            <el-button type="info" size="small" class="action-btn" @click="quickAction('suggestion')">
-              <el-icon><MagicStick /></el-icon>
-              <span>学习建议</span>
-            </el-button>
-          </div>
-        </el-card>
+            </template>
+          </el-input>
+        </div>
 
-        <el-card class="knowledge-mini" shadow="hover">
-          <template #header>
-            <div class="card-header"><el-icon><MagicStick /></el-icon><span>AI 解析风格</span></div>
-          </template>
-          <div class="style-buttons">
-            <div v-for="style in aiStyles" :key="style.id"
-                 :class="['style-btn', { active: selectedStyle === style.id }]"
-                 @click="switchStyle(style.id)">
-              <span class="style-emoji">{{ style.emoji }}</span>
-              <span class="style-name">{{ style.name }}</span>
-              <span class="style-desc">{{ style.description }}</span>
-            </div>
-          </div>
-        </el-card>
-      </div>
+        <div v-loading="graphLoading" class="catalog-body">
+          <section
+            v-for="group in filteredGroups"
+            :key="group.name"
+            class="subject-section"
+          >
+            <button class="subject-heading" @click="toggleGroup(group.name)">
+              <span class="subject-dot" :style="{ backgroundColor: group.color }"></span>
+              <strong>{{ group.name }}</strong>
+              <em>{{ group.points.length }} 个知识点</em>
+              <el-icon :class="{ open: expandedGroups.includes(group.name) }"><ArrowDown /></el-icon>
+            </button>
 
-      <div class="center-panel">
-        <div class="chat-container">
-          <div class="chat-messages" ref="messagesRef">
-            <div v-for="(msg, index) in messages" :key="index" 
-                 :class="['message-item', msg.role === 'user' ? 'user-message' : 'ai-message']">
-              <template v-if="msg.role === 'assistant'">
-                <div class="message-avatar">
-                  <el-icon><MagicStick /></el-icon>
+            <div v-show="expandedGroups.includes(group.name)" class="knowledge-list">
+              <article
+                v-for="point in group.points"
+                :key="point.id"
+                class="knowledge-link"
+                :class="{ active: selectedPoint && selectedPoint.rawId === point.rawId }"
+                @click="selectPoint(point)"
+              >
+                <div>
+                  <h3>{{ point.name }}</h3>
+                  <p>{{ point.description || '暂无描述，点击后可用 RAG 生成讲解和模拟题。' }}</p>
                 </div>
-                <div class="message-content" v-html="formatMessage(msg.content)"></div>
-              </template>
-              <template v-else>
-                <div class="message-content" v-html="formatMessage(msg.content)"></div>
-                <div class="message-avatar user-avatar">
-                  <el-icon><User /></el-icon>
-                </div>
-              </template>
+                <span class="level-badge">L{{ point.level || 1 }}</span>
+              </article>
             </div>
-            <div v-if="isTyping" class="typing-indicator">
-              <div class="typing-dot"></div>
-              <div class="typing-dot"></div>
-              <div class="typing-dot"></div>
+          </section>
+
+          <el-empty v-if="!filteredGroups.length && !graphLoading" description="没有匹配的知识点" />
+        </div>
+      </main>
+
+      <aside class="right-panel">
+        <section class="panel-card detail-card">
+          <div class="panel-title compact">
+            <div>
+              <span>RAG Link</span>
+              <h2>{{ selectedPointDetail.name || '选择一个知识点' }}</h2>
             </div>
           </div>
-          <div class="chat-input">
+
+          <div v-if="selectedPointDetail.name" class="point-detail">
+            <el-tag effect="plain">{{ selectedPointDetail.subjectName || selectedSubjectName || '408 综合' }}</el-tag>
+            <p>{{ selectedPointDetail.description || selectedPoint?.description || '这个知识点还缺少详细描述，可以先用 RAG 讲解补充学习材料。' }}</p>
+
+            <div class="detail-links">
+              <button @click="askRagExplanation">
+                <el-icon><MagicStick /></el-icon>
+                RAG 讲解
+              </button>
+              <button @click="generatePractice">
+                <el-icon><Edit /></el-icon>
+                模拟出题
+              </button>
+              <button @click="goAiAnalyze">
+                <el-icon><Search /></el-icon>
+                题目识别
+              </button>
+            </div>
+
+            <div class="related-block">
+              <h3>知识链接</h3>
+              <div v-if="childPoints.length" class="chip-list">
+                <button v-for="child in childPoints" :key="child.id" @click="selectPointByRawId(child.id)">
+                  {{ child.name }}
+                </button>
+              </div>
+              <p v-else>暂无下级知识点，可通过 RAG 讲解补足学习路径。</p>
+            </div>
+
+            <div class="related-block">
+              <h3>关联真题</h3>
+              <div v-if="relatedQuestions.length" class="question-list">
+                <div v-for="question in relatedQuestions" :key="question.id" class="question-row">
+                  <span>{{ question.title || question.name || `题目 #${question.id}` }}</span>
+                  <em>难度 {{ question.difficult || '-' }}</em>
+                </div>
+              </div>
+              <p v-else>暂无已关联真题，适合用“模拟出题”生成针对练习。</p>
+            </div>
+          </div>
+
+          <div v-else class="empty-detail">
+            <el-icon><Share /></el-icon>
+            <p>从中间目录选择知识点后，这里会显示 RAG 讲解、模拟出题和关联真题入口。</p>
+          </div>
+        </section>
+
+        <section class="panel-card ai-card">
+          <div class="panel-title compact">
+            <div>
+              <span>AI Workspace</span>
+              <h2>RAG 输出</h2>
+            </div>
+          </div>
+          <div ref="messagesRef" class="ai-messages">
+            <div v-for="(msg, index) in messages" :key="index" :class="['ai-message', msg.role]">
+              <div v-html="formatMessage(msg.content)"></div>
+            </div>
+            <div v-if="isTyping" class="typing-line">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="ai-input">
             <el-input
               v-model="inputMessage"
               type="textarea"
-              :rows="2"
-              placeholder="问我任何关于408的问题..."
+              :rows="3"
+              placeholder="围绕当前知识点继续追问..."
               @keydown.enter.ctrl="sendMessage"
             />
-            <div class="input-actions">
-              <span class="tip-text">Ctrl + Enter 发送</span>
-              <el-button type="primary" :loading="isTyping" @click="sendMessage">
-                <el-icon><Edit /></el-icon>
-                发送
-              </el-button>
-            </div>
+            <el-button type="primary" :loading="isTyping" @click="sendMessage">
+              发送
+            </el-button>
           </div>
-        </div>
-      </div>
-
-      <div class="right-panel">
-        <el-card class="graph-panel" shadow="hover">
-          <template #header>
-            <div class="card-header">
-              <el-icon><Share /></el-icon>
-              <span>知识图谱</span>
-              <el-select v-model="filterSubject" size="small" placeholder="选择学科" @change="loadGraph" style="margin-left: auto;">
-                <el-option label="全部" :value="null" />
-                <el-option v-for="subject in subjects" :key="subject.id" :label="subject.name" :value="subject.id" />
-              </el-select>
-            </div>
-          </template>
-          <div ref="chartRef" class="graph-chart"></div>
-        </el-card>
-      </div>
+        </section>
+      </aside>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
-import * as echarts from 'echarts'
-import { User, MagicStick, Search, Edit, Document, Picture, WarningFilled, Share } from '@element-plus/icons-vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ArrowDown, Edit, MagicStick, Search, Share } from '@element-plus/icons-vue'
 import { get, post } from '@/utils/request'
 
+const router = useRouter()
+
+const graphLoading = ref(false)
+const keyword = ref('')
+const selectedStyle = ref(localStorage.getItem('master408-default-skill') || 'default')
+const selectedSubjectName = ref('全部')
+const selectedPoint = ref(null)
+const selectedPointDetail = reactive({})
+const relatedQuestions = ref([])
+const childPoints = ref([])
 const inputMessage = ref('')
 const isTyping = ref(false)
 const messages = ref([])
-const filterSubject = ref(null)
-const subjects = ref([])
-const chartRef = ref(null)
 const messagesRef = ref(null)
-const chartInstance = ref(null)
-const graphData = reactive({ nodes: [], links: [], categories: [] })
+const expandedGroups = ref([])
 
-const selectedStyle = ref('default')
-const aiStyles = [
-  { id: 'default', emoji: '📚', name: '标准解析', description: '清晰讲透知识点' },
-  { id: 'feynman', emoji: '🎓', name: '费曼风格', description: '像给小白讲故事' },
-  { id: 'plato', emoji: '❓', name: '柏拉图式', description: '启发式自问自答' },
-  { id: 'first-principles', emoji: '⚡', name: '第一性原理', description: '从本质逐步推导' }
-]
+const graphData = reactive({
+  nodes: [],
+  links: [],
+  categories: []
+})
 
 const userStats = reactive({
   totalQuestions: 0,
   accuracy: 0,
-  weakPoints: 0
+  weakPoints: 0,
+  subjects: []
 })
 
-const subjectStats = ref([])
+const subjectColors = ['#2563eb', '#059669', '#ea580c', '#7c3aed', '#0891b2', '#dc2626']
+
+const aiStyles = [
+  { id: 'default', short: '常', name: '常规解析', description: '考点清晰，适合作为默认' },
+  { id: 'feynman', short: '费', name: '费曼学习法', description: '用白话和类比讲明白' },
+  { id: 'first-principles', short: '一', name: '第一性原理', description: '从底层定义推导' },
+  { id: 'plato', short: '问', name: '柏拉图式对话', description: '通过追问启发理解' }
+]
+
+const currentStyle = computed(() => aiStyles.find(item => item.id === selectedStyle.value) || aiStyles[0])
 
 const progressColor = computed(() => {
-  if (userStats.accuracy >= 80) return '#67c23a'
-  if (userStats.accuracy >= 60) return '#e6a23c'
-  return '#f56c6c'
+  if (userStats.accuracy >= 80) return '#059669'
+  if (userStats.accuracy >= 60) return '#ea580c'
+  return '#dc2626'
 })
 
-const formatMessage = (content) => {
-  if (!content) return ''
-  let formatted = content
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/^###\s(.*)/gm, '<h3>$1</h3>')
-    .replace(/^##\s(.*)/gm, '<h2>$1</h2>')
-    .replace(/^\*\s(.*)/gm, '<li>$1</li>')
-    .replace(/^(\d+)\.\s(.*)/gm, '<li>$2</li>')
-  return formatted
+const totalKnowledgePoints = computed(() => {
+  return graphData.nodes.filter(node => normalizeType(node.type) === 'knowledge_point').length
+})
+
+const groupedKnowledge = computed(() => {
+  const categoryNames = graphData.categories.map(item => item.name)
+  const subjectNodes = graphData.nodes.filter(node => normalizeType(node.type) === 'subject')
+  const groups = new Map()
+
+  categoryNames.forEach((name, index) => {
+    groups.set(name, {
+      name,
+      color: subjectColors[index % subjectColors.length],
+      points: []
+    })
+  })
+
+  subjectNodes.forEach((node, index) => {
+    if (!groups.has(node.name)) {
+      groups.set(node.name, {
+        name: node.name,
+        color: subjectColors[index % subjectColors.length],
+        points: []
+      })
+    }
+  })
+
+  graphData.nodes
+    .filter(node => normalizeType(node.type) === 'knowledge_point')
+    .forEach(node => {
+      const groupName = categoryNames[node.category] || findSubjectNameByLink(node.id) || '未分类'
+      if (!groups.has(groupName)) {
+        groups.set(groupName, {
+          name: groupName,
+          color: subjectColors[groups.size % subjectColors.length],
+          points: []
+        })
+      }
+      groups.get(groupName).points.push({
+        id: node.id,
+        rawId: parseKnowledgeId(node.id),
+        name: node.name,
+        level: node.level,
+        description: node.description,
+        category: node.category,
+        subjectName: groupName
+      })
+    })
+
+  return Array.from(groups.values())
+    .map(group => ({
+      ...group,
+      points: group.points.sort((a, b) => (a.level || 1) - (b.level || 1) || a.name.localeCompare(b.name))
+    }))
+    .filter(group => group.points.length)
+})
+
+const filteredGroups = computed(() => {
+  const kw = keyword.value.trim().toLowerCase()
+  const groups = selectedSubjectName.value === '全部'
+    ? groupedKnowledge.value
+    : groupedKnowledge.value.filter(group => group.name === selectedSubjectName.value)
+
+  if (!kw) return groups
+
+  return groups
+    .map(group => ({
+      ...group,
+      points: group.points.filter(point => {
+        return point.name.toLowerCase().includes(kw) ||
+          String(point.description || '').toLowerCase().includes(kw)
+      })
+    }))
+    .filter(group => group.points.length)
+})
+
+const normalizedSubjectStats = computed(() => {
+  const statItems = (userStats.subjects || []).map((item, index) => ({
+    id: item.id,
+    name: item.name || item.subjectName || `学科 ${index + 1}`,
+    accuracy: safePercent(item.accuracy),
+    done: item.totalQuestions || item.done || item.questionCount || 0,
+    color: subjectColors[index % subjectColors.length]
+  }))
+
+  const existing = new Set(statItems.map(item => item.name))
+  groupedKnowledge.value.forEach((group, index) => {
+    if (!existing.has(group.name)) {
+      statItems.push({
+        id: group.name,
+        name: group.name,
+        accuracy: 0,
+        done: 0,
+        color: group.color || subjectColors[index % subjectColors.length]
+      })
+    }
+  })
+
+  return [
+    {
+      id: 'all',
+      name: '全部',
+      accuracy: safePercent(userStats.accuracy),
+      done: userStats.totalQuestions || 0,
+      color: '#172033'
+    },
+    ...statItems
+  ]
+})
+
+const safePercent = (value) => {
+  const number = Number(value || 0)
+  if (Number.isNaN(number)) return 0
+  return Math.max(0, Math.min(100, Math.round(number)))
 }
 
-const loadSubjects = async () => {
+const normalizeType = (type) => {
+  return String(type || '').replace('-', '_')
+}
+
+const parseKnowledgeId = (id) => {
+  const match = String(id || '').match(/kp_(\d+)/)
+  return match ? Number(match[1]) : id
+}
+
+const findSubjectNameByLink = (nodeId) => {
+  const link = graphData.links.find(item => item.target === nodeId && String(item.source).startsWith('subject_'))
+  if (!link) return null
+  const subject = graphData.nodes.find(node => node.id === link.source)
+  return subject ? subject.name : null
+}
+
+const loadGraph = async () => {
+  graphLoading.value = true
   try {
-    const response = await get('/api/student/subject/list')
+    const response = await get('/api/student/knowledge-graph/graph')
     if (response.code === 1) {
-      subjects.value = response.response || []
+      graphData.nodes = response.response?.nodes || []
+      graphData.links = response.response?.links || []
+      graphData.categories = response.response?.categories || []
+      expandedGroups.value = groupedKnowledge.value.slice(0, 4).map(group => group.name)
+      if (!selectedPoint.value && groupedKnowledge.value[0]?.points[0]) {
+        await selectPoint(groupedKnowledge.value[0].points[0])
+      }
     }
   } catch (error) {
-    console.error('加载学科失败:', error)
+    graphData.nodes = []
+    graphData.links = []
+    graphData.categories = []
+  } finally {
+    graphLoading.value = false
   }
 }
 
@@ -213,125 +439,155 @@ const loadUserStats = async () => {
   try {
     const response = await get('/api/student/user/stats')
     if (response.code === 1) {
-      Object.assign(userStats, response.response)
-      subjectStats.value = response.response.subjects || []
+      Object.assign(userStats, response.response || {})
+      userStats.subjects = response.response?.subjects || []
     }
   } catch (error) {
     userStats.totalQuestions = 0
     userStats.accuracy = 0
     userStats.weakPoints = 0
-    subjectStats.value = []
+    userStats.subjects = []
   }
 }
 
-const loadGraph = async () => {
+const selectSubject = (subject) => {
+  selectedSubjectName.value = subject.name
+  if (subject.name !== '全部' && !expandedGroups.value.includes(subject.name)) {
+    expandedGroups.value = [...expandedGroups.value, subject.name]
+  }
+}
+
+const toggleGroup = (name) => {
+  if (expandedGroups.value.includes(name)) {
+    expandedGroups.value = expandedGroups.value.filter(item => item !== name)
+  } else {
+    expandedGroups.value = [...expandedGroups.value, name]
+  }
+}
+
+const selectPoint = async (point) => {
+  selectedPoint.value = point
+  Object.keys(selectedPointDetail).forEach(key => delete selectedPointDetail[key])
+  relatedQuestions.value = []
+  childPoints.value = []
+
   try {
-    const response = await get('/api/student/knowledge-graph/graph', { subjectId: filterSubject.value })
+    const response = await get('/api/student/knowledge-graph/knowledge-point/' + point.rawId)
     if (response.code === 1) {
-      graphData.nodes = response.response.nodes
-      graphData.links = response.response.links
-      graphData.categories = response.response.categories
-      renderChart()
+      Object.assign(selectedPointDetail, response.response || {})
+      selectedPointDetail.subjectName = selectedPointDetail.subjectName || point.subjectName
+      relatedQuestions.value = response.response?.relatedQuestions || []
+      childPoints.value = response.response?.children || []
     }
   } catch (error) {
-    console.error('加载知识图谱失败:', error)
-    graphData.nodes = []
-    graphData.links = []
-    graphData.categories = []
-    renderChart()
+    Object.assign(selectedPointDetail, {
+      id: point.rawId,
+      name: point.name,
+      description: point.description,
+      subjectName: point.subjectName
+    })
   }
 }
 
-const initChart = () => {
-  if (!chartRef.value) return
-  chartInstance.value = echarts.init(chartRef.value)
-}
-
-const renderChart = () => {
-  if (!chartInstance.value || !graphData.nodes.length) return
-  const option = {
-    backgroundColor: '#fff',
-    tooltip: { trigger: 'item', formatter: (params) => params.name },
-    animationDuration: 1000,
-    series: [{
-      name: '知识图谱',
-      type: 'graph',
-      layout: 'force',
-      data: graphData.nodes.map(node => ({
-        name: node.name, id: node.id,
-        symbolSize: node.symbolSize || 40,
-        itemStyle: { color: node.type === 'subject' ? '#667eea' : '#f59f5f' },
-        label: { show: true, position: 'bottom', fontSize: 11 }
-      })),
-      links: graphData.links.map(link => ({
-        source: link.source, target: link.target,
-        lineStyle: { color: '#ddd', width: 1 }
-      })),
-      categories: graphData.categories,
-      roam: true, draggable: true,
-      force: { repulsion: 300, gravity: 0.1, edgeLength: 80 }
-    }]
+const selectPointByRawId = async (id) => {
+  const point = groupedKnowledge.value
+    .flatMap(group => group.points)
+    .find(item => item.rawId === id)
+  if (point) {
+    await selectPoint(point)
   }
-  chartInstance.value.setOption(option)
 }
 
-const sendMessage = async () => {
+const setDefaultStyle = (styleId) => {
+  selectedStyle.value = styleId
+  localStorage.setItem('master408-default-skill', styleId)
+}
+
+const askRagExplanation = () => {
+  if (!selectedPoint.value) return
+  inputMessage.value = `请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，结合 RAG 知识库说明定义、常见考法和易错点。`
+  sendAnalyzeMessage(inputMessage.value)
+}
+
+const generatePractice = () => {
+  if (!selectedPoint.value) return
+  inputMessage.value = `请围绕 408 知识点「${selectedPoint.value.name}」模拟出一道统考风格题目，并给出答案、解析和对应学科。`
+  sendAnalyzeMessage(inputMessage.value)
+}
+
+const goAiAnalyze = () => {
+  router.push({ path: '/question/ai-analyze' })
+}
+
+const sendMessage = () => {
   if (!inputMessage.value.trim()) return
-  
-  const userMsg = inputMessage.value.trim()
-  messages.value.push({ role: 'user', content: userMsg })
+  sendAnalyzeMessage(inputMessage.value.trim())
+}
+
+const sendAnalyzeMessage = async (question) => {
+  if (!question.trim()) return
+
+  const userQuestion = question.trim()
+  const knowledgeText = selectedPoint.value
+    ? `${selectedPoint.value.name}\n${selectedPoint.value.description || selectedPointDetail.description || ''}`
+    : ''
+
+  messages.value.push({ role: 'user', content: userQuestion })
   inputMessage.value = ''
   isTyping.value = true
-  
+
   await nextTick()
   scrollToBottom()
-  
+
   try {
-    const response = await post('/api/student/chat', {
-      message: userMsg,
-      history: messages.value.slice(-10)
+    const response = await post('/api/student/ai/analyze', {
+      style: selectedStyle.value,
+      question: userQuestion,
+      knowledgePoints: knowledgeText
     })
-    
+
     if (response.code === 1) {
-      messages.value.push({ role: 'assistant', content: response.response })
+      const result = response.response || {}
+      let content = result.analysis || result || ''
+      if (result.references && result.references.length > 0) {
+        content += '\n\n---\n参考来源\n'
+        result.references.forEach((ref, idx) => {
+          content += `\n${idx + 1}. [${ref.similarity}] ${ref.title}`
+        })
+      }
+      messages.value.push({ role: 'assistant', content })
     } else {
-      messages.value.push({ 
-        role: 'assistant', 
-        content: `我是你的408Master导师！我已经读取了你当前账号的做题统计，可以据此给你学习建议。
-
-📊 你的学习数据：
-- 总做题数：${userStats.totalQuestions}
-- 正确率：${userStats.accuracy}%
-- 错题数：${userStats.weakPoints}个
-
-💡 你可以问我：
-- "帮我分析一下这道题"
-- "操作系统有哪些高频考点？"
-- "给我生成一些408练习题"
-- "我的薄弱点是什么？"`
-      })
+      messages.value.push({ role: 'assistant', content: fallbackAnswer(userQuestion) })
     }
   } catch (error) {
-    messages.value.push({ 
-      role: 'assistant', 
-      content: `我是你的408Master导师！我已经读取了你当前账号的做题统计，可以据此给你学习建议。
-
-📊 你的学习数据：
-- 总做题数：${userStats.totalQuestions}
-- 正确率：${userStats.accuracy}%
-- 错题数：${userStats.weakPoints}个
-
-💡 你可以问我：
-- "帮我分析一下这道题"
-- "操作系统有哪些高频考点？"
-- "给我生成一些408练习题"
-- "我的薄弱点是什么？"`
-    })
+    messages.value.push({ role: 'assistant', content: fallbackAnswer(userQuestion) })
   } finally {
     isTyping.value = false
     await nextTick()
     scrollToBottom()
   }
+}
+
+const fallbackAnswer = (question) => {
+  const pointName = selectedPoint.value?.name || '当前知识点'
+  return `当前 AI 服务暂时不可用，但可以先按 ${currentStyle.value.name} 的思路学习「${pointName}」：
+
+1. 先确认它属于哪一科以及常见题型。
+2. 再把定义、约束条件和典型公式写清楚。
+3. 最后用一道真题或模拟题验证是否真的会用。
+
+你的问题：${question}`
+}
+
+const formatMessage = (content) => {
+  if (!content) return ''
+  return String(content)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
 }
 
 const scrollToBottom = () => {
@@ -340,413 +596,581 @@ const scrollToBottom = () => {
   }
 }
 
-const quickAction = (type) => {
-  const prompts = {
-    analyze: '帮我分析一下这道题应该怎么做',
-    practice: '给我生成5道408练习题',
-    review: '帮我回顾一下我的错题',
-    suggestion: '根据我的学习数据，给我一些学习建议'
-  }
-  inputMessage.value = prompts[type]
-  sendMessage()
-}
-
-const switchStyle = (styleId) => {
-  selectedStyle.value = styleId
-  const styleNames = { default: '标准解析', feynman: '费曼风格', plato: '柏拉图式', 'first-principles': '第一性原理' }
-  inputMessage.value = `请用${styleNames[styleId]}的风格帮我解析题目`
-  sendAnalyzeMessage(styleId, inputMessage.value)
-}
-
-const sendAnalyzeMessage = async (styleId, question) => {
-  if (!question.trim()) return
-  
-  messages.value.push({ role: 'user', content: question })
-  inputMessage.value = ''
-  isTyping.value = true
-  
-  await nextTick()
-  scrollToBottom()
-  
-  try {
-    const response = await post('/api/student/ai/analyze', {
-      style: styleId,
-      question: question,
-      knowledgePoints: ''
-    })
-    
-    if (response.code === 1) {
-      const result = response.response
-      let content = result.analysis || ''
-      if (result.references && result.references.length > 0) {
-        content += '\n\n---\n📚 **参考来源（来自题库）**\n'
-        result.references.forEach((ref, idx) => {
-          content += `\n- [${ref.similarity}] ${ref.title}`
-        })
-      }
-      messages.value.push({ role: 'assistant', content: content })
-    } else {
-      messages.value.push({ role: 'assistant', content: '抱歉，AI分析暂时不可用：' + (response.message || '未知错误') })
-    }
-  } catch (error) {
-    console.error('AI分析失败:', error)
-    messages.value.push({ role: 'assistant', content: '抱歉，AI服务暂时不可用，请稍后重试。' })
-  } finally {
-    isTyping.value = false
-    await nextTick()
-    scrollToBottom()
-  }
-}
-
 onMounted(async () => {
-  await loadSubjects()
-  await loadUserStats()
-  initChart()
-  await loadGraph()
-  
+  await Promise.all([loadGraph(), loadUserStats()])
   messages.value.push({
     role: 'assistant',
-    content: `你好！我是 **408Master**，你的专属考研408智能导师 🤖
-
-📊 我已经分析了你的学习数据：
-- 总做题数：**${userStats.totalQuestions}道**
-- 正确率：**${userStats.accuracy}%**
-- 当前错题数：**${userStats.weakPoints}个**
-
-🎯 我会根据这些真实做题记录来给你学习建议；记录越多，建议会越准。
-
-💡 你可以这样和我交流：
-- **题目解析**：把题目发给我，我会用不同风格给你讲解
-- **知识讲解**：问我任何408相关的知识点
-- **生成练习**：让我给你出针对性的练习题
-- **学习建议**：让我分析你的薄弱点并给出建议`
+    content: `已进入 408Master 知识工作台。你可以先选一个知识点，再用默认 Skill「${currentStyle.value.name}」进行 RAG 讲解或模拟出题。`
   })
 })
 </script>
 
 <style lang="scss" scoped>
-.master-container { 
-  background-color: #f5f7fa; 
-  min-height: calc(100vh - 70px); 
-  padding: 20px;
+.knowledge-workspace {
+  min-height: calc(100vh - 70px);
+  padding: 24px;
+  background:
+    radial-gradient(circle at 16% 12%, rgba(37, 99, 235, 0.12), transparent 28%),
+    radial-gradient(circle at 88% 8%, rgba(124, 58, 237, 0.1), transparent 30%),
+    linear-gradient(180deg, #f8fbff 0%, #edf3f8 100%);
+  color: #172033;
 }
 
-.master-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 30px 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  margin-bottom: 20px;
-  color: #fff;
-  
-  .avatar-circle {
-    width: 70px;
-    height: 70px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .el-icon { font-size: 36px; }
-  }
-  
-  .header-info {
-    flex: 1;
-    h2 { font-size: 28px; margin: 0 0 5px; font-weight: 700; }
-    p { font-size: 14px; margin: 0; opacity: 0.9; }
-  }
-  
-  .header-stats {
-    display: flex;
-    gap: 30px;
-    
-    .stat-item {
-      text-align: center;
-      .stat-value { display: block; font-size: 28px; font-weight: 700; }
-      .stat-label { font-size: 13px; opacity: 0.8; }
-    }
-  }
-}
-
-.master-content {
-  display: flex;
-  gap: 20px;
-  height: calc(100vh - 220px);
-}
-
-.left-panel {
-  width: 280px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
-
-.center-panel {
-  flex: 1;
-  min-width: 0;
-}
-
-.right-panel {
-  width: 350px;
-  flex-shrink: 0;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f2f3d;
-  .el-icon { margin-right: 8px; color: #667eea; font-size: 16px; }
-}
-
-.profile-card, .quick-actions, .knowledge-mini, .graph-panel {
-  border: none;
-  border-radius: 12px;
-  
-  :deep(.el-card__body) {
-    padding: 18px;
-  }
-}
-
-.profile-content {
-  .accuracy-bar {
-    margin-bottom: 20px;
-    .bar-label { font-size: 13px; color: #666; margin-bottom: 10px; }
-  }
-  
-  .subject-stats {
-    .subject-item {
-      margin-bottom: 12px;
-      &:last-child { margin-bottom: 0; }
-      .subject-name {
-        display: block;
-        font-size: 13px;
-        color: #333;
-        margin-bottom: 5px;
-      }
-    }
-  }
-}
-
-.action-buttons {
+.workspace-hero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  
-  .action-btn {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    padding: 12px 8px;
-    height: auto;
-    font-size: 12px;
-    
-    .el-icon { font-size: 18px; }
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  max-width: 1480px;
+  margin: 0 auto 22px;
+  padding: 28px 32px;
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 64, 175, 0.88)),
+    #172033;
+  color: #fff;
+  overflow: hidden;
+
+  h1 {
+    margin: 8px 0 12px;
+    font-size: 36px;
+    line-height: 1.2;
+  }
+
+  p {
+    max-width: 860px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.76);
+    line-height: 1.8;
   }
 }
 
-.style-buttons {
+.hero-kicker,
+.panel-title span,
+.catalog-toolbar span {
+  color: #60a5fa;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.hero-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 110px);
+  gap: 12px;
+  align-self: center;
+
+  div {
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  strong {
+    display: block;
+    font-size: 28px;
+  }
+
+  span {
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 13px;
+  }
+}
+
+.workspace-grid {
+  max-width: 1480px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 380px;
+  gap: 22px;
+  align-items: start;
+}
+
+.left-panel,
+.right-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.panel-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 18px 52px rgba(15, 23, 42, 0.08);
+}
+
+.accuracy-card,
+.skill-card,
+.detail-card,
+.ai-card,
+.catalog-panel {
+  padding: 22px;
+}
+
+.panel-title,
+.catalog-toolbar {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  h2 {
+    margin: 4px 0 0;
+    font-size: 21px;
+  }
+}
+
+.panel-title.compact {
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.subject-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.subject-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  &:hover,
+  &.active {
+    border-color: #93c5fd;
+    background: #eff6ff;
+  }
+}
+
+.subject-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.subject-main {
+  min-width: 0;
+
+  strong,
+  em {
+    display: block;
+  }
+
+  strong {
+    color: #172033;
+    font-size: 14px;
+  }
+
+  em {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 12px;
+    font-style: normal;
+  }
+}
+
+.subject-rate {
+  color: #172033;
+  font-weight: 800;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.skill-option {
+  min-height: 118px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  &:hover,
+  &.active {
+    transform: translateY(-2px);
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.12);
+  }
+
+  strong,
+  em {
+    display: block;
+  }
+
+  strong {
+    margin: 10px 0 6px;
+    color: #172033;
+  }
+
+  em {
+    color: #64748b;
+    font-size: 12px;
+    font-style: normal;
+    line-height: 1.5;
+  }
+}
+
+.skill-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  font-weight: 800;
+}
+
+.skill-hint {
+  margin: 14px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.catalog-panel {
+  min-height: 760px;
+}
+
+.catalog-toolbar {
+  margin-bottom: 18px;
+}
+
+.catalog-search {
+  max-width: 360px;
+}
+
+.catalog-body {
+  display: grid;
+  gap: 14px;
+}
+
+.subject-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.subject-heading {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 12px auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 16px;
+  border: 0;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+
+  strong {
+    color: #172033;
+    font-size: 16px;
+  }
+
+  em {
+    color: #64748b;
+    font-size: 13px;
+    font-style: normal;
+  }
+
+  .el-icon {
+    transition: transform 0.2s ease;
+  }
+
+  .el-icon.open {
+    transform: rotate(180deg);
+  }
+}
+
+.knowledge-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px;
+}
+
+.knowledge-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  min-height: 126px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  &:hover,
+  &.active {
+    border-color: #60a5fa;
+    box-shadow: 0 14px 32px rgba(37, 99, 235, 0.12);
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #172033;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.level-badge {
+  align-self: start;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.point-detail {
+  p {
+    color: #475569;
+    line-height: 1.8;
+  }
+}
+
+.detail-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+
+  button {
+    min-height: 72px;
+    border: 0;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .el-icon {
+    display: block;
+    margin: 0 auto 6px;
+    font-size: 20px;
+  }
+}
+
+.related-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+
+  h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+  }
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 
-  .style-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
+  button {
+    padding: 7px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    color: #1d4ed8;
+    background: #eff6ff;
     cursor: pointer;
-    transition: all 0.25s;
-    border: 2px solid transparent;
-    background: #f8f9fa;
-
-    .style-emoji {
-      font-size: 20px;
-      width: 32px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-
-    .style-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1f2f3d;
-      flex-shrink: 0;
-    }
-
-    .style-desc {
-      font-size: 11px;
-      color: #909399;
-      margin-left: auto;
-    }
-
-    &:hover {
-      background: #eef0ff;
-      border-color: #c0c8ff;
-      transform: translateX(4px);
-    }
-
-    &.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-color: #667eea;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
-
-      .style-name, .style-desc { color: #fff; }
-    }
   }
 }
 
-.chat-container {
+.question-list {
+  display: grid;
+  gap: 8px;
+}
+
+.question-row {
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #fff;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  overflow: hidden;
+  background: #f8fafc;
+  color: #334155;
+
+  em {
+    color: #64748b;
+    font-style: normal;
+  }
 }
 
-.chat-messages {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  
-  .message-item {
-    display: flex;
-    margin-bottom: 20px;
-    gap: 12px;
-    
-    .message-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      .el-icon { font-size: 18px; }
-    }
-    
-    .user-avatar {
-      background: #f59f5f;
-    }
-    
-    .message-content {
-      max-width: 75%;
-      padding: 14px 18px;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.7;
-      word-break: break-word;
-      
-      code {
-        background: #f0f0f0;
-        padding: 2px 6px;
-        border-radius: 3px;
-        font-family: monospace;
-      }
-      
-      strong { color: #667eea; }
-      h2, h3 { color: #667eea; margin: 10px 0 5px; }
-      li { margin-left: 15px; }
-    }
-    
-    &.user-message {
-      flex-direction: row-reverse;
-      .message-content {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #fff;
-        
-        code { background: rgba(255,255,255,0.2); }
-        strong { color: #fff; }
-      }
-    }
-    
-    &.ai-message {
-      .message-content {
-        background: #f5f7fa;
-        color: #333;
-      }
-    }
+.empty-detail {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #64748b;
+
+  .el-icon {
+    font-size: 48px;
+    color: #93c5fd;
   }
-  
-  .typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 14px 18px;
-    
-    .typing-dot {
-      width: 8px;
-      height: 8px;
-      background: #667eea;
-      border-radius: 50%;
-      animation: typing 1.4s infinite ease-in-out;
-      
-      &:nth-child(2) { animation-delay: 0.2s; }
-      &:nth-child(3) { animation-delay: 0.4s; }
-    }
+}
+
+.ai-card {
+  min-height: 420px;
+}
+
+.ai-messages {
+  max-height: 260px;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  padding: 4px 4px 12px;
+}
+
+.ai-message {
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: #334155;
+  background: #f8fafc;
+  line-height: 1.7;
+  font-size: 13px;
+
+  &.user {
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+  }
+
+  :deep(strong) {
+    color: #1d4ed8;
+  }
+
+  :deep(code) {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: #e2e8f0;
+  }
+}
+
+.typing-line {
+  display: flex;
+  gap: 5px;
+  padding: 8px 4px;
+
+  span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2563eb;
+    animation: typing 1.2s infinite ease-in-out;
+  }
+
+  span:nth-child(2) { animation-delay: 0.15s; }
+  span:nth-child(3) { animation-delay: 0.3s; }
+}
+
+.ai-input {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+
+  .el-button {
+    justify-self: end;
+    border-radius: 999px;
   }
 }
 
 @keyframes typing {
-  0%, 100% { transform: scale(0.5); opacity: 0.5; }
-  50% { transform: scale(1); opacity: 1; }
+  0%, 100% { opacity: 0.35; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
 }
 
-.chat-input {
-  padding: 15px 20px;
-  border-top: 1px solid #eee;
-  
-  :deep(.el-textarea__inner) {
-    resize: none;
-    border-radius: 10px;
+@media screen and (max-width: 1280px) {
+  .workspace-grid {
+    grid-template-columns: 280px minmax(0, 1fr);
   }
-  
-  .input-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    
-    .tip-text { font-size: 12px; color: #999; }
+
+  .right-panel {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
-.graph-panel {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  
-  :deep(.el-card__body) {
-    flex: 1;
-    padding: 0;
-    display: flex;
+@media screen and (max-width: 900px) {
+  .knowledge-workspace {
+    padding: 16px;
   }
-  
-  .graph-chart {
-    flex: 1;
-    min-height: 0;
+
+  .workspace-hero,
+  .workspace-grid,
+  .right-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .knowledge-list,
+  .skill-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .catalog-search {
+    max-width: none;
   }
 }
 
-@media screen and (max-width: 1400px) {
-  .right-panel { display: none; }
-}
+@media screen and (max-width: 560px) {
+  .workspace-hero {
+    padding: 22px;
 
-@media screen and (max-width: 992px) {
-  .master-content { flex-direction: column; height: auto; }
-  .left-panel { width: 100%; flex-direction: row; flex-wrap: wrap; }
-  .profile-card, .quick-actions, .knowledge-mini { width: calc(33.333% - 15px); }
-  .center-panel { min-height: 500px; }
+    h1 {
+      font-size: 28px;
+    }
+  }
+
+  .hero-summary,
+  .detail-links {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
