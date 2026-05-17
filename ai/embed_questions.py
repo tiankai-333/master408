@@ -4,7 +4,7 @@
 API：https://open.bigmodel.cn/api/paas/v4/embeddings
 
 使用方法：
-    1. 先执行 database/05_rag_embeddings.sql 添加 embedding 列
+    1. 先执行 database/current/05_rag_embeddings.sql 添加 embedding 列
     2. 设置环境变量 GLM_API_KEY
     3. python ai/embed_questions.py
 

@@ -88,8 +88,8 @@ class OCRProcessor:
         return results
 
 def main():
-    img_dir = r'c:/Dev/Workspaces/master408/docs/2024_408/images'
-    output_dir = r'c:/Dev/Workspaces/master408/docs/question_data_cleaner'
+    img_dir = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/2024_408/images'
+    output_dir = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/question_data_cleaner'
     
     processor = OCRProcessor(img_dir, output_dir)
     processor.process_all_pages()

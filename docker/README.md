@@ -1,30 +1,47 @@
-### 6.3 docker部署
+# docker
 
-* 打开网站<https://gitee.com/mindskip/xzs-mysql>，找到docker目录，里面有已配置好的文件
-* 下载sql脚本，下载教程<https://www.mindskip.net:999>，然后解压sql压缩包，找到xzs-mysql.sql文件，编辑此文件，在文件开头加如下代码：
+原学之思项目 Docker 部署参考目录。
 
-```xzs-mysql
-CREATE DATABASE `xzs` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE xzs;
+当前 408Master AI/RAG 分支的推荐部署配置在根目录 `deploy/`，这里保留旧版 Docker 方案用于对照、回滚和理解原项目部署方式。
+
+## 目录结构
+
+| 路径 | 说明 |
+|---|---|
+| `docker-compose.yml` | 原项目 `mysql` + `java` 服务编排。 |
+| `install/` | 旧版 `docker-compose` 二进制安装文件。 |
+| `release/` | 原部署方式下放置 jar 的目录。 |
+
+## 与 `deploy/` 的区别
+
+| 项目 | `docker/` | `deploy/` |
+|---|---|---|
+| 定位 | 原项目参考方案 | 当前推荐方案 |
+| 前端 | 后端静态资源或单独 Nginx | Nginx 容器挂载 `static/student`、`static/admin` |
+| 后端 | `java` 容器直接运行 jar | `backend` 镜像由 Dockerfile 构建 |
+| MySQL 密码 | 示例值 `123456` | 当前部署值 `doushijiaxiang0.` |
+| AI/RAG 数据 | 未覆盖当前增量 | 配合 `database/05`、`database/06` 和知识点爬虫导入 |
+
+## 不建议直接用于当前云端部署
+
+如果要部署当前分支，请优先看：
+
+```text
+deploy/README.md
+deploy/REDEPLOY_GUIDE.md
+docs/04-deployment/朋友远程部署操作手册.md
 ```
 
-* sql文件改好后，将文件移动到 docker/sql 目录下
-* 将整个docker目录中的文件，复制到/usr/local/xzs下面
-* 进入到install目录，执行下面命令，安装docker-compose
+## 仅作参考的启动方式
 
-```docker-compose
-cd /usr/local/xzs/install
-mv docker-compose-linux-x86_64 /usr/local/bin/docker-compose
-chmod +x  /usr/local/bin/docker-compose
-docker-compose --version
+```bash
+cd docker
+docker compose up -d
 ```
 
-* 执行下面命令，启动学之思网站，有问题可以看下/usr/local/xzs/log中的日志
+如果确实使用旧方案，需要自行确认：
 
-```docker-xzs
-cd /usr/local/xzs
-docker-compose up -d
-```
-
-* 学生端访问地址为：<http://ip:8000/student>
-* 管理员端访问地址为：<http://ip:8000/admin>
+1. SQL 是否包含当前 408 真题和 AI/RAG 增量表。
+2. 后端 jar 是否为当前分支重新构建产物。
+3. 前端静态文件是否为当前分支重新构建产物。
+4. Nginx 或后端静态资源路径是否能正确访问 `/student/`、`/admin/` 和 `/api/`。

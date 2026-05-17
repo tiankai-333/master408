@@ -4,7 +4,7 @@
 
 ### 1. PDF转换
 - **输入**: `sql/2024年408计算机专业基础综合真题+答案.pdf`
-- **输出目录**: `docs/2024_408/`
+- **输出目录**: `docs/05-data-pipeline/2024_408/`
 - **提取内容**:
   - 24张页面图片 (`images/page1_img1.jpeg` ~ `page24_img1.jpeg`)
   - 图片索引 (`image_references.md`)
@@ -67,7 +67,7 @@ python docs/ocr_extract.py
 ## 📁 输出文件结构
 
 ```
-docs/2024_408/
+docs/05-data-pipeline/2024_408/
 ├── 2024_408_真题.md          # 空的markdown模板
 ├── 页面内容映射.md            # 页面结构说明
 ├── image_references.md       # 图片Base64索引

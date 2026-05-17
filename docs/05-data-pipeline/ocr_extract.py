@@ -2,8 +2,8 @@ import easyocr
 from PIL import Image
 import os
 
-img_dir = r"c:/Dev/Workspaces/master408/docs/2024_408/images"
-output_file = r"c:/Dev/Workspaces/master408/docs/2024_408/ocr_text.md"
+img_dir = r"c:/Dev/Workspaces/master408/docs/05-data-pipeline/2024_408/images"
+output_file = r"c:/Dev/Workspaces/master408/docs/05-data-pipeline/2024_408/ocr_text.md"
 
 print("初始化EasyOCR (首次运行会下载模型)...")
 reader = easyocr.Reader(['ch_sim', 'en'], gpu=False)

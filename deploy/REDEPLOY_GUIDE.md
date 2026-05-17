@@ -1,4 +1,4 @@
-# 学之思 (xzs) 408Master — feature/ai 重新部署操作指南
+# 408Master — codex/ai-knowledge-rag 重新部署操作指南
 
 ## 部署日期
 
@@ -35,13 +35,13 @@
 | 1 | **数据库完全为空** | 0 条题目、0 条试卷，所有页面无数据 | 导入完整 SQL（含数据） |
 | 2 | **缺少 exam 数据** | `t_text_content`、`t_question`、`t_exam_paper` 表结构有但无数据 | 执行 `04_exam_data.sql` |
 | 3 | **缺少 embedding 列** | RAG 检索功能不可用 | 执行 `05_rag_embeddings.sql` |
-| 4 | **旧版 JAR 包** | May 15 的旧代码，无 AI RAG 功能 | 重新打包 feature/ai 并构建 Docker 镜像 |
+| 4 | **旧版 JAR 包** | May 15 的旧代码，无 AI RAG 功能 | 重新打包 `codex/ai-knowledge-rag` 并构建 Docker 镜像 |
 | 5 | **旧版前端静态文件** | 无 4 种 Skill 风格切换界面 | 重新构建前端 dist |
 | 6 | **后端报错 knowledge_point 表不存在** | 旧版 SQL schema 不完整 | 使用新版完整初始化脚本 |
 
 ### 1.4 数据库对比
 
-| 指标 | 本地（feature/ai） | 云端（118.31.34.132） | 差距 |
+| 指标 | 本地（codex/ai-knowledge-rag） | 云端（118.31.34.132） | 差距 |
 |------|-------------------|----------------------|------|
 | t_text_content | 735 | 0 | ❌ 缺 735 条 |
 | t_question | 714 | 0 | ❌ 缺 714 条 |
@@ -85,11 +85,12 @@
 
 ## 三、重新部署步骤（逐步执行）
 
-### ⚠️ 重要：在执行以下操作前，先确保本地已切换到 `feature/ai` 分支
+### ⚠️ 重要：在执行以下操作前，先确保本地已切换到 `codex/ai-knowledge-rag` 分支
 
 ```bash
-git checkout feature/ai
-git pull origin feature/ai
+git fetch origin
+git checkout codex/ai-knowledge-rag
+git pull origin codex/ai-knowledge-rag
 ```
 
 ---
@@ -120,13 +121,9 @@ mvn clean package -DskipTests
 # 产出：source\xzs\target\xzs-3.9.0.jar
 ```
 
-### 第 3 步：打包 SQL 数据为单文件导入用
+### 第 3 步：确认 SQL 主线文件
 
-```powershell
-cd database
-# 创建用于云端的合并 SQL（去掉 DROP/CREATE DATABASE 语句，保留 CREATE TABLE IF NOT EXISTS）
-# 注意：直接使用 04_exam_data.sql 文件，它包含完整的 INSERT 数据
-```
+当前生产初始化只使用 `database/current/` 下的 SQL。`database/archive/` 是历史备份和早期知识库实验脚本，不参与当前部署。
 
 ### 第 4 步：上传文件到云服务器
 
@@ -142,8 +139,11 @@ scp -r source\vue\xzs-student\dist\* root@118.31.34.132:/opt/xzs-deploy/static/s
 scp -r source\vue\xzs-admin\dist\* root@118.31.34.132:/opt/xzs-deploy/static/admin/
 
 # 上传 SQL 数据文件
-scp database\04_exam_data.sql root@118.31.34.132:/opt/xzs-deploy/sql/
-scp database\05_rag_embeddings.sql root@118.31.34.132:/opt/xzs-deploy/sql/
+scp database\current\01_init_structure.sql root@118.31.34.132:/opt/xzs-deploy/sql/
+scp database\current\02_extend_fields.sql root@118.31.34.132:/opt/xzs-deploy/sql/
+scp database\current\04_exam_data.sql root@118.31.34.132:/opt/xzs-deploy/sql/
+scp database\current\05_rag_embeddings.sql root@118.31.34.132:/opt/xzs-deploy/sql/
+scp database\current\06_ai_knowledge_rag.sql root@118.31.34.132:/opt/xzs-deploy/sql/
 ```
 
 > **上传工具选择**：你可以使用任意 SCP 工具，如：
@@ -191,11 +191,17 @@ docker exec xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs -e "
   SET FOREIGN_KEY_CHECKS=1;
 "
 
-# 导入考试数据（735 条题目 + 14 套试卷）
-docker exec -i xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs < /opt/xzs-deploy/sql/04_exam_data.sql
-
-# 添加 embedding 列（RAG 向量存储）
-docker exec -i xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs < /opt/xzs-deploy/sql/05_rag_embeddings.sql
+# 按当前主线顺序导入结构、题库、RAG/Agent 表
+for f in \
+  01_init_structure.sql \
+  02_extend_fields.sql \
+  04_exam_data.sql \
+  05_rag_embeddings.sql \
+  06_ai_knowledge_rag.sql
+do
+  echo "IMPORT $f"
+  docker exec -i xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs < "/opt/xzs-deploy/sql/$f"
+done
 ```
 
 ### 第 8 步：验证数据库恢复
@@ -369,7 +375,7 @@ ls -la /opt/xzs-deploy/static/admin/     # 确认 index.html 存在
 
 ```bash
 #!/bin/bash
-# Master408 feature/ai 一键部署脚本
+# Master408 codex/ai-knowledge-rag 一键部署脚本
 # 使用方法：在本地 Git Bash 中执行
 
 SERVER="root@118.31.34.132"
@@ -396,14 +402,21 @@ echo "=== 4. 上传文件 ==="
 sshpass -p "$SSH_PASS" scp source/xzs/target/xzs-3.9.0.jar ${SERVER}:${REMOTE_DIR}/
 sshpass -p "$SSH_PASS" scp -r source/vue/xzs-student/dist/* ${SERVER}:${REMOTE_DIR}/static/student/
 sshpass -p "$SSH_PASS" scp -r source/vue/xzs-admin/dist/* ${SERVER}:${REMOTE_DIR}/static/admin/
-sshpass -p "$SSH_PASS" scp database/04_exam_data.sql ${SERVER}:${REMOTE_DIR}/sql/
-sshpass -p "$SSH_PASS" scp database/05_rag_embeddings.sql ${SERVER}:${REMOTE_DIR}/sql/
+sshpass -p "$SSH_PASS" scp database/current/01_init_structure.sql ${SERVER}:${REMOTE_DIR}/sql/
+sshpass -p "$SSH_PASS" scp database/current/02_extend_fields.sql ${SERVER}:${REMOTE_DIR}/sql/
+sshpass -p "$SSH_PASS" scp database/current/04_exam_data.sql ${SERVER}:${REMOTE_DIR}/sql/
+sshpass -p "$SSH_PASS" scp database/current/05_rag_embeddings.sql ${SERVER}:${REMOTE_DIR}/sql/
+sshpass -p "$SSH_PASS" scp database/current/06_ai_knowledge_rag.sql ${SERVER}:${REMOTE_DIR}/sql/
 
 echo "=== 5. 初始化数据库 ==="
 sshpass -p "$SSH_PASS" ssh "$SERVER" "
   cd $REMOTE_DIR
-  docker exec -i xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs < sql/04_exam_data.sql
-  docker exec -i xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs < sql/05_rag_embeddings.sql
+  docker exec xzs-mysql mysql -u root -p'doushijiaxiang0.' -e \
+    'CREATE DATABASE IF NOT EXISTS xzs DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+  for f in 01_init_structure.sql 02_extend_fields.sql 04_exam_data.sql 05_rag_embeddings.sql 06_ai_knowledge_rag.sql; do
+    echo IMPORT \$f
+    docker exec -i xzs-mysql mysql -u root -p'doushijiaxiang0.' xzs < sql/\$f
+  done
 "
 
 echo "=== 6. 构建并启动后端 ==="
@@ -446,8 +459,11 @@ echo "管理端: http://118.31.34.132/admin/"
 | `xzs-3.9.0.jar` | 后端 Spring Boot 包 | `source/xzs/target/` |
 | `static/student/` | 学生端前端 | `source/vue/xzs-student/dist/` |
 | `static/admin/` | 管理端前端 | `source/vue/xzs-admin/dist/` |
-| `sql/04_exam_data.sql` | 735 条目题目 + 14 套试卷数据 | `database/` |
-| `sql/05_rag_embeddings.sql` | RAG 向量列（embedding） | `database/` |
+| `sql/01_init_structure.sql` | 基础库表结构和基础账号/学科 | `database/current/` |
+| `sql/02_extend_fields.sql` | 真题兼容扩展字段 | `database/current/` |
+| `sql/04_exam_data.sql` | 735 条题目 + 14 套试卷数据 | `database/current/` |
+| `sql/05_rag_embeddings.sql` | RAG 向量列（embedding） | `database/current/` |
+| `sql/06_ai_knowledge_rag.sql` | AI 知识库、学生画像、反馈闭环表 | `database/current/` |
 | `Dockerfile` | 后端 Docker 镜像构建 | `deploy/` |
 | `docker-compose.yml` | 服务编排 | `deploy/` |
 | `nginx.conf` | Nginx 配置（服务器已有，无需更新） | `deploy/` |

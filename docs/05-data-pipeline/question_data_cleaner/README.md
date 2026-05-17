@@ -34,7 +34,7 @@
 
 1. **运行快速启动脚本**
    ```bash
-   cd docs/question_data_cleaner
+   cd docs/05-data-pipeline/question_data_cleaner
    python quick_start.py
    ```
    这将：
@@ -131,7 +131,7 @@ python merge_files.py examples/questions_only.json examples/answers_only.json me
 
 1. **运行主脚本**
    ```bash
-   cd docs/question_data_cleaner
+   cd docs/05-data-pipeline/question_data_cleaner
    python main.py
    ```
    这将依次执行：

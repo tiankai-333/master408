@@ -5,7 +5,7 @@
 - **项目名称**: xzs-admin (学之思教育管理系统 - 管理员端)
 - **Vue 2 版本**: vue ^2.6.11 + vue-router ^3.5.3 + vuex ^3.6.2 + element-ui ^2.15.13 + vue-cli ^4.5.19
 - **Vue 3 版本**: vue ^3.4.31 + vue-router ^4.3.3 + pinia ^2.3.0 + element-plus ^2.9.1 + vite ^5.4.14
-- **迁移日期**: 2024
+- **迁移日期**: 2026-5-14
 - **项目路径**: `c:/Dev/Workspaces/master408/source/vue/xzs-admin`
 
 ---

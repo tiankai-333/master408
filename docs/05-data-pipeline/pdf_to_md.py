@@ -4,7 +4,7 @@ import base64
 from pathlib import Path
 
 pdf_path = r"c:/Dev/Workspaces/master408/sql/2024年408计算机专业基础综合真题+答案.pdf"
-output_dir = r"c:/Dev/Workspaces/master408/docs/2024_408"
+output_dir = r"c:/Dev/Workspaces/master408/docs/05-data-pipeline/2024_408"
 img_dir = os.path.join(output_dir, "images")
 
 os.makedirs(output_dir, exist_ok=True)
