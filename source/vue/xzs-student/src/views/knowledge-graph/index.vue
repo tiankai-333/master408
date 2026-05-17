@@ -596,9 +596,17 @@ const draftPrompt = (content, taskType = 'chat') => {
   draftTaskType.value = taskType
 }
 
+const appendIntent = (intent, taskType = 'chat') => {
+  const draft = inputMessage.value.trim()
+  inputMessage.value = draft ? `${draft}\n\n${intent}` : intent
+  draftTaskType.value = taskType
+}
+
 const explainKnowledge = () => {
   const target = getCurrentTarget(false)
-  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+  if (inputMessage.value.trim()) {
+    appendIntent(`请用${currentStyle.value.name}结合知识库讲解，补充定义、常见考法和易错点。`, 'explain')
+  } else if (contextMode.value === 'knowledge' && selectedPoint.value) {
     draftPrompt(`请用${currentStyle.value.name}讲解 408 知识点「${selectedPoint.value.name}」，说明定义、常见考法和易错点。`, 'explain')
   } else if (target) {
     draftPrompt(`请用${currentStyle.value.name}结合知识库讲解下面这道题或问题：\n${target}`, 'explain')
@@ -610,7 +618,9 @@ const explainKnowledge = () => {
 
 const explainWithExam = () => {
   const target = getCurrentTarget(false)
-  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+  if (inputMessage.value.trim()) {
+    appendIntent('请结合 408 真题讲解，指出考点、解题抓手和易错点。', 'exam')
+  } else if (contextMode.value === 'knowledge' && selectedPoint.value) {
     draftPrompt(`请结合 408 真题讲解「${selectedPoint.value.name}」，指出常见设问方式、解题步骤和容易掉坑的地方。`, 'exam')
   } else if (target) {
     draftPrompt(`请结合 408 真题讲解下面这道题或问题，指出考点、解题抓手和易错点：\n${target}`, 'exam')
@@ -622,7 +632,9 @@ const explainWithExam = () => {
 
 const generatePractice = () => {
   const target = getCurrentTarget(false)
-  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+  if (inputMessage.value.trim()) {
+    appendIntent('请基于上面的内容生成一道同考点的 408 统考风格练习题，并给出答案与解析。', 'practice')
+  } else if (contextMode.value === 'knowledge' && selectedPoint.value) {
     draftPrompt(`请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`, 'practice')
   } else if (target) {
     draftPrompt(`请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n${target}`, 'practice')
@@ -821,7 +833,7 @@ onMounted(async () => {
   await Promise.all([loadGraph(), loadUserStats()])
   messages.value.push({
     role: 'assistant',
-    content: '欢迎来到 AI 学习工作台。页面不会默认绑定知识点；你可以先粘贴题目，也可以从右侧知识目录手动选择上下文。'
+    content: '欢迎来到 AI 学习工作台。你可以先粘贴题目，也可以从右侧知识目录手动选择上下文。'
   })
 })
 </script>
