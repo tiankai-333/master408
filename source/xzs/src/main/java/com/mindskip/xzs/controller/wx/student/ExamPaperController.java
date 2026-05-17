@@ -43,7 +43,6 @@ public class ExamPaperController extends BaseWXApiController {
 
     @RequestMapping(value = "/pageList", method = RequestMethod.POST)
     public RestResponse<PageInfo<ExamPaperPageResponseVM>> pageList(@Valid ExamPaperPageVM model) {
-        model.setLevelId(getCurrentUser().getUserLevel());
         PageInfo<ExamPaper> pageInfo = examPaperService.studentPage(model);
         PageInfo<ExamPaperPageResponseVM> page = PageInfoHelper.copyMap(pageInfo, e -> {
             ExamPaperPageResponseVM vm = modelMapper.map(e, ExamPaperPageResponseVM.class);

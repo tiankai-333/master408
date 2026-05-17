@@ -16,8 +16,8 @@ def main():
     print("=" * 60)
     
     # 路径配置
-    img_dir = r'c:/Dev/Workspaces/master408/docs/2024_408/images'
-    output_dir = r'c:/Dev/Workspaces/master408/docs/question_data_cleaner'
+    img_dir = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/2024_408/images'
+    output_dir = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/question_data_cleaner'
     
     print("\n[步骤 1/4] OCR 识别页面内容...")
     processor = OCRProcessor(img_dir, output_dir)

@@ -1,154 +1,155 @@
-# 数据库说明
+# database
 
-## 基本信息
+数据库脚本目录。当前已经按用途整理成三类：`current/` 是当前分支部署必需 SQL，`archive/` 是历史/实验脚本，`tests/` 是测试数据脚本。
 
-- **数据库名**: xzs
-- **字符集**: utf8mb4 / utf8mb4_unicode_ci
-- **MySQL 版本**: 8.0.36
+## 目录结构
 
-## 快速导入（全新环境）
+| 目录 | 说明 |
+|---|---|
+| `current/` | 当前 `codex/ai-knowledge-rag` 分支推荐导入脚本。部署只应优先使用这里。 |
+| `archive/legacy-knowledge/` | 历史知识体系实验脚本，包含旧表名如 `t_knowledge_point`、`t_question_vector`，当前代码不依赖。 |
+| `archive/backups/` | 历史数据库备份，保留作追溯，不建议直接导入当前环境。 |
+| `tests/` | 局部测试数据，例如 NPE 复现/验证脚本。 |
+
+## 当前导入顺序
+
+全新环境按以下顺序导入：
+
+| 顺序 | 文件 | 说明 |
+|---|---|---|
+| 1 | `current/01_init_structure.sql` | 主表结构。 |
+| 2 | `current/02_extend_fields.sql` | 408 真题扩展字段和综合题表。 |
+| 3 | `current/04_exam_data.sql` | 2011-2024 真题、试卷、用户、科目等基础数据。 |
+| 4 | `current/05_rag_embeddings.sql` | `t_text_content.embedding` 字段。 |
+| 5 | `current/06_ai_knowledge_rag.sql` | AI 知识库向量字段、学生画像、学习事件、Skill 反馈、方法论摘要。 |
+
+推荐命令：
 
 ```bash
-cd database
-mysql -u root -p123456 -e "CREATE DATABASE IF NOT EXISTS xzs DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci"
-python ../import_db.py
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS xzs DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci"
+
+mysql -u root -p xzs < database/current/01_init_structure.sql
+mysql -u root -p xzs < database/current/02_extend_fields.sql
+mysql -u root -p xzs < database/current/04_exam_data.sql
+mysql -u root -p xzs < database/current/05_rag_embeddings.sql
+mysql -u root -p xzs < database/current/06_ai_knowledge_rag.sql
 ```
 
-> **注意**：不要用 PowerShell 的 `Get-Content | mysql` 管道导入，会导致中文乱码。使用 `import_db.py` 脚本通过 pymysql 连接，保证 UTF-8 编码正确。
+也可以使用根目录脚本：
 
-## 文件列表
+```bash
+python import_db.py
+```
 
-| 文件 | 说明 | 执行顺序 |
-|------|------|---------|
-| `01_init_structure.sql` | 表结构（19 张表，从代码反推） | 1 |
-| `02_extend_fields.sql` | 408 真题扩展字段 | 2 |
-| `04_exam_data.sql` | 全量数据（由 `crawler/generate_sql.py` 生成） | 3 |
-| `init_knowledge_data.sql` | 知识体系初始化数据 | 4 |
-| `enhance_knowledge_system.sql` | 知识体系增强 | 5 |
-| `supplement_knowledge_system.sql` | 知识体系补充 | 6 |
-| `optimize_study_system.sql` | 学习系统优化 | 7 |
-| `create_question_wrong_analysis.sql` | 错题分析表 | 8 |
-| `xzs-20260515.sql` | 完整数据库备份（参考用） | - |
+> Windows PowerShell 不要用 `Get-Content | mysql` 导入中文 SQL，容易乱码。优先使用 `import_db.py` 或 MySQL 原生命令。
 
-## 数据统计
+## 知识点爬虫导入
 
-| 数据 | 数量 |
-|------|------|
-| 选择题 | 560 道（2011-2024） |
-| 综合应用题 | 98 道（2011-2024） |
-| 试卷 | 14 份（2011-2024） |
-| 科目 | 5 个（408综合 + 数据结构、计组、OS、网络） |
-| 用户 | 4 个（admin/student/teacher/231310423） |
-| 知识标签 | 652 道有标签，6 道无标签（网站缺失） |
-| 文本内容 | 672 条（题目内容 + 试卷框架） |
+`current/06_ai_knowledge_rag.sql` 只创建 AI/RAG 结构和方法论摘要。408 四科 116 条知识点页面需要通过爬虫快照导入：
 
-## 表结构来源
+```bash
+python3 crawler/knowledge_crawler.py \
+  --skip-crawl \
+  --import-db \
+  --clear-existing \
+  --db-host 127.0.0.1 \
+  --db-port 3306 \
+  --db-user root \
+  --db-password '123456' \
+  --db-name xzs \
+  --output crawler/data/knowledge_pages.json
+```
 
-所有表结构从以下代码反推，保证与代码 100% 一致：
+导入后验证：
 
-- `source/xzs/src/main/resources/mapper/*.xml`（19 个 Mapper XML）
-- `source/xzs/src/main/java/com/mindskip/xzs/domain/*.java`（16 个 Domain 类）
+```sql
+SELECT source_type, COUNT(*) FROM t_ai_knowledge_base GROUP BY source_type;
+SELECT COUNT(*) AS knowledge_points FROM knowledge_point;
+```
+
+预期至少看到：
+
+- `csgraduates` 约 116 条
+- `method_summary` 约 3 条
+
+## 当前数据概览
+
+| 数据 | 数量/说明 |
+|---|---|
+| 真题年份 | 2011-2024 |
+| 试卷 | 14 份 |
+| 选择题 | 约 560 道入库真题选择题 |
+| 综合应用题 | 98 道 |
+| 科目 | 数据结构、组成原理、操作系统、计算机网络、408 综合 |
+| 常用用户 | `admin`、`student`、`teacher`、`231310423` |
+| AI 知识库 | 方法论摘要由 SQL 写入，408 知识点由爬虫导入 |
 
 ## 核心表说明
 
-### t_question（题目表）
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | int | 主键 |
-| `question_type` | int | 1=单选, 2=多选, 3=判断, 4=填空, 5=综合应用题 |
-| `subject_id` | int | 科目 ID（1=DS, 2=CO, 3=OS, 4=CN） |
-| `score` | int | 分数 × 10（2 分存为 20，10 分存为 100） |
-| `correct` | varchar(255) | 正确答案（选择题 A/B/C/D） |
-| `info_text_content_id` | int | 指向 t_text_content（题目内容 JSON） |
-| `source` | varchar(100) | 来源（如 `2024年408真题`） |
-| `source_year` | int | 来源年份 |
-| `source_question_no` | int | 原始题号（1-47） |
-| `tags` | text | 知识标签，逗号分隔 |
-
-### t_text_content（文本内容表）
-
-存储题目内容和试卷框架，以 JSON 格式。
-
-**题目内容格式**（对应 QuestionObject.java）：
-```json
-{
-  "titleContent": "题干文本",
-  "analyze": "解析文本",
-  "questionItemObjects": [
-    {"prefix": "A", "content": "选项内容", "itemUuid": "xxx"}
-  ]
-}
-```
-
-**试卷框架格式**（对应 ExamPaperTitleItemObject.java）：
-```json
-[
-  {
-    "name": "一、单项选择题（数据结构，1-10题，每题2分）",
-    "questionItems": [{"id": 1, "itemOrder": 1}]
-  }
-]
-```
-
-### t_exam_paper（试卷表）
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `subject_id` | int | 科目 ID（5=408综合，所有真题试卷统一指向此科目） |
-| `paper_type` | int | 1=固定试卷, 4=时段试卷, 6=任务试卷 |
-| `grade_level` | int | 年级（已废弃，保留字段兼容旧代码） |
-| `score` | int | 总分 × 10（150 分存为 1500） |
-| `frame_text_content_id` | int | 指向 t_text_content（试卷框架 JSON） |
-| `source_year` | int | 来源年份 |
-
-### t_subject（科目表）
-
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | int | 1=数据结构, 2=计组, 3=OS, 4=网络, 5=408综合 |
-| `level` | int | 年级（已废弃，不再使用） |
-| `deleted` | bit(1) | 软删除 |
-
-### knowledge_point（知识点表）
-
-注意：表名无 `t_` 前缀，与 Mapper XML 一致。
-
-### question_knowledge_point（题目-知识点关联表）
-
-注意：表名无 `t_` 前缀，与 Mapper XML 一致。
-
-## 分数存储机制
-
-xzs 系统中分数以**整数存储**（实际分值 × 10），避免浮点精度问题：
-
-| 实际分值 | 数据库存储 | 前端显示 |
-|---------|-----------|---------|
-| 2 分 | 20 | `ExamUtil.scoreToVM(20)` → "2" |
-| 10 分 | 100 | `ExamUtil.scoreToVM(100)` → "10" |
-| 150 分 | 1500 | `ExamUtil.scoreToVM(1500)` → "150" |
+| 表 | 作用 |
+|---|---|
+| `t_subject` | 科目。 |
+| `t_text_content` | 题干、解析、试卷框架 JSON。 |
+| `t_question` | 题目元数据，含年份、题号、标签、图片路径。 |
+| `t_essay_question` | 综合应用题原始结构化数据。 |
+| `t_exam_paper` | 试卷。 |
+| `knowledge_point` | 当前代码使用的知识点表，无 `t_` 前缀。 |
+| `question_knowledge_point` | 题目-知识点关联表，无 `t_` 前缀。 |
+| `t_ai_knowledge_base` | RAG 文档库。 |
+| `t_user_learning_profile` | 学生画像。 |
+| `t_user_learning_event` | 学习事件。 |
+| `t_user_skill_feedback` | Skill 反馈。 |
 
 ## 常用账号
 
 | 用户名 | 密码 | 角色 |
-|--------|------|------|
-| admin | 123456 | 管理员 |
-| student | 123456 | 学生 |
-| teacher | 123456 | 教师 |
-| 231310423 | 123456 | 学生（测试） |
+|---|---|---|
+| `admin` | `123456` | 管理员 |
+| `student` | `123456` | 学生 |
+| `teacher` | `123456` | 教师 |
+| `231310423` | `123456` | 学生测试账号 |
 
-## 验证数据
+## 验证 SQL
 
 ```sql
 SELECT question_type, COUNT(*) FROM t_question GROUP BY question_type;
-SELECT source, COUNT(*) FROM t_question GROUP BY source;
-SELECT id, name, score FROM t_exam_paper LIMIT 5;
+SELECT source, COUNT(*) FROM t_question GROUP BY source ORDER BY source;
+SELECT id, name, score, question_count FROM t_exam_paper ORDER BY source_year DESC LIMIT 5;
+SELECT source_type, COUNT(*) FROM t_ai_knowledge_base GROUP BY source_type;
 ```
 
-## 注意事项
+检查悬空引用：
 
-1. `knowledge_point` 和 `question_knowledge_point` 表名无 `t_` 前缀（与 Mapper XML 一致）
-2. `paper_type` 和 `question_type` 是 `int` 类型（不是 varchar）
-3. 用户密码使用 BCrypt 加密
-4. `t_text_content.content` 实际是 TEXT 类型（存储 JSON）
-5. **导入数据必须用 `import_db.py`**，不要用 PowerShell 管道（会乱码）
+```sql
+SELECT 'exam_paper->text_content' AS ck, COUNT(*) AS dangling
+FROM t_exam_paper ep
+LEFT JOIN t_text_content tc ON ep.frame_text_content_id = tc.id
+WHERE tc.id IS NULL AND ep.frame_text_content_id IS NOT NULL
+UNION ALL
+SELECT 'question->text_content', COUNT(*)
+FROM t_question q
+LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id
+WHERE tc.id IS NULL AND q.info_text_content_id IS NOT NULL
+UNION ALL
+SELECT 'question->subject', COUNT(*)
+FROM t_question q
+LEFT JOIN t_subject s ON q.subject_id = s.id
+WHERE s.id IS NULL AND q.subject_id IS NOT NULL;
+```
+
+## 归档脚本说明
+
+`archive/legacy-knowledge/` 中的脚本来自早期知识系统设计，创建的是旧表体系，例如：
+
+- `t_knowledge_point`
+- `t_question_knowledge`
+- `t_question_vector`
+- `t_question_ai_analysis`
+- `t_user_learning_behavior`
+- `t_user_learning_session`
+
+当前代码主线已经改为使用 `knowledge_point`、`question_knowledge_point` 和 `t_ai_knowledge_base`。因此这些脚本只作历史参考，不应在当前部署流程中默认执行。
+
+`archive/backups/xzs-20260515.sql` 是历史备份，包含旧版数据和部分乱码内容，只作追溯，不建议直接恢复到当前环境。
+
+`tests/test_npe_data.sql` 是异常场景测试数据，不应导入生产环境。

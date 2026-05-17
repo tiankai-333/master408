@@ -99,8 +99,8 @@ class SQLGenerator:
         return output_file
 
 def main():
-    parsed_questions_file = r'c:/Dev/Workspaces/master408/docs/question_data_cleaner/parsed_questions.json'
-    output_dir = r'c:/Dev/Workspaces/master408/docs/question_data_cleaner'
+    parsed_questions_file = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/question_data_cleaner/parsed_questions.json'
+    output_dir = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/question_data_cleaner'
     
     generator = SQLGenerator(parsed_questions_file, output_dir)
     generator.generate_full_sql()

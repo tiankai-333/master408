@@ -121,8 +121,8 @@ class QuestionParser:
         return output_file
 
 def main():
-    ocr_results_file = r'c:/Dev/Workspaces/master408/docs/question_data_cleaner/ocr_results.json'
-    output_dir = r'c:/Dev/Workspaces/master408/docs/question_data_cleaner'
+    ocr_results_file = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/question_data_cleaner/ocr_results.json'
+    output_dir = r'c:/Dev/Workspaces/master408/docs/05-data-pipeline/question_data_cleaner'
     
     parser = QuestionParser(ocr_results_file, output_dir)
     questions = parser.parse_questions()

@@ -11,6 +11,7 @@ import com.mindskip.xzs.service.UserTokenService;
 import com.mindskip.xzs.utility.WxUtil;
 import com.mindskip.xzs.viewmodel.wx.student.user.BindInfo;
 import com.mindskip.xzs.domain.User;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -51,8 +52,7 @@ public class AuthController extends BaseWXApiController {
         if (UserStatusEnum.Disable == userStatusEnum) {
             return RestResponse.fail(3, "用户被禁用");
         }
-        String code = model.getCode();
-        String openid = WxUtil.getOpenId(systemConfig.getWx().getAppid(), systemConfig.getWx().getSecret(), code);
+        String openid = resolveBindOpenId(model);
         if (null == openid) {
             return RestResponse.fail(4, "获取微信OpenId失败");
         }
@@ -64,6 +64,9 @@ public class AuthController extends BaseWXApiController {
 
     @RequestMapping(value = "/checkBind", method = RequestMethod.POST)
     public RestResponse checkBind(@Valid @NotBlank String code) {
+        if (StringUtils.isBlank(systemConfig.getWx().getSecret())) {
+            return RestResponse.fail(2, "开发模式：请先绑定账号");
+        }
         String openid = WxUtil.getOpenId(systemConfig.getWx().getAppid(), systemConfig.getWx().getSecret(), code);
         if (null == openid) {
             return RestResponse.fail(3, "获取微信OpenId失败");
@@ -81,5 +84,12 @@ public class AuthController extends BaseWXApiController {
         UserToken userToken = getUserToken();
         userTokenService.unBind(userToken);
         return RestResponse.ok();
+    }
+
+    private String resolveBindOpenId(BindInfo model) {
+        if (StringUtils.isBlank(systemConfig.getWx().getSecret())) {
+            return "dev-" + model.getUserName();
+        }
+        return WxUtil.getOpenId(systemConfig.getWx().getAppid(), systemConfig.getWx().getSecret(), model.getCode());
     }
 }
