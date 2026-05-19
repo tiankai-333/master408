@@ -281,11 +281,12 @@ onMounted(() => {
 
 @media screen and (max-width: 768px) {
   .paper-container {
-    padding: 15px;
+    padding: 12px;
   }
 
   .paper-header {
-    padding: 30px 20px;
+    padding: 20px;
+    border-radius: 18px;
 
     h2 {
       font-size: 24px;
@@ -293,7 +294,42 @@ onMounted(() => {
   }
 
   .paper-content {
-    padding: 15px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .subject-tabs {
+    :deep(.el-tabs__header) {
+      float: none;
+      width: 100%;
+      margin: 0 0 14px 0;
+      padding: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      background: transparent;
+    }
+
+    :deep(.el-tabs__nav) {
+      display: flex;
+      min-width: max-content;
+      transform: none !important;
+      white-space: nowrap;
+    }
+
+    :deep(.el-tabs__item) {
+      height: 40px;
+      line-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+    }
+
+    :deep(.el-tabs__content) {
+      overflow: visible;
+    }
+  }
+
+  .tab-content {
+    padding: 0;
   }
 }
 </style>

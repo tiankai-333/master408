@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.RagDocumentMapper">
+
+    <resultMap id="ChunkResultMap" type="com.mindskip.xzs.domain.rag.RagChunkRecord">
+        <id column="id" property="id"/>
+        <result column="document_id" property="documentId"/>
+        <result column="chunk_index" property="chunkIndex"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="content_text" property="contentText"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="knowledge_point_id" property="knowledgePointId"/>
+        <result column="citation_label" property="citationLabel"/>
+        <result column="source_position" property="sourcePosition"/>
+        <result column="vector_id" property="vectorId"/>
+    </resultMap>
+
+    <insert id="backfillDocumentsFromLegacyKnowledgeBase">
+        INSERT INTO rag_document (
+            document_type, title, summary, subject_id, knowledge_point_id,
+            source_type, source_name, source_ref, permission_scope, version,
+            content_hash, status, legacy_knowledge_base_id, create_user
+        )
+        SELECT
+            'knowledge_base',
+            kb.title,
+            kb.core_concepts,
+            NULL,
+            COALESCE(kp_title.id, kp_sub.id),
+            kb.source_type,
+            kb.source_name,
+            CONCAT('t_ai_knowledge_base:', kb.id),
+            'public',
+            1,
+            COALESCE(kb.content_hash, SHA2(CONCAT_WS('|', kb.id, kb.title, kb.content), 256)),
+            IF(kb.enabled = b'1', 'ready', 'disabled'),
+            kb.id,
+            kb.create_user
+        FROM t_ai_knowledge_base kb
+        LEFT JOIN (
+          SELECT name COLLATE utf8mb4_unicode_ci AS name_key, MIN(id) AS id
+          FROM knowledge_point
+          GROUP BY name COLLATE utf8mb4_unicode_ci
+        ) kp_title ON kp_title.name_key = kb.title COLLATE utf8mb4_unicode_ci
+        LEFT JOIN (
+          SELECT name COLLATE utf8mb4_unicode_ci AS name_key, MIN(id) AS id
+          FROM knowledge_point
+          GROUP BY name COLLATE utf8mb4_unicode_ci
+        ) kp_sub ON kp_sub.name_key = kb.sub_domain COLLATE utf8mb4_unicode_ci
+        WHERE kb.deleted = b'0'
+          AND NOT EXISTS (
+              SELECT 1 FROM rag_document rd WHERE rd.legacy_knowledge_base_id = kb.id
+          )
+    </insert>
+
+    <insert id="backfillChunksFromLegacyKnowledgeBase">
+        INSERT INTO rag_chunk (
+            document_id, chunk_index, content, content_text, token_count,
+            subject_id, knowledge_point_id, citation_label, source_position,
+            content_hash, enabled
+        )
+        SELECT
+            rd.id,
+            COALESCE(kb.chunk_index, 0),
+            kb.content,
+            kb.content,
+            CHAR_LENGTH(kb.content),
+            rd.subject_id,
+            rd.knowledge_point_id,
+            kb.title,
+            rd.source_ref,
+            COALESCE(kb.content_hash, SHA2(CONCAT_WS('|', kb.id, kb.title, kb.content), 256)),
+            kb.enabled
+        FROM rag_document rd
+        JOIN t_ai_knowledge_base kb ON kb.id = rd.legacy_knowledge_base_id
+        WHERE kb.deleted = b'0'
+          AND kb.content IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM rag_chunk rc
+              WHERE rc.document_id = rd.id AND rc.chunk_index = COALESCE(kb.chunk_index, 0)
+          )
+    </insert>
+
+    <select id="selectIndexableChunks" resultMap="ChunkResultMap">
+        SELECT
+            rc.id, rc.document_id, rc.chunk_index, rd.title, rc.content, rc.content_text,
+            rc.subject_id, rc.knowledge_point_id, rc.citation_label, rc.source_position,
+            CAST(rc.id AS CHAR) AS vector_id
+        FROM rag_chunk rc
+        JOIN rag_document rd ON rd.id = rc.document_id
+        LEFT JOIN rag_embedding re
+          ON re.chunk_id = rc.id
+         AND re.vector_store = 'qdrant'
+         AND re.status = 'indexed'
+        WHERE rc.enabled = b'1'
+          AND rd.status = 'ready'
+          AND re.id IS NULL
+        ORDER BY rc.id ASC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="upsertEmbeddingMetadata">
+        INSERT INTO rag_embedding (
+            chunk_id, embedding_model, embedding_dimension, vector_store,
+            collection_name, vector_id, payload_hash, indexed_at, status, error_message
+        ) VALUES (
+            #{chunkId}, #{embeddingModel}, #{embeddingDimension}, #{vectorStore},
+            #{collectionName}, #{vectorId},
+            SHA2(CONCAT_WS('|', #{chunkId}, #{embeddingModel}, #{collectionName}, #{vectorId}), 256),
+            IF(#{status} = 'indexed', NOW(), NULL),
+            #{status}, #{errorMessage}
+        )
+        ON DUPLICATE KEY UPDATE
+            embedding_dimension = VALUES(embedding_dimension),
+            vector_store = VALUES(vector_store),
+            vector_id = VALUES(vector_id),
+            payload_hash = VALUES(payload_hash),
+            indexed_at = VALUES(indexed_at),
+            status = VALUES(status),
+            error_message = VALUES(error_message),
+            update_time = NOW()
+    </insert>
+</mapper>

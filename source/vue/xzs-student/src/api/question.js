@@ -1,4 +1,4 @@
-import { form, post } from '@/utils/request'
+import { form, post, postStream } from '@/utils/request'
 
 export default {
   analyzeImage: (formData) => {
@@ -6,5 +6,8 @@ export default {
   },
   analyzeQuestion: (params) => {
     return post('/api/student/question/analyze-question', params)
+  },
+  analyzeQuestionStream: (params, handlers) => {
+    return postStream('/api/student/question/analyze-question-stream', params, handlers)
   }
 }

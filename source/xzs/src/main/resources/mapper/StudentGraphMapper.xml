@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.StudentGraphMapper">
+
+    <insert id="insertEvent" parameterType="com.mindskip.xzs.domain.student.StudentLearningEvent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student_learning_event (
+            user_id, event_type, target_type, target_id, question_id, knowledge_point_id,
+            exam_paper_answer_id, customer_answer_id, is_correct, score_rate,
+            duration_seconds, summary, metadata
+        ) VALUES (
+            #{userId}, #{eventType}, #{targetType}, #{targetId}, #{questionId}, #{knowledgePointId},
+            #{examPaperAnswerId}, #{customerAnswerId}, #{correct}, #{scoreRate},
+            #{durationSeconds}, #{summary}, #{metadata}
+        )
+    </insert>
+
+    <insert id="upsertKnowledgeStateFromEvent">
+        INSERT INTO student_knowledge_state (
+            user_id, knowledge_point_id, mastery, confidence,
+            attempt_count, correct_count, wrong_count, last_event_time
+        ) VALUES (
+            #{userId}, #{knowledgePointId},
+            IF(#{correct}, 0.6500, 0.2500),
+            0.3000,
+            1,
+            IF(#{correct}, 1, 0),
+            IF(#{correct}, 0, 1),
+            NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            attempt_count = attempt_count + 1,
+            correct_count = correct_count + IF(#{correct}, 1, 0),
+            wrong_count = wrong_count + IF(#{correct}, 0, 1),
+            mastery = LEAST(1.0000, GREATEST(0.0000, mastery + IF(#{correct}, 0.0600, -0.1000))),
+            confidence = LEAST(1.0000, confidence + 0.0300),
+            last_event_time = NOW(),
+            update_time = NOW()
+    </insert>
+
+    <insert id="upsertMistakeFromEvent" parameterType="com.mindskip.xzs.domain.student.StudentLearningEvent">
+        INSERT INTO student_mistake_book (
+            user_id, question_id, knowledge_point_id, first_wrong_answer_id,
+            last_answer_id, status, wrong_count, last_wrong_time, next_review_time
+        ) VALUES (
+            #{userId}, #{questionId}, #{knowledgePointId}, #{customerAnswerId},
+            #{customerAnswerId}, 'open', 1, NOW(), DATE_ADD(NOW(), INTERVAL 1 DAY)
+        )
+        ON DUPLICATE KEY UPDATE
+            knowledge_point_id = COALESCE(VALUES(knowledge_point_id), knowledge_point_id),
+            last_answer_id = VALUES(last_answer_id),
+            status = 'open',
+            wrong_count = wrong_count + 1,
+            last_wrong_time = NOW(),
+            next_review_time = DATE_ADD(NOW(), INTERVAL 1 DAY),
+            update_time = NOW()
+    </insert>
+</mapper>

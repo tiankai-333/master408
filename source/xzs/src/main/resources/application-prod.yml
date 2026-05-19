@@ -7,3 +7,11 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+ai:
+  rag:
+    vector:
+      enabled: true
+      qdrant:
+        url: http://qdrant:6333
+        collection: xzs_408_chunks

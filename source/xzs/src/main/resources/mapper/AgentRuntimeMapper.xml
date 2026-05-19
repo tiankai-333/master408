@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.AgentRuntimeMapper">
+
+    <select id="selectAgentByCode" resultType="java.util.HashMap">
+        SELECT *
+        FROM ai_agent
+        WHERE code = #{code}
+          AND enabled = b'1'
+        LIMIT 1
+    </select>
+
+    <select id="selectSkillsByAgentCode" resultType="java.util.HashMap">
+        SELECT s.*
+        FROM ai_agent a
+        JOIN ai_agent_skill aks ON aks.agent_id = a.id AND aks.enabled = b'1'
+        JOIN ai_skill s ON s.id = aks.skill_id AND s.enabled = b'1'
+        WHERE a.code = #{code}
+          AND a.enabled = b'1'
+        ORDER BY aks.sort_order ASC, s.id ASC
+    </select>
+
+    <insert id="insertRunLog" parameterType="com.mindskip.xzs.domain.ai.AgentRunRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_run_log (
+            agent_id, skill_id, user_id, session_id, request_text, response_text,
+            retrieval_log_id, tool_call_json, model_name, prompt_tokens,
+            completion_tokens, latency_ms, cost_amount, status, error_message
+        ) VALUES (
+            #{agentId}, #{skillId}, #{userId}, #{sessionId}, #{requestText}, #{responseText},
+            #{retrievalLogId}, #{toolCallJson}, #{modelName}, #{promptTokens},
+            #{completionTokens}, #{latencyMs}, #{costAmount}, #{status}, #{errorMessage}
+        )
+    </insert>
+</mapper>

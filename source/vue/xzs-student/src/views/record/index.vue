@@ -19,53 +19,55 @@
               </div>
             </template>
 
-            <el-table
-              v-loading="listLoading"
-              :data="tableData"
-              fit
-              highlight-current-row
-              style="width: 100%"
-              @row-click="itemSelect"
-              class="record-table"
-              :header-cell-style="{ background: '#f8f9fa', color: '#1f2f3d', fontWeight: '600' }"
-            >
-              <el-table-column prop="id" label="序号" width="80">
-                <template #default="{ $index }">
-                  <span class="row-index">{{ $index + 1 }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="paperName" label="试卷名称">
-                <template #default="{ row }">
-                  <div class="paper-name">
-                    <el-icon><Notebook /></el-icon>
-                    <span>{{ row.paperName }}</span>
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="subjectName" label="学科" width="100">
-                <template #default="{ row }">
-                  <el-tag type="info" size="small">{{ row.subjectName }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="状态" prop="status" width="100">
-                <template #default="{ row }">
-                  <el-tag :type="statusTagFormatter(row.status)" size="small">
-                    {{ statusTextFormatter(row.status) }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="createTime" label="考试时间" width="160" />
-              <el-table-column align="right" width="120">
-                <template #default="{ row }">
-                  <router-link target="_blank" :to="{ path: '/edit', query: { id: row.id } }" v-if="row.status === 1">
-                    <el-button type="warning" size="small" class="action-btn">批改</el-button>
-                  </router-link>
-                  <router-link target="_blank" :to="{ path: '/read', query: { id: row.id } }" v-if="row.status === 2">
-                    <el-button type="primary" size="small" class="action-btn">查看</el-button>
-                  </router-link>
-                </template>
-              </el-table-column>
-            </el-table>
+            <div class="mobile-table-scroll">
+              <el-table
+                v-loading="listLoading"
+                :data="tableData"
+                fit
+                highlight-current-row
+                style="width: 100%"
+                @row-click="itemSelect"
+                class="record-table"
+                :header-cell-style="{ background: '#f8f9fa', color: '#1f2f3d', fontWeight: '600' }"
+              >
+                <el-table-column prop="id" label="序号" width="70">
+                  <template #default="{ $index }">
+                    <span class="row-index">{{ $index + 1 }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="paperName" label="试卷名称" min-width="220">
+                  <template #default="{ row }">
+                    <div class="paper-name">
+                      <el-icon><Notebook /></el-icon>
+                      <span>{{ row.paperName }}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="subjectName" label="学科" width="92">
+                  <template #default="{ row }">
+                    <el-tag type="info" size="small">{{ row.subjectName }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="状态" prop="status" width="92">
+                  <template #default="{ row }">
+                    <el-tag :type="statusTagFormatter(row.status)" size="small">
+                      {{ statusTextFormatter(row.status) }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="createTime" label="考试时间" width="150" />
+                <el-table-column align="right" width="108">
+                  <template #default="{ row }">
+                    <router-link target="_blank" :to="{ path: '/edit', query: { id: row.id } }" v-if="row.status === 1">
+                      <el-button type="warning" size="small" class="action-btn">批改</el-button>
+                    </router-link>
+                    <router-link target="_blank" :to="{ path: '/read', query: { id: row.id } }" v-if="row.status === 2">
+                      <el-button type="primary" size="small" class="action-btn">查看</el-button>
+                    </router-link>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
 
             <pagination
               v-show="total > 0"
@@ -223,6 +225,12 @@ onMounted(() => {
   .action-btn { border-radius: 16px; padding: 6px 12px; }
 }
 
+.mobile-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .record-info-card {
   .info-content { padding: 10px 0; }
   .info-item {
@@ -266,5 +274,28 @@ onMounted(() => {
 @media screen and (max-width: 992px) {
   .el-col-16, .el-col-8 { width: 100%; }
   .el-col-8 { margin-top: 20px; }
+}
+
+@media screen and (max-width: 768px) {
+  .record-container { padding: 12px; }
+  .record-header { padding: 20px; border-radius: 18px;
+    h2 { font-size: 24px; }
+  }
+  .record-table { min-width: 642px; }
+  .record-table .paper-name {
+    align-items: flex-start;
+    span { white-space: normal; overflow-wrap: anywhere; line-height: 1.45; }
+  }
+  .record-info-card .info-item {
+    gap: 10px;
+    .info-label { min-width: 0; }
+    .info-value { flex-shrink: 0; }
+  }
+  .custom-pagination {
+    margin-top: 18px;
+    padding: 12px 0 0;
+    overflow-x: auto;
+    :deep(.el-pagination) { justify-content: flex-start; gap: 4px; min-width: max-content; }
+  }
 }
 </style>

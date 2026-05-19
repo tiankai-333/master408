@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.QuestionContentMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.canonical.QuestionContent">
+        <id column="id" property="id"/>
+        <result column="question_id" property="questionId"/>
+        <result column="version" property="version"/>
+        <result column="title" property="title"/>
+        <result column="options" property="options"/>
+        <result column="correct_answer" property="correctAnswer"/>
+        <result column="analysis" property="analysis"/>
+        <result column="title_text" property="titleText"/>
+        <result column="analysis_text" property="analysisText"/>
+        <result column="content_format" property="contentFormat"/>
+        <result column="has_image" property="hasImage"/>
+        <result column="has_code" property="hasCode"/>
+        <result column="legacy_text_content_id" property="legacyTextContentId"/>
+        <result column="source_hash" property="sourceHash"/>
+        <result column="is_current" property="current"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectCurrentByQuestionId" resultMap="BaseResultMap">
+        SELECT *
+        FROM question_content
+        WHERE question_id = #{questionId}
+          AND is_current = b'1'
+        ORDER BY version DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.canonical.QuestionContent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO question_content (
+            question_id, version, title, options, correct_answer, analysis,
+            title_text, analysis_text, content_format, has_image, has_code,
+            legacy_text_content_id, source_hash, is_current
+        ) VALUES (
+            #{questionId}, #{version}, #{title}, #{options}, #{correctAnswer}, #{analysis},
+            #{titleText}, #{analysisText}, #{contentFormat}, #{hasImage}, #{hasCode},
+            #{legacyTextContentId}, #{sourceHash}, #{current}
+        )
+    </insert>
+
+    <select id="selectMaxVersion" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(version), 0)
+        FROM question_content
+        WHERE question_id = #{questionId}
+    </select>
+
+    <update id="clearCurrent">
+        UPDATE question_content
+        SET is_current = b'0'
+        WHERE question_id = #{questionId}
+          AND is_current = b'1'
+    </update>
+
+    <insert id="backfillFromLegacy">
+        INSERT INTO question_content (
+            question_id, version, title, options, correct_answer, analysis,
+            title_text, analysis_text, content_format, has_image, has_code,
+            legacy_text_content_id, source_hash, is_current
+        )
+        SELECT
+            q.id,
+            1,
+            COALESCE(q.title, IF(JSON_VALID(tc.content), JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')), NULL), tc.content),
+            q.options,
+            COALESCE(q.correct_answer, q.correct),
+            COALESCE(q.analysis, IF(JSON_VALID(tc.content), JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.analyze')), NULL)),
+            q.title_text,
+            q.analysis_text,
+            COALESCE(q.content_format, 'html'),
+            COALESCE(q.has_image, b'0'),
+            COALESCE(q.has_code, b'0'),
+            q.info_text_content_id,
+            SHA2(CONCAT_WS('|', q.id, COALESCE(q.title, ''), COALESCE(q.options, ''), COALESCE(q.correct_answer, q.correct, ''), COALESCE(q.analysis, ''), COALESCE(tc.content, '')), 256),
+            b'1'
+        FROM t_question q
+        LEFT JOIN t_text_content tc ON tc.id = q.info_text_content_id
+        WHERE q.deleted = b'0'
+          AND NOT EXISTS (
+              SELECT 1 FROM question_content qc
+              WHERE qc.question_id = q.id AND qc.version = 1
+          )
+    </insert>
+
+    <select id="countCurrent" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM question_content WHERE is_current = b'1'
+    </select>
+</mapper>

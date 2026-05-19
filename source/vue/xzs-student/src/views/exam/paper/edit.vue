@@ -133,4 +133,34 @@ onMounted(() => {
   :deep(.el-form-item__label) { font-size: 15px !important; }
 }
 .question-title-padding { padding-left: 25px; padding-right: 25px; }
+
+@media screen and (max-width: 768px) {
+  .align-center {
+    height: auto;
+    padding: 14px 0 8px;
+
+    h1 {
+      margin: 8px 0;
+      font-size: 22px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  :deep(.el-main) {
+    padding-top: 10px;
+  }
+
+  :deep(.el-form) {
+    width: 100%;
+  }
+
+  .exam-question-item {
+    padding: 8px 0;
+  }
+
+  :deep(.el-card__body) {
+    padding: 14px;
+  }
+}
 </style>

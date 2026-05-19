@@ -5,15 +5,19 @@ body {
   text-rendering: optimizeLegibility;
   font-family: 'Segoe UI', system-ui, -apple-system, Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
   background-color: #f5f7fb;
+  overflow-x: hidden;
 }
 
 html {
   height: 100%;
   box-sizing: border-box;
+  width: 100%;
 }
 
 #app {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 *,
@@ -79,11 +83,37 @@ html {
 
 @media only screen and (max-width: 768px) {
   .app-item-contain {
-    padding: 30px 0px 0px 0px;
+    padding: 16px 10px 0px 10px;
   }
 
   .app-contain {
-    padding: 30px 0px 0px 0px;
+    padding: 16px 10px 0px 10px;
+  }
+
+  .student-main {
+    min-width: 0;
+  }
+
+  .el-main {
+    min-width: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .el-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .el-col {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .el-card__body,
+  .el-card__header {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }
 
@@ -129,6 +159,29 @@ html {
   .el-checkbox__input {
     line-height: 1.8;
     vertical-align: top;
+  }
+}
+
+.q-title,
+.q-content,
+.q-item-content,
+.q-item-span-content {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+
+  img,
+  table,
+  pre {
+    max-width: 100%;
+  }
+
+  img {
+    height: auto;
+  }
+
+  table,
+  pre {
+    overflow-x: auto;
   }
 }
 
@@ -240,12 +293,15 @@ html {
   background: #fff6f6;
   z-index: 999;
   padding: 5px 0px;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .do-exam-title-hidden {
   width: 100%;
   visibility: hidden;
   padding: 5px 0px;
+  white-space: nowrap;
 }
 
 .do-exam-title-tag {
@@ -258,6 +314,76 @@ html {
   line-height: 2;
   font-size: 14px;
   padding-right: 5px;
+}
+
+@media only screen and (max-width: 768px) {
+  .q-content {
+    margin: 10px 0 14px 0;
+  }
+
+  .q-title {
+    margin: 5px 0 0;
+  }
+
+  .q-item-prefix {
+    margin: 5px 6px 5px 0;
+  }
+
+  .question-prefix {
+    padding-right: 8px;
+  }
+
+  .gapfilling-span {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0 10px;
+    margin: 4px 0;
+  }
+
+  .do-exam-title {
+    padding: 6px 8px;
+  }
+
+  .do-exam-time {
+    float: none;
+    display: inline-block;
+    margin-left: 8px;
+    padding-right: 0;
+  }
+
+  .question-title-padding {
+    display: block;
+    padding: 4px 0;
+  }
+
+  .exam-question-item {
+    padding: 8px 0;
+  }
+
+  .exam-question-item .el-form-item__content {
+    min-width: 0;
+    display: block;
+  }
+
+  .exam-question-item .el-radio,
+  .exam-question-item .el-checkbox {
+    height: auto;
+    min-height: 32px;
+    margin-right: 0;
+    white-space: normal;
+    align-items: flex-start;
+  }
+
+  .exam-question-item .el-radio-group,
+  .exam-question-item .el-checkbox-group {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .exampaper-item-box {
+    width: 100%;
+  }
 }
 
 .do-align-center {

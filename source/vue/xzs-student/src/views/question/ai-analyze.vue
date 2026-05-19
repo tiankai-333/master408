@@ -207,7 +207,33 @@ const parseQuestionItem = (item) => {
   .el-icon { margin-right: 10px; }
 }
 @media screen and (max-width: 768px) {
+  .ai-analyze-container { padding: 12px; }
+  .ai-header {
+    padding: 20px;
+    border-radius: 18px;
+  }
   .ai-content { grid-template-columns: 1fr; }
   .ai-header h1 { font-size: 26px; }
+  .upload-section,
+  .result-section {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .upload-area {
+    padding: 28px 14px;
+  }
+  .result-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    .el-button { width: 100%; }
+  }
+  .result-card {
+    padding: 18px 14px;
+  }
+  .options-list {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
 }
 </style>

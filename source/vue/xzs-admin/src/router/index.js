@@ -21,6 +21,13 @@ const constantRoutes = [
     meta: { title: '登录' }
   },
   {
+    path: '/developer',
+    name: 'DeveloperBrief',
+    hidden: true,
+    component: () => import('@/views/developer/index.vue'),
+    meta: { title: '开发者说明' }
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
@@ -252,6 +259,24 @@ const constantRoutes = [
     ]
   },
   {
+    path: '/ai',
+    component: Layout,
+    name: 'AiPage',
+    meta: {
+      title: 'AI 管理',
+      icon: 'skill'
+    },
+    alwaysShow: true,
+    children: [
+      {
+        path: 'config',
+        component: () => import('@/views/ai/config.vue'),
+        name: 'AiConfigPage',
+        meta: { title: '密钥与用量', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/profile',
     component: Layout,
     hidden: true,
@@ -273,7 +298,7 @@ const constantRoutes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: constantRoutes
 })
 

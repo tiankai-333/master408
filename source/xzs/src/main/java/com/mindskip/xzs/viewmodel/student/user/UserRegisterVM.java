@@ -2,9 +2,10 @@ package com.mindskip.xzs.viewmodel.student.user;
 
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 public class UserRegisterVM {
+
+    private static final int DEFAULT_USER_LEVEL = 1;
 
     @NotBlank
     private String userName;
@@ -12,7 +13,6 @@ public class UserRegisterVM {
     @NotBlank
     private String password;
 
-    @NotNull
     private Integer userLevel;
 
     public String getUserName() {
@@ -32,7 +32,7 @@ public class UserRegisterVM {
     }
 
     public Integer getUserLevel() {
-        return userLevel;
+        return userLevel == null ? DEFAULT_USER_LEVEL : userLevel;
     }
 
     public void setUserLevel(Integer userLevel) {

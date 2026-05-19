@@ -1,10 +1,13 @@
 <wxs module="enumItem" src="../../../wxs/enumItem.wxs"></wxs>
-<view class="card-image-container">
-  <image src="/assets/logo2.png" style="width:175px;height:147px"></image>
+<view class="auth-page">
+<view class="brand-card">
+  <view class="brand-mark">408</view>
+  <view class="brand-name">创建 408Master 账号</view>
+  <view class="brand-subtitle">保存你的刷题记录、错题回顾和学习进度</view>
 </view>
 
 <form bindsubmit='formSubmit'>
-  <i-panel title="用户名">
+  <i-panel title="账号">
     <i-input value="{{ userName }}" name="userName" maxlength="-1" />
   </i-panel>
 
@@ -22,5 +25,6 @@
   </view>
   <i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
 </form>
+</view>
 
 <i-message id="message" />

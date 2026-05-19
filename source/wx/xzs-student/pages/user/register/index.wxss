@@ -1,9 +1,44 @@
 /* pages/user/register/index.wxss */
 
-.card-image-container {
-  align-items: center;
-  display: flex;
-  justify-content: center;
+.auth-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding: 36rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.brand-card {
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 46rpx 36rpx 42rpx;
+  margin-bottom: 28rpx;
+  box-shadow: 0 10rpx 30rpx rgba(21, 45, 92, 0.08);
+  text-align: center;
+}
+
+.brand-mark {
+  width: 124rpx;
+  height: 124rpx;
+  line-height: 124rpx;
+  margin: 0 auto 22rpx;
+  border-radius: 28rpx;
+  background: #1677ff;
+  color: #ffffff;
+  font-size: 42rpx;
+  font-weight: 700;
+}
+
+.brand-name {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #17233d;
+}
+
+.brand-subtitle {
+  margin-top: 14rpx;
+  color: #6b7280;
+  font-size: 26rpx;
+  line-height: 1.6;
 }
 
 
