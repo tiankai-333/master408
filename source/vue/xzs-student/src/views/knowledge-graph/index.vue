@@ -206,7 +206,7 @@
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowDown, Edit, MagicStick, Search } from '@element-plus/icons-vue'
-import { get, post } from '@/utils/request'
+import { get, post, postStream } from '@/utils/request'
 
 const router = useRouter()
 
@@ -669,6 +669,8 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
   const knowledgeText = getKnowledgeText()
 
   messages.value.push({ role: 'user', content: userQuestion })
+  const assistantMessage = { role: 'assistant', content: '' }
+  messages.value.push(assistantMessage)
   inputMessage.value = ''
   isTyping.value = true
 
@@ -676,12 +678,54 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
   scrollToBottom()
 
   try {
-    const response = await post('/api/student/ai/analyze', {
+    let received = ''
+    let references = []
+    await postStream('/api/student/ai/analyze-stream', {
       style: selectedStyle.value,
       taskType,
       question: userQuestion,
       knowledgePoints: knowledgeText
+    }, {
+      onStatus: (status) => {
+        if (!received) updateAssistantMessage(assistantMessage, status)
+        nextTick().then(scrollToBottom)
+      },
+      onReferences: (raw) => {
+        try {
+          references = JSON.parse(raw) || []
+        } catch (e) {
+          references = []
+        }
+      },
+      onChunk: (chunk) => {
+        if (!received) updateAssistantMessage(assistantMessage, '')
+        received += chunk
+        updateAssistantMessage(assistantMessage, received)
+        nextTick().then(scrollToBottom)
+      },
+      onError: (message) => {
+        throw new Error(message || 'AI分析失败')
+      }
     })
+
+    if (!received.trim()) {
+      throw new Error('AI返回内容为空')
+    }
+    if (references.length > 0) {
+      let contentWithReferences = assistantMessage.content + '\n\n---\n参考来源\n'
+      references.forEach((ref, idx) => {
+        contentWithReferences += `\n${idx + 1}. [${ref.similarity}] ${ref.title}`
+      })
+      updateAssistantMessage(assistantMessage, contentWithReferences)
+    }
+  } catch (streamError) {
+    try {
+      const response = await post('/api/student/ai/analyze', {
+        style: selectedStyle.value,
+        taskType,
+        question: userQuestion,
+        knowledgePoints: knowledgeText
+      })
 
     if (response.code === 1) {
       const result = response.response || {}
@@ -692,17 +736,23 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
           content += `\n${idx + 1}. [${ref.similarity}] ${ref.title}`
         })
       }
-      messages.value.push({ role: 'assistant', content })
+        updateAssistantMessage(assistantMessage, content)
     } else {
-      messages.value.push({ role: 'assistant', content: fallbackAnswer(userQuestion) })
+        updateAssistantMessage(assistantMessage, fallbackAnswer(userQuestion))
+      }
+    } catch (error) {
+      updateAssistantMessage(assistantMessage, fallbackAnswer(userQuestion))
     }
-  } catch (error) {
-    messages.value.push({ role: 'assistant', content: fallbackAnswer(userQuestion) })
   } finally {
     isTyping.value = false
     await nextTick()
     scrollToBottom()
   }
+}
+
+const updateAssistantMessage = (message, content) => {
+  message.content = content
+  messages.value = messages.value.slice()
 }
 
 const fallbackAnswer = (question) => {
@@ -731,20 +781,38 @@ const escapeHtml = (text) => {
 const renderInlineMarkdown = (text) => {
   return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+}
+
+const normalizeMarkdown = (content) => {
+  return content
+    .replace(/\r\n/g, '\n')
+    .replace(/([^\n])\s*(#{1,4})(?=\S)/g, '$1\n\n$2 ')
+    .replace(/^(#{1,4})(\S)/gm, '$1 $2')
+    .replace(/([。；;：:！!?？])\s*(\d+\.\s*\S)/g, '$1\n$2')
 }
 
 const renderMarkdown = (content) => {
-  const lines = content.replace(/\r\n/g, '\n').split('\n')
+  const lines = normalizeMarkdown(content).split('\n')
   const html = []
-  let inList = false
+  let listType = ''
   let inCode = false
   const codeLines = []
 
   const closeList = () => {
-    if (inList) {
-      html.push('</ul>')
-      inList = false
+    if (listType) {
+      html.push(`</${listType}>`)
+      listType = ''
+    }
+  }
+
+  const openList = (type) => {
+    if (listType !== type) {
+      closeList()
+      html.push(`<${type}>`)
+      listType = type
     }
   }
 
@@ -782,20 +850,27 @@ const renderMarkdown = (content) => {
 
     const listItem = trimmed.match(/^[-*]\s+(.+)$/)
     if (listItem) {
-      if (!inList) {
-        html.push('<ul>')
-        inList = true
-      }
+      openList('ul')
       html.push(`<li>${renderInlineMarkdown(listItem[1])}</li>`)
+      return
+    }
+
+    if (/^---+$/.test(trimmed)) {
+      closeList()
+      html.push('<hr>')
+      return
+    }
+
+    const quote = trimmed.match(/^>\s+(.+)$/)
+    if (quote) {
+      closeList()
+      html.push(`<blockquote>${renderInlineMarkdown(quote[1])}</blockquote>`)
       return
     }
 
     const numberedItem = trimmed.match(/^\d+\.\s+(.+)$/)
     if (numberedItem) {
-      if (!inList) {
-        html.push('<ul>')
-        inList = true
-      }
+      openList('ol')
       html.push(`<li>${renderInlineMarkdown(numberedItem[1])}</li>`)
       return
     }
@@ -1144,7 +1219,8 @@ onMounted(async () => {
     margin: 8px 0;
   }
 
-  :deep(ul) {
+  :deep(ul),
+  :deep(ol) {
     margin: 8px 0;
     padding-left: 20px;
   }

@@ -1,8 +1,8 @@
 <!--pages/exam/index/index.wxml-->
 <view>
 	<i-tabs current="{{ paperType }}" bindchange="tabChange" fixed="true">
-		<i-tab key="1" title="固定试卷" />
-		<i-tab key="4" title="时段试卷" />
+		<i-tab key="1" title="专项练习" />
+		<i-tab key="4" title="限时训练" />
 	</i-tabs>
 	<view class="exam-tab-view">
 		<i-cell-group>

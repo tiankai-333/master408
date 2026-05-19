@@ -12,25 +12,27 @@
             <template #header>
               <div class="card-header"><el-icon><Document /></el-icon><span>错题列表</span></div>
             </template>
-            <el-table v-loading="listLoading" :data="tableData" fit highlight-current-row style="width: 100%" @row-click="itemSelect" class="question-table"
-              :header-cell-style="{ background: '#f8f9fa', color: '#1f2f3d', fontWeight: '600' }">
-              <el-table-column prop="shortTitle" label="题干" show-overflow-tooltip>
-                <template #default="{ row }">
-                  <div class="question-title"><el-icon><Edit /></el-icon><span>{{ row.shortTitle }}</span></div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="questionType" label="题型" width="90">
-                <template #default="{ row }">
-                  <el-tag type="warning" size="small">{{ questionTypeFormatter(row.questionType) }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="subjectName" label="学科" width="80">
-                <template #default="{ row }">
-                  <el-tag type="info" size="small">{{ row.subjectName }}</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="createTime" label="做题时间" width="160" />
-            </el-table>
+            <div class="mobile-table-scroll">
+              <el-table v-loading="listLoading" :data="tableData" fit highlight-current-row style="width: 100%" @row-click="itemSelect" class="question-table"
+                :header-cell-style="{ background: '#f8f9fa', color: '#1f2f3d', fontWeight: '600' }">
+                <el-table-column prop="shortTitle" label="题干" min-width="220" show-overflow-tooltip>
+                  <template #default="{ row }">
+                    <div class="question-title"><el-icon><Edit /></el-icon><span>{{ row.shortTitle }}</span></div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="questionType" label="题型" width="88">
+                  <template #default="{ row }">
+                    <el-tag type="warning" size="small">{{ questionTypeFormatter(row.questionType) }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="subjectName" label="学科" width="78">
+                  <template #default="{ row }">
+                    <el-tag type="info" size="small">{{ row.subjectName }}</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="createTime" label="做题时间" width="150" />
+              </el-table>
+            </div>
             <pagination v-show="total > 0" :total="total" :background="false" v-model:page="queryParam.pageIndex"
               :limit="queryParam.pageSize" @pagination="search" class="custom-pagination" />
           </el-card>
@@ -139,13 +141,17 @@ const qAnswerShow = (id) => {
   })
 }
 
-const analyzeQuestion = () => {
+const analyzeQuestion = async () => {
   if (!selectItem.value.questionItem) {
     ElMessage.warning('请先选择一道题目')
     return
   }
   aiAnalyzing.value = true
-  aiAnalysisResult.value = null
+  aiAnalysisResult.value = {
+    content: '',
+    isMarkdown: true,
+    styleName: aiStyles.value.find(s => s.id === selectedStyle.value)?.name
+  }
   const question = selectItem.value.questionItem
   const answer = selectItem.value.answerItem
   let options = ''
@@ -163,36 +169,172 @@ const analyzeQuestion = () => {
     default: questionType = '未知'
   }
   const titleContent = question.title || question.titleContent || question.content || ''
-  questionApi.analyzeQuestion({ questionType, questionContent: titleContent, options, correctAnswer, style: selectedStyle.value }).then(response => {
-    if (response.code === 1 && response.response) {
-      aiAnalysisResult.value = {
-        content: response.response,
-        isMarkdown: true,
-        styleName: aiStyles.value.find(s => s.id === selectedStyle.value)?.name
+  const payload = { questionType, questionContent: titleContent, options, correctAnswer, style: selectedStyle.value }
+  try {
+    let received = ''
+    await questionApi.analyzeQuestionStream(payload, {
+      onStatus: (status) => {
+        if (!received) updateAnalysisContent(status)
+      },
+      onChunk: (chunk) => {
+        if (!received) updateAnalysisContent('')
+        received += chunk
+        updateAnalysisContent(received)
+      },
+      onError: (message) => {
+        throw new Error(message || '分析失败')
       }
-    } else {
-      ElMessage.error(response.message || '分析失败')
+    })
+    if (!received.trim()) {
+      throw new Error('AI返回内容为空')
     }
-  }).catch(error => {
-    ElMessage.error('分析失败：' + (error.message || '网络错误'))
-  }).finally(() => {
+  } catch (streamError) {
+    try {
+      const response = await questionApi.analyzeQuestion(payload)
+      if (response.code === 1 && response.response) {
+        aiAnalysisResult.value = {
+          content: response.response,
+          isMarkdown: true,
+          styleName: aiStyles.value.find(s => s.id === selectedStyle.value)?.name
+        }
+      } else {
+        ElMessage.error(response.message || '分析失败')
+      }
+    } catch (error) {
+      ElMessage.error('分析失败：' + (error.message || streamError.message || '网络错误'))
+    }
+  } finally {
     aiAnalyzing.value = false
-  })
+  }
+}
+
+const updateAnalysisContent = (content) => {
+  aiAnalysisResult.value = {
+    ...(aiAnalysisResult.value || {}),
+    content,
+    isMarkdown: true,
+    styleName: aiStyles.value.find(s => s.id === selectedStyle.value)?.name
+  }
 }
 
 const formatMarkdown = (text) => {
   if (!text) return ''
-  let formatted = text
+  return renderMarkdown(String(text))
+}
+
+const escapeHtml = (text) => {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+const renderInlineMarkdown = (text) => {
+  return escapeHtml(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>')
-    .replace(/^###\s(.*)/gm, '<h3>$1</h3>')
-    .replace(/^##\s(.*)/gm, '<h2>$1</h2>')
-    .replace(/^#\s(.*)/gm, '<h1>$1</h1>')
-    .replace(/^\*\s(.*)/gm, '<li>$1</li>')
-    .replace(/^(\d+)\.\s(.*)/gm, '<li>$2</li>')
-  return formatted
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+}
+
+const normalizeMarkdown = (content) => {
+  return content
+    .replace(/\r\n/g, '\n')
+    .replace(/([^\n])\s*(#{1,4})(?=\S)/g, '$1\n\n$2 ')
+    .replace(/^(#{1,4})(\S)/gm, '$1 $2')
+    .replace(/([。；;：:！!?？])\s*(\d+\.\s*\S)/g, '$1\n$2')
+}
+
+const renderMarkdown = (content) => {
+  const lines = normalizeMarkdown(content).split('\n')
+  const html = []
+  let listType = ''
+  let inCode = false
+  const codeLines = []
+
+  const closeList = () => {
+    if (listType) {
+      html.push(`</${listType}>`)
+      listType = ''
+    }
+  }
+
+  const openList = (type) => {
+    if (listType !== type) {
+      closeList()
+      html.push(`<${type}>`)
+      listType = type
+    }
+  }
+
+  lines.forEach(line => {
+    if (line.trim().startsWith('```')) {
+      if (inCode) {
+        html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`)
+        codeLines.length = 0
+        inCode = false
+      } else {
+        closeList()
+        inCode = true
+      }
+      return
+    }
+
+    if (inCode) {
+      codeLines.push(line)
+      return
+    }
+
+    const trimmed = line.trim()
+    if (!trimmed) {
+      closeList()
+      return
+    }
+
+    if (/^---+$/.test(trimmed)) {
+      closeList()
+      html.push('<hr>')
+      return
+    }
+
+    const heading = trimmed.match(/^(#{1,4})\s+(.+)$/)
+    if (heading) {
+      closeList()
+      const level = Math.min(heading[1].length + 1, 4)
+      html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`)
+      return
+    }
+
+    const quote = trimmed.match(/^>\s+(.+)$/)
+    if (quote) {
+      closeList()
+      html.push(`<blockquote>${renderInlineMarkdown(quote[1])}</blockquote>`)
+      return
+    }
+
+    const listItem = trimmed.match(/^[-*]\s+(.+)$/)
+    if (listItem) {
+      openList('ul')
+      html.push(`<li>${renderInlineMarkdown(listItem[1])}</li>`)
+      return
+    }
+
+    const numberedItem = trimmed.match(/^\d+\.\s+(.+)$/)
+    if (numberedItem) {
+      openList('ol')
+      html.push(`<li>${renderInlineMarkdown(numberedItem[1])}</li>`)
+      return
+    }
+
+    closeList()
+    html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`)
+  })
+
+  closeList()
+  if (inCode) {
+    html.push(`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`)
+  }
+  return html.join('')
 }
 
 onMounted(() => {
@@ -238,6 +380,7 @@ onMounted(() => {
   }
   .question-answer-wrapper { padding: 20px; }
 }
+.mobile-table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .custom-pagination { margin-top: 30px; padding: 20px 0; text-align: center;
   :deep(.el-pagination) { display: inline-flex; gap: 10px;
     .btn-prev, .btn-next { border-radius: 8px; background: #fff; border: 1px solid #dcdfe6; transition: all 0.3s;
@@ -260,19 +403,59 @@ onMounted(() => {
     }
     .analysis-value { font-size: 14px; color: #333; line-height: 1.6; padding-left: 15px; }
     .markdown-content { font-size: 14px; color: #333; line-height: 1.8;
-      h1, h2, h3 { color: #667eea; margin: 15px 0 10px; font-weight: 600; }
-      h1 { font-size: 20px; }
-      h2 { font-size: 17px; }
-      h3 { font-size: 15px; }
-      li { margin-left: 20px; list-style: disc; }
-      code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
-      strong { color: #667eea; font-weight: 600; }
-      em { color: #764ba2; font-style: italic; }
+      :deep(h1), :deep(h2), :deep(h3), :deep(h4) { color: #475569; margin: 16px 0 8px; font-weight: 700; line-height: 1.35; }
+      :deep(h1) { font-size: 21px; }
+      :deep(h2) { font-size: 18px; }
+      :deep(h3) { font-size: 16px; }
+      :deep(h4) { font-size: 15px; }
+      :deep(h1:first-child), :deep(h2:first-child), :deep(h3:first-child), :deep(p:first-child) { margin-top: 0; }
+      :deep(p) { margin: 8px 0; }
+      :deep(ul), :deep(ol) { margin: 8px 0; padding-left: 22px; }
+      :deep(li) { margin: 5px 0; }
+      :deep(hr) { height: 1px; margin: 16px 0; border: 0; background: #e2e8f0; }
+      :deep(blockquote) { margin: 10px 0; padding: 8px 12px; border-left: 3px solid #7c3aed; background: #f8fafc; color: #475569; }
+      :deep(pre) { overflow-x: auto; margin: 10px 0; padding: 12px; border-radius: 10px; background: #0f172a; color: #e2e8f0; }
+      :deep(code) { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #334155; }
+      :deep(pre code) { background: transparent; padding: 0; color: inherit; }
+      :deep(strong) { color: #334155; font-weight: 700; }
+      :deep(em) { color: #7c3aed; font-style: italic; }
+      :deep(a) { color: #2563eb; text-decoration: none; border-bottom: 1px solid rgba(37, 99, 235, 0.35); }
     }
   }
 }
 @media screen and (max-width: 992px) {
   .el-col-14, .el-col-10 { width: 100%; }
   .el-col-10 { margin-top: 20px; }
+}
+@media screen and (max-width: 768px) {
+  .question-error-container { padding: 12px; }
+  .question-error-header { padding: 20px; border-radius: 18px;
+    h2 { font-size: 24px; }
+  }
+  .question-table { min-width: 536px; }
+  .question-list-card, .question-detail-card {
+    .card-header {
+      flex-wrap: wrap;
+      gap: 10px;
+      .ai-analyze-wrapper {
+        flex: 0 0 100%;
+        margin-left: 0;
+        align-items: stretch;
+      }
+      .style-select { width: 100%; }
+      .ai-analyze-btn { width: 100%; }
+    }
+  }
+  .question-list-card .question-table .question-title {
+    align-items: flex-start;
+    span { white-space: normal; overflow-wrap: anywhere; line-height: 1.45; }
+  }
+  .question-answer-wrapper { overflow-x: auto; }
+  .custom-pagination {
+    margin-top: 18px;
+    padding: 12px 0 0;
+    overflow-x: auto;
+    :deep(.el-pagination) { justify-content: flex-start; gap: 4px; min-width: max-content; }
+  }
 }
 </style>

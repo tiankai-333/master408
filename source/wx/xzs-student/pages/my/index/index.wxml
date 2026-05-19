@@ -1,7 +1,10 @@
 <view class="userinfo">
   <block>
     <image class="userinfo-avatar" src="{{info.imagePath}}"></image>
-    <text class="userinfo-nickname">{{info.userName}}</text>
+    <view class="userinfo-text">
+      <text class="userinfo-nickname">{{info.userName}}</text>
+      <text class="userinfo-subtitle">408Master 学习档案</text>
+    </view>
   </block>
 </view>
 <view>
@@ -9,7 +12,7 @@
     <i-cell title="个人资料" is-link url="/pages/my/info/index">
       <i-icon type="mine_fill" slot="icon" size="20" />
     </i-cell>
-    <i-cell title="个人动态" is-link url="/pages/my/log/index">
+    <i-cell title="学习动态" is-link url="/pages/my/log/index">
       <i-icon type="collection_fill" slot="icon" size="20" />
     </i-cell>
     <i-cell title="消息" is-link url="/pages/my/message/list/index">
@@ -20,7 +23,7 @@
 
 <view>
   <i-cell-group i-class="my-group-margin">
-    <i-cell title="设置" is-link url="/pages/dashboard/index">
+    <i-cell title="学习设置" is-link url="/pages/dashboard/index">
       <i-icon type="setup_fill" slot="icon" size="20" />
     </i-cell>
     <i-cell title="反馈" is-link url="/pages/dashboard/index">
@@ -40,7 +43,7 @@
   </i-cell-group>
 </view>
 
-<view class="copyright">开源地址: github.com/tiankai-333/master408 | 东华大学软工实训14小组</view>
+<view class="copyright">408Master | 计算机考研学习助手</view>
 
 <i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
 <i-message id="message" />

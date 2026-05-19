@@ -1,7 +1,8 @@
 {
   "description": "Project configuration file",
   "packOptions": {
-    "ignore": []
+    "ignore": [],
+    "include": []
   },
   "setting": {
     "urlCheck": false,
@@ -36,15 +37,20 @@
     "packNpmManually": false,
     "packNpmRelationList": [],
     "minifyWXSS": true,
-    "showES6CompileOption": false
+    "showES6CompileOption": false,
+    "compileWorklet": false,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true
   },
   "compileType": "miniprogram",
   "libVersion": "2.8.0",
-  "appid": "wxa0d64cf3de0cc0ce",
-  "projectname": "xzs-student",
-  "debugOptions": {
-    "hidedInDevtools": []
-  },
+  "appid": "wx217587125a29c7b5",
+  "projectname": "408Master",
   "isGameTourist": false,
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
@@ -65,5 +71,6 @@
     "miniprogram": {
       "list": []
     }
-  }
+  },
+  "editorSetting": {}
 }

@@ -40,7 +40,7 @@ CREATE TABLE `t_user` (
   `age` int DEFAULT NULL,
   `sex` int DEFAULT NULL,
   `birth_day` datetime DEFAULT NULL,
-  `user_level` int DEFAULT NULL,
+  `user_level` int DEFAULT 1,
   `phone` varchar(255) DEFAULT NULL,
   `role` int NOT NULL DEFAULT 1,
   `status` int NOT NULL DEFAULT 1,

@@ -50,3 +50,17 @@ Thumbs.db
 
 # Large files/PDFs
 *.pdf
+
+# Deploy runtime data
+deploy/mysql-data/
+deploy/qdrant-data/
+deploy/sql/
+deploy/static/
+deploy/*.jar
+
+# Claude Code
+.claude/settings.json
+
+# Python cache
+__pycache__/
+*.pyc

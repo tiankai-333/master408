@@ -340,27 +340,79 @@ watch(() => route.path, (to) => {
 @media screen and (max-width: 768px) {
   .student-header {
     height: auto !important;
+    overflow: visible;
 
     .header-content {
-      flex-direction: column;
-      padding: 10px 0;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px 10px;
+      padding: 10px 12px;
     }
 
-    .el-menu-title {
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
+    .logo-section {
+      margin-right: 0;
 
-      .el-menu-item {
-        flex: 1 0 50%;
-        text-align: center;
-        height: 50px;
-        line-height: 50px;
+      .logo-wrapper {
+        padding: 7px 10px;
+        gap: 8px;
+
+        .logo-icon {
+          width: 32px;
+          height: 32px;
+
+          .el-icon {
+            font-size: 18px;
+          }
+        }
+
+        .logo-text-container {
+          .logo-main {
+            font-size: 18px;
+          }
+
+          .logo-sub {
+            display: none;
+          }
+        }
       }
     }
 
     .head-user {
-      margin: 10px 0 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .el-menu-title {
+      order: 3;
+      flex: 0 0 100%;
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .el-menu-item {
+        flex: 0 0 auto;
+        min-width: 92px;
+        padding: 0 10px;
+        text-align: center;
+        height: 50px;
+        line-height: 50px;
+        font-size: 14px;
+
+        .el-icon {
+          margin-right: 5px;
+          font-size: 16px;
+        }
+      }
     }
   }
 }

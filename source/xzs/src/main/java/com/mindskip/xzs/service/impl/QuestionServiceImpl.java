@@ -3,12 +3,14 @@ package com.mindskip.xzs.service.impl;
 import com.mindskip.xzs.domain.other.KeyValue;
 import com.mindskip.xzs.domain.Question;
 import com.mindskip.xzs.domain.TextContent;
+import com.mindskip.xzs.domain.canonical.QuestionContent;
 import com.mindskip.xzs.domain.enums.QuestionStatusEnum;
 import com.mindskip.xzs.domain.enums.QuestionTypeEnum;
 import com.mindskip.xzs.domain.question.QuestionItemObject;
 import com.mindskip.xzs.domain.question.QuestionObject;
 import com.mindskip.xzs.repository.QuestionMapper;
 import com.mindskip.xzs.service.QuestionService;
+import com.mindskip.xzs.service.QuestionContentService;
 import com.mindskip.xzs.service.SubjectService;
 import com.mindskip.xzs.service.TextContentService;
 import com.mindskip.xzs.utility.DateTimeUtil;
@@ -41,6 +43,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
     private final QuestionMapper questionMapper;
     private final TextContentService textContentService;
     private final SubjectService subjectService;
+    private final QuestionContentService questionContentService;
 
     @Value("${ai.api.key}")
     private String aiApiKey;
@@ -52,11 +55,12 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
     private String aiApiType;
 
     @Autowired
-    public QuestionServiceImpl(QuestionMapper questionMapper, TextContentService textContentService, SubjectService subjectService) {
+    public QuestionServiceImpl(QuestionMapper questionMapper, TextContentService textContentService, SubjectService subjectService, QuestionContentService questionContentService) {
         super(questionMapper);
         this.textContentService = textContentService;
         this.questionMapper = questionMapper;
         this.subjectService = subjectService;
+        this.questionContentService = questionContentService;
     }
 
     @Override
@@ -92,6 +96,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
         question.setCreateUser(userId);
         question.setDeleted(false);
         questionMapper.insertSelective(question);
+        questionContentService.saveFromEdit(question, model);
         return question;
     }
 
@@ -111,6 +116,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
         TextContent infoTextContent = textContentService.selectById(question.getInfoTextContentId());
         setQuestionInfoFromVM(infoTextContent, model);
         textContentService.updateByIdFilter(infoTextContent);
+        questionContentService.saveFromEdit(question, model);
 
         return question;
     }
@@ -132,6 +138,10 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
         QuestionObject questionObject = JsonUtil.toJsonObject(questionInfoTextContent.getContent(), QuestionObject.class);
         QuestionEditRequestVM questionEditRequestVM = modelMapper.map(question, QuestionEditRequestVM.class);
         questionEditRequestVM.setTitle(questionObject.getTitleContent());
+        QuestionContent currentContent = questionContentService.getCurrent(question.getId());
+        if (currentContent != null && currentContent.getTitle() != null) {
+            questionEditRequestVM.setTitle(currentContent.getTitle());
+        }
 
         //答案
         QuestionTypeEnum questionTypeEnum = QuestionTypeEnum.fromCode(question.getQuestionType());
@@ -154,7 +164,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
                 break;
         }
         questionEditRequestVM.setScore(ExamUtil.scoreToVM(question.getScore()));
-        questionEditRequestVM.setAnalyze(questionObject.getAnalyze());
+        questionEditRequestVM.setAnalyze(currentContent != null && currentContent.getAnalysis() != null ? currentContent.getAnalysis() : questionObject.getAnalyze());
 
 
         //题目项映射
