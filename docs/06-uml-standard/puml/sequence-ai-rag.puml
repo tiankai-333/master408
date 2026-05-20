@@ -1,0 +1,38 @@
+@startuml
+title 408Master AI/RAG 流式请求时序图
+
+actor "学生" as Student
+boundary "Student Web Client" as Frontend
+control "Student AI Controller" as Controller
+control "AnalysisService" as Analysis
+control "RagService" as Rag
+database "MySQL" as MySQL
+collections "Qdrant" as Qdrant
+entity "AI Provider API" as LLM
+
+Student -> Frontend : 输入问题并点击发送
+Frontend -> Controller : POST /api/student/ai/analyze-stream
+Controller -> Analysis : analyzeStream(request)
+Analysis -> Rag : retrieve(question, context)
+
+alt RAG enabled and available
+  Rag -> Qdrant : similaritySearch(embedding)
+  Qdrant --> Rag : vectorIds + scores
+  Rag -> MySQL : loadChunksAndSources(vectorIds)
+  MySQL --> Rag : chunks + citations
+  Rag --> Analysis : context + citations
+else RAG unavailable
+  Rag --> Analysis : emptyContext + degradedReason
+end
+
+Analysis -> LLM : chatCompletionStream(prompt, context)
+loop stream chunks
+  LLM --> Analysis : delta.content
+  Analysis --> Controller : SSE chunk
+  Controller --> Frontend : event: chunk
+end
+
+Analysis -> MySQL : saveUsageLog(success/error, tokens, provider)
+Controller --> Frontend : event: done/error
+Frontend --> Student : Markdown 渲染最终回答
+@enduml

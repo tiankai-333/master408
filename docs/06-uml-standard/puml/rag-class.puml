@@ -1,0 +1,56 @@
+@startuml
+!pragma layout smetana
+title 408Master RAG 类图
+hide circle
+skinparam classAttributeIconSize 0
+
+class RagDocument {
+  +id: Long
+  +title: String
+  +sourceType: String
+  +subject: String
+  +version: Integer
+  +hash: String
+  +status: String
+}
+
+class RagChunk {
+  +id: Long
+  +documentId: Long
+  +chunkIndex: Integer
+  +content: Text
+  +tokenCount: Integer
+  +sourceLocation: String
+}
+
+class RagEmbedding {
+  +id: Long
+  +chunkId: Long
+  +model: String
+  +dimension: Integer
+  +collectionName: String
+  +vectorId: String
+  +status: String
+}
+
+class RagRetrievalLog {
+  +id: Long
+  +userId: Integer
+  +query: Text
+  +providerCode: String
+  +createdTime: DateTime
+}
+
+class RagAnswerCitation {
+  +id: Long
+  +retrievalLogId: Long
+  +chunkId: Long
+  +score: Decimal
+  +used: Boolean
+}
+
+RagDocument "1" *-- "1..*" RagChunk
+RagChunk "1" -- "0..1" RagEmbedding
+RagRetrievalLog "1" -- "0..*" RagAnswerCitation
+RagChunk "1" -- "0..*" RagAnswerCitation
+@enduml

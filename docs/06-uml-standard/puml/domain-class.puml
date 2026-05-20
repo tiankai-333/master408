@@ -1,0 +1,103 @@
+@startuml
+!pragma layout smetana
+title 408Master 核心领域类图
+hide circle
+skinparam classAttributeIconSize 0
+
+class Student {
+  +id: Integer
+  +userName: String
+  +role: String
+  +status: Integer
+  +answer(questionId, answer): AnswerRecord
+}
+
+class Question {
+  +id: Integer
+  +questionType: Integer
+  +subjectId: Integer
+  +sourceYear: Integer
+  +sourceQuestionNo: Integer
+  +score: Integer
+  +isActive(): Boolean
+}
+
+class QuestionContent {
+  +id: Long
+  +questionId: Integer
+  +version: Integer
+  +title: Text
+  +options: Text
+  +correctAnswer: Text
+  +analysis: Text
+  +hasImage: Boolean
+}
+
+class KnowledgePoint {
+  +id: Long
+  +name: String
+  +subject: String
+  +path: String
+  +importance: Integer
+}
+
+class QuestionKnowledgePoint {
+  +questionId: Integer
+  +knowledgePointId: Long
+  +weight: Decimal
+}
+
+class ExamPaper {
+  +id: Integer
+  +name: String
+  +paperType: Integer
+  +questionCount: Integer
+  +score: Integer
+  +suggestTime: Integer
+}
+
+class ExamPaperQuestionItem {
+  +examPaperId: Integer
+  +questionId: Integer
+  +itemOrder: Integer
+}
+
+class AnswerRecord {
+  +id: Integer
+  +studentId: Integer
+  +questionId: Integer
+  +answer: String
+  +doRight: Boolean
+  +customerScore: Integer
+}
+
+class MistakeBook {
+  +id: Long
+  +studentId: Integer
+  +questionId: Integer
+  +status: String
+  +wrongCount: Integer
+  +nextReviewTime: DateTime
+}
+
+class StudentKnowledgeState {
+  +id: Long
+  +studentId: Integer
+  +knowledgePointId: Long
+  +mastery: Decimal
+  +confidence: Decimal
+  +lastPracticeTime: DateTime
+}
+
+Question "1" *-- "1..*" QuestionContent : versions
+Question "1" -- "0..*" QuestionKnowledgePoint
+KnowledgePoint "1" -- "0..*" QuestionKnowledgePoint
+ExamPaper "1" -- "1..*" ExamPaperQuestionItem
+Question "1" -- "0..*" ExamPaperQuestionItem
+Student "1" -- "0..*" AnswerRecord
+Question "1" -- "0..*" AnswerRecord
+Student "1" -- "0..*" MistakeBook
+Question "1" -- "0..*" MistakeBook
+Student "1" -- "0..*" StudentKnowledgeState
+KnowledgePoint "1" -- "0..*" StudentKnowledgeState
+@enduml

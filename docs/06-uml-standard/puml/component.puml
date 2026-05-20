@@ -1,0 +1,62 @@
+@startuml
+!pragma layout smetana
+title 408Master 组件图
+skinparam componentStyle rectangle
+
+package "Client Layer" {
+  [Student Web Client] as StudentClient
+  [Admin Web Client] as AdminClient
+  [WeChat Mini Program] as WxClient
+}
+
+package "API Layer" {
+  [Student API Controllers] as StudentApi
+  [Admin API Controllers] as AdminApi
+  [WX API Controllers] as WxApi
+}
+
+package "Application Layer" {
+  [Question Application Service] as QuestionApp
+  [Exam Application Service] as ExamApp
+  [AI Analysis Service] as AiAnalysis
+  [RAG Application Service] as RagApp
+  [Student Graph Service] as StudentGraphApp
+}
+
+package "Domain Layer" {
+  [Question/Exam Domain] as QuestionDomain
+  [Knowledge Graph Domain] as KnowledgeDomain
+  [Student Learning Domain] as StudentDomain
+  [AI Runtime Domain] as AiRuntimeDomain
+}
+
+package "Infrastructure Adapter Layer" {
+  [MySQL Repository Adapter] as MySQLAdapter
+  [Qdrant Index Adapter] as QdrantAdapter
+  [AI Provider Client] as AiProviderClient
+}
+
+StudentClient ..> StudentApi : HTTP
+AdminClient ..> AdminApi : HTTP
+WxClient ..> WxApi : HTTP
+
+StudentApi ..> ExamApp
+StudentApi ..> AiAnalysis
+StudentApi ..> StudentGraphApp
+AdminApi ..> QuestionApp
+AdminApi ..> AiAnalysis
+WxApi ..> ExamApp
+
+QuestionApp ..> QuestionDomain
+ExamApp ..> QuestionDomain
+AiAnalysis ..> AiRuntimeDomain
+AiAnalysis ..> RagApp
+RagApp ..> KnowledgeDomain
+StudentGraphApp ..> StudentDomain
+
+QuestionApp ..> MySQLAdapter
+ExamApp ..> MySQLAdapter
+RagApp ..> MySQLAdapter
+RagApp ..> QdrantAdapter
+AiAnalysis ..> AiProviderClient
+@enduml

@@ -31,6 +31,7 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/xzs?useSSL=false&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&allowMultiQueries=true"
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "doushijiaxiang0."
+      AI_SECRET_MASTER_KEY: "408MasterLocalSecret"
       TZ: "Asia/Shanghai"
     volumes:
       - ./logs:/var/log/xzs

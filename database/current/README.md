@@ -18,6 +18,7 @@ mysql -u root -p xzs < database/current/11_default_user_level.sql
 mysql -u root -p xzs < database/current/12_canonical_ai_architecture.sql
 mysql -u root -p xzs < database/current/13_backfill_canonical_ai_data.sql
 mysql -u root -p xzs < database/current/14_ai_provider_config.sql
+mysql -u root -p xzs < database/current/15_embed_question_images.sql
 ```
 
 ## 文件说明
@@ -37,6 +38,7 @@ mysql -u root -p xzs < database/current/14_ai_provider_config.sql
 | `12_canonical_ai_architecture.sql` | 新增规范题目内容、RAG 元数据、学生图谱、Agent/Skill/Tool 表。 |
 | `13_backfill_canonical_ai_data.sql` | 从旧题库和 AI 知识库幂等回填规范层。 |
 | `14_ai_provider_config.sql` | 管理端 AI 供应商密钥配置表和默认供应商种子。 |
+| `15_embed_question_images.sql` | 将题目 images 列路径转为 `<img>` 标签追加到 title，同步 question_content。 |
 
 `10_knowledge_points_data.sql` 让云端部署不依赖额外运行爬虫。需要重新抓取或刷新数据时，再使用 `crawler/knowledge_crawler.py --skip-crawl --import-db --clear-existing` 从 `crawler/data/knowledge_pages.json` 导入本地库，并重新导出该 SQL。
 

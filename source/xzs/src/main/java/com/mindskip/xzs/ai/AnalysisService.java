@@ -199,10 +199,13 @@ public class AnalysisService {
         StringBuilder prompt = new StringBuilder();
         prompt.append("你正在 408Master 的 AI 学习工作台中回答学生。请遵守：\n")
             .append("1. 输出必须是标准 Markdown，不要把标题写成普通文本，不要把所有内容挤成一段。\n")
+            .append("   标题必须写成“## 标题”，不要输出单独一行的 #。\n")
             .append("2. 面向学生表达，不要暴露 RAG、向量检索、prompt、上下文注入等技术实现词。\n")
             .append("3. 如果参考资料不足，要明确说明“不确定”，不要编造真题年份、题号或答案。\n")
             .append("4. 讲解要围绕 408 的四科：数据结构、组成原理、操作系统、计算机网络。\n")
-            .append("5. 当前讲法：").append(styleName(style)).append("。\n\n");
+            .append("5. 只输出最终教学答案，不输出自我规划、草稿、元说明或“我需要/我将/现在我”的过程描述。\n")
+            .append("6. 不要重复整段结构；每个标题只出现一次。\n")
+            .append("7. 当前讲法：").append(styleName(style)).append("。\n\n");
 
         if (knowledgePoints != null && !knowledgePoints.trim().isEmpty()) {
             prompt.append("## 当前知识点\n").append(knowledgePoints.trim()).append("\n\n");
@@ -213,42 +216,52 @@ public class AnalysisService {
         }
 
         prompt.append("## 学生请求\n").append(question != null ? question.trim() : "").append("\n\n");
+        prompt.append(buildStyleOutputRules(style, taskType)).append("\n");
 
         if ("practice".equals(taskType)) {
             prompt.append("## 输出要求\n")
-                .append("请严格按以下顺序输出：\n")
-                .append("### 练习题\n")
-                .append("- 先给出完整题干。\n")
-                .append("- 如果是选择题，必须给出 A、B、C、D 四个选项。\n")
-                .append("- 题目必须能独立作答，不要一上来给答案。\n\n")
-                .append("### 请先作答\n")
-                .append("用一句话提醒学生先自己做，再看解析。\n\n")
-                .append("### 答案与解析\n")
-                .append("- 明确答案。\n")
-                .append("- 分步骤解释为什么。\n")
-                .append("- 对选择题逐项说明选项对错。\n\n")
-                .append("### 关联知识点\n")
-                .append("- 列出所属科目和 2-4 个核心考点。\n")
-                .append("- 给出一个变式练习方向。\n");
-        } else if ("exam".equals(taskType)) {
-            prompt.append("## 输出要求\n")
-                .append("请按以下结构输出：\n")
-                .append("### 真题考法\n说明这个知识点在 408 中通常怎么设问。\n\n")
-                .append("### 解题抓手\n给出读题时优先抓的关键词和条件。\n\n")
-                .append("### 典型题型示例\n给一个简短示例，必须先给题干或题型场景，再解释思路。\n\n")
-                .append("### 易错点\n列出 2-3 个常见误区。\n\n")
-                .append("### 复习建议\n给出下一步练习建议。\n");
+                .append("- 这是“AI 辅助组卷/练习推荐”，不是自由出题。\n")
+                .append("- 只能从题库已经存在的题目中挑选 1-5 道，不能编造新题、题号、年份、来源或选项。\n")
+                .append("- 如果上下文没有提供可选题目 ID 或完整题库候选，请只输出筛选条件和组卷方案，不要输出虚构题目正文。\n")
+                .append("- 推荐格式：## 选题目标 / ## 筛选条件 / ## 推荐题目 / ## 覆盖知识点。\n")
+                .append("- 推荐题目必须标注题目 ID、知识点、题目来源；无法确认时写“不确定”。\n");
         } else {
             prompt.append("## 输出要求\n")
-                .append("请按以下结构输出：\n")
-                .append("### 核心定义\n用准确但易懂的话解释概念。\n\n")
-                .append("### 为什么重要\n说明它在 408 中解决什么问题。\n\n")
-                .append("### 常见考法\n列出 3 个常见设问方式。\n\n")
-                .append("### 易错提醒\n列出 2-3 个易错点。\n\n")
-                .append("### 小练习\n最后给一个 1 分钟小问题，让学生可以立刻练习。\n");
+                .append("- 根据学生问题选择最合适的结构，不要机械套固定模板。\n")
+                .append("- 普通刷题优先短答案；概念讲解可以稍展开，但不要写长篇背景。\n");
+            if (wantsExamStyle(question)) {
+                prompt.append("- 学生明确要求结合真题时，可以补充“## 常见考法”。\n");
+            } else {
+                prompt.append("- 不要默认输出“真题考法”“解题抓手”“典型题型示例”“复习建议”。\n");
+            }
         }
 
         return prompt.toString();
+    }
+
+    private String buildStyleOutputRules(String style, String taskType) {
+        StringBuilder rules = new StringBuilder("## 输出风格\n");
+        if ("feynman".equals(style)) {
+            rules.append("- 推荐结构：## 一句话解释 / ## 简单类比 / ## 回到题目 / ## 易错点。\n")
+                .append("- 用白话和简单类比讲清楚，但不要啰嗦。\n");
+        } else if ("first-principles".equals(style)) {
+            rules.append("- 推荐结构：## 从定义出发 / ## 推出规则 / ## 应用到题目 / ## 结论。\n")
+                .append("- 少背结论，多说明为什么。\n");
+        } else if ("plato".equals(style)) {
+            rules.append("- 推荐结构：## 关键追问 / ## 推出答案 / ## 结论。\n")
+                .append("- 用 2-3 个关键追问引导判断，每个追问后直接给判断，不要假装等待学生回答。\n");
+        } else {
+            rules.append("- 推荐结构：## 考点 / ## 解题 / ## 答案 / ## 易错点。\n")
+                .append("- 短、准、直接，先结论后原因。\n");
+        }
+        if ("practice".equals(taskType)) {
+            rules.append("- 当前任务只允许推荐题库已有题目 1-5 道；没有题库候选时只给选题方案，不要编题。\n");
+        }
+        return rules.toString();
+    }
+
+    private boolean wantsExamStyle(String question) {
+        return question != null && (question.contains("真题") || question.contains("408 真题"));
     }
 
     private String styleName(String style) {
@@ -338,10 +351,11 @@ public class AnalysisService {
                 resultContent = rootNode.path("choices").get(0).path("message").path("content").asText();
             }
             
-            int tokensUsed = rootNode.path("usage").path("total_tokens").asInt(estimateTokens(systemPrompt, userPrompt, resultContent));
-            saveUsageLog(aiType, model, userPrompt, systemPrompt, resultContent, tokensUsed,
+            String cleanedResult = cleanAiAnswer(resultContent);
+            int tokensUsed = rootNode.path("usage").path("total_tokens").asInt(estimateTokens(systemPrompt, userPrompt, cleanedResult));
+            saveUsageLog(aiType, model, userPrompt, systemPrompt, cleanedResult, tokensUsed,
                     (int) (System.currentTimeMillis() - startTime), true, null);
-            return resultContent;
+            return cleanedResult;
         } catch (Exception e) {
             System.err.println("AI API调用失败: " + e.getMessage());
             saveUsageLog(aiType, model, userPrompt, systemPrompt, null, estimateTokens(systemPrompt, userPrompt, null),
@@ -421,7 +435,7 @@ public class AnalysisService {
                 }
             }
 
-            String result = fullResponse.toString();
+            String result = cleanAiAnswer(fullResponse.toString());
             saveUsageLog(aiType, resolvedModel, userPrompt, systemPrompt, result, estimateTokens(systemPrompt, userPrompt, result),
                 (int) (System.currentTimeMillis() - startTime), true, null);
             return result;
@@ -444,25 +458,13 @@ public class AnalysisService {
             if (choices.isArray() && choices.size() > 0) {
                 com.fasterxml.jackson.databind.JsonNode choice = choices.get(0);
                 com.fasterxml.jackson.databind.JsonNode delta = choice.path("delta");
-                String content = delta.path("content").asText();
-                if (!content.isEmpty()) {
-                    return content;
-                }
-                content = delta.path("reasoning_content").asText();
-                if (!content.isEmpty()) {
-                    return content;
-                }
-                com.fasterxml.jackson.databind.JsonNode message = choice.path("message");
-                content = message.path("content").asText();
-                if (!content.isEmpty()) {
+                com.fasterxml.jackson.databind.JsonNode contentNode = delta.path("content");
+                String content = contentNode.isTextual() ? contentNode.asText() : "";
+                if (!content.isEmpty() && !"null".equalsIgnoreCase(content)) {
                     return content;
                 }
             }
-            String response = rootNode.path("response").asText();
-            if (!response.isEmpty()) {
-                return response;
-            }
-            return rootNode.path("data").path("content").asText();
+            return "";
         } catch (Exception e) {
             logger.debug("Failed to parse stream chunk: {}", e.getMessage());
             return "";
@@ -481,6 +483,18 @@ public class AnalysisService {
             }
         }
         return builder.toString();
+    }
+
+    private String cleanAiAnswer(String answer) {
+        if (answer == null) {
+            return null;
+        }
+        String cleaned = answer.trim();
+        cleaned = cleaned.replaceFirst("^(?i)(?:null\\s*)+", "");
+        cleaned = cleaned.replaceFirst("(?s)^(好的，?)?\\s*(我需要|让我|现在我将|我将|我来)\\s*[^#\\n]*(?:\\n|。|：|:)+\\s*", "");
+        cleaned = cleaned.replaceFirst("(?s)\\s*(现在我已经完成|我已经完成|以上就是我|这样我就完成了)[^#]*$", "");
+        cleaned = cleaned.replaceAll("(?m)^#\\s*$", "");
+        return cleaned.trim();
     }
 
     private void saveUsageLog(String aiType, String model, String question, String prompt, String response,

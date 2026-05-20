@@ -114,9 +114,6 @@
           <div class="input-footer">
             <span>Ctrl + Enter 发送</span>
             <div class="send-actions">
-              <button @click="explainKnowledge">结合知识库讲解</button>
-              <button @click="explainWithExam">结合真题讲解</button>
-              <button @click="generatePractice">生成练习题</button>
               <el-button type="primary" :loading="isTyping" @click="sendMessage">发送</el-button>
             </div>
           </div>
@@ -623,12 +620,12 @@ const explainWithExam = () => {
 const generatePractice = () => {
   const target = getCurrentTarget(false)
   if (contextMode.value === 'knowledge' && selectedPoint.value && !inputMessage.value.trim()) {
-    draftPrompt(`请围绕 408 知识点「${selectedPoint.value.name}」生成一道统考风格练习题。`, 'practice')
+    draftPrompt(`请从题库已经存在的题目中，围绕 408 知识点「${selectedPoint.value.name}」挑选 1-5 道练习题。要求标注题目 ID、知识点和题目来源；如果当前上下文没有可选题目，请只给筛选条件，不要编造新题。`, 'practice')
   } else if (target) {
-    draftPrompt(`请基于下面这道题或问题，生成一道同考点的 408 统考风格变式练习题：\n${target}`, 'practice')
+    draftPrompt(`请基于下面这道题或问题，从题库已经存在的题目中挑选 1-5 道同考点练习题。要求标注题目 ID、知识点和题目来源；如果当前上下文没有可选题目，请只给筛选条件，不要编造新题：\n${target}`, 'practice')
     setQuestionContext(target)
   } else {
-    draftPrompt('请生成一道 408 统考风格练习题。', 'practice')
+    draftPrompt('请从题库已经存在的题目中挑选 1-5 道 408 练习题。要求标注题目 ID、知识点和题目来源；如果当前上下文没有可选题目，请只给筛选条件，不要编造新题。', 'practice')
   }
 }
 
@@ -637,7 +634,7 @@ const draftLearningProfile = () => {
 }
 
 const draftTargetedPractice = () => {
-  draftPrompt(`请根据我的错题、薄弱知识点和近期做题情况，生成一组针对性 408 练习题。要求优先使用真题风格，覆盖薄弱科目，并给出答案与解析。`, 'practice')
+  draftPrompt(`请根据我的错题、薄弱知识点和近期做题情况，从题库已经存在的题目中挑选 1-5 道针对性 408 练习题。要求标注题目 ID、知识点和题目来源；如果当前上下文没有可选题目，请只给筛选条件，不要编造新题。`, 'practice')
 }
 
 const draftRelatedQuestion = (question) => {
@@ -738,10 +735,10 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
       }
         updateAssistantMessage(assistantMessage, content)
     } else {
-        updateAssistantMessage(assistantMessage, fallbackAnswer(userQuestion))
+        updateAssistantMessage(assistantMessage, 'AI 服务暂时不可用，请稍后重试。')
       }
     } catch (error) {
-      updateAssistantMessage(assistantMessage, fallbackAnswer(userQuestion))
+      updateAssistantMessage(assistantMessage, 'AI 服务暂时不可用，请稍后重试。')
     }
   } finally {
     isTyping.value = false
@@ -751,24 +748,17 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
 }
 
 const updateAssistantMessage = (message, content) => {
-  message.content = content
+  message.content = cleanAiDisplayContent(content)
   messages.value = messages.value.slice()
-}
-
-const fallbackAnswer = (question) => {
-  const contextName = contextMode.value === 'knowledge' && selectedPoint.value ? selectedPoint.value.name : '当前题目 / 问题'
-  return `当前 AI 服务暂时不可用，但可以先按 ${currentStyle.value.name} 的思路学习「${contextName}」：
-
-1. 先确认它属于哪一科以及常见题型。
-2. 再把定义、约束条件和典型公式写清楚。
-3. 最后用一道真题或模拟题验证是否真的会用。
-
-你的问题：${question}`
 }
 
 const formatMessage = (content) => {
   if (!content) return ''
-  return renderMarkdown(String(content))
+  return renderMarkdown(cleanAiDisplayContent(content))
+}
+
+const cleanAiDisplayContent = (content) => {
+  return String(content || '').replace(/^(?:null\s*)+/i, '').trimStart()
 }
 
 const escapeHtml = (text) => {

@@ -179,7 +179,7 @@ const analyzeQuestion = async () => {
       onChunk: (chunk) => {
         if (!received) updateAnalysisContent('')
         received += chunk
-        updateAnalysisContent(received)
+        updateAnalysisContent(cleanAiDisplayContent(received))
       },
       onError: (message) => {
         throw new Error(message || '分析失败')
@@ -206,6 +206,10 @@ const analyzeQuestion = async () => {
   } finally {
     aiAnalyzing.value = false
   }
+}
+
+const cleanAiDisplayContent = (content) => {
+  return String(content || '').replace(/^(?:null\s*)+/i, '').trimStart()
 }
 
 const updateAnalysisContent = (content) => {

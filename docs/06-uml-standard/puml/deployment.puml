@@ -1,0 +1,32 @@
+@startuml
+!pragma layout smetana
+title 408Master 部署图
+
+node "User Browser" as Browser {
+  artifact "Student/Admin Web UI" as WebUi
+}
+
+node "Cloud Server / Local Docker Host" as Host {
+  node "Nginx Container" as Nginx {
+    artifact "student static files" as StudentStatic
+    artifact "admin static files" as AdminStatic
+    artifact "image static files" as ImageStatic
+  }
+
+  node "Backend Container" as Backend {
+    artifact "xzs-3.9.0.jar" as Jar
+  }
+
+  database "MySQL Container" as MySQL
+  node "Qdrant Container" as Qdrant
+}
+
+cloud "AI Provider API\nGLM / DeepSeek / OpenAI" as AiProvider
+
+Browser --> Nginx : HTTP 80
+Nginx --> Backend : reverse proxy /api
+Backend --> MySQL : JDBC
+Backend --> Qdrant : HTTP vector search
+Backend --> AiProvider : HTTPS chat/embedding
+Nginx --> ImageStatic : /images/*
+@enduml

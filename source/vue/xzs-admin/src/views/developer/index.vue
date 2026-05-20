@@ -60,31 +60,75 @@
           <h2>系统架构</h2>
         </div>
         <div class="architecture">
-          <div class="arch-node">学生端 Vue<br><small>/student/index</small></div>
-          <div class="arch-arrow">→</div>
-          <div class="arch-node">Student API<br><small>/api/student</small></div>
-          <div class="arch-arrow">→</div>
-          <div class="arch-node">Spring Boot<br><small>业务服务层</small></div>
-          <div class="arch-node">管理端 Vue<br><small>/admin</small></div>
-          <div class="arch-arrow">→</div>
-          <div class="arch-node">Admin API<br><small>/api/admin</small></div>
-          <div class="arch-arrow">→</div>
-          <div class="arch-node">MySQL 8<br><small>权威业务数据</small></div>
-          <div class="arch-node muted">Qdrant<br><small>向量检索</small></div>
-          <div class="arch-arrow muted">←</div>
-          <div class="arch-node muted">RAG Service<br><small>chunk / citation / log</small></div>
-          <div class="arch-arrow muted">←</div>
-          <div class="arch-node muted">AI Provider<br><small>GLM / DeepSeek / OpenAI</small></div>
+          <div class="arch-row">
+            <div class="arch-node">学生端 Vue<br><small>/student/index · Cookie 认证</small></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">Student API<br><small>/api/student</small></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node arch-center" rowspan>Spring Boot<br><small>Java 8 · 业务服务层</small></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">Admin API<br><small>/api/admin</small></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">管理端 Vue<br><small>/admin · Cookie 认证</small></div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-node">微信小程序<br><small>4 Tab · 13 页面 · Token 认证</small></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">WeChat API<br><small>/api/wx/student</small></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-spacer"></div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">MySQL 8<br><small>权威业务数据 + RAG 元数据</small></div>
+          </div>
+          <div class="arch-row muted">
+            <div class="arch-spacer"></div>
+            <div class="arch-spacer"></div>
+            <div class="arch-spacer"></div>
+            <div class="arch-arrow">←</div>
+            <div class="arch-node">Qdrant<br><small>向量检索 · 119 chunks</small></div>
+            <div class="arch-arrow">←</div>
+            <div class="arch-node">RAG Service<br><small>chunk / citation / log</small></div>
+            <div class="arch-arrow">←</div>
+            <div class="arch-node">AI Provider<br><small>GLM / DeepSeek / OpenAI</small></div>
+          </div>
         </div>
         <p class="note">
           MySQL 保存题库、用户、学习记录、AI 配置和 RAG 元数据；Qdrant 只保存向量检索所需的 vector 和 payload。这样云服务器不必长期运行本地大模型，离线或 API 生成 embedding 后再上传即可。
         </p>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <span>03</span>
+          <h2>UML 分析与读图指南</h2>
+        </div>
+        <p class="lead">
+          UML 适合用来讲清楚“谁在使用系统、模块怎么分工、一次 AI 请求怎么流转、核心业务对象如何关联”。本页已改用 PlantUML 生成的标准 UML SVG，不再用 Mermaid 近似模拟用例图、组件图和部署图。
+        </p>
+        <div class="uml-stack">
+          <article v-for="item in umlViews" :key="item.title" class="uml-card">
+            <div>
+              <b>{{ item.title }}</b>
+              <p>{{ item.desc }}</p>
+            </div>
+            <div class="uml-image-frame">
+              <img :src="item.src" :alt="item.title" class="uml-svg" />
+            </div>
+            <p class="uml-source">PlantUML 源文件：<code>{{ item.source }}</code></p>
+          </article>
+        </div>
+        <div class="decision-list">
+          <div v-for="item in umlGuide" :key="item.question">
+            <strong>{{ item.question }}</strong>
+            <p>{{ item.answer }}</p>
+          </div>
+        </div>
+      </section>
+
       <section class="two-column">
         <article class="panel">
           <div class="section-title">
-            <span>03</span>
+            <span>04</span>
             <h2>当前数据状态</h2>
           </div>
           <div class="data-table">
@@ -99,22 +143,23 @@
 
         <article class="panel">
           <div class="section-title">
-            <span>04</span>
+            <span>05</span>
             <h2>核心能力</h2>
           </div>
           <ul class="plain-list">
             <li>2011-2024 年 408 真题题库，支持选择题和综合应用题。</li>
             <li>四种 AI 解析 Skill：常规、费曼、第一性原理、柏拉图式对话。</li>
+            <li>AI 题目图片识别：拍照上传 → OCR → AI 解析，支持拍照刷题场景。</li>
             <li>知识图谱与 RAG 知识库，用于减少 AI 解析幻觉。</li>
             <li>学生学习事件、答题记录、错题本，为学生图谱打基础。</li>
-            <li>微信小程序学生端已跑通基础登录、试卷列表、做题记录链路。</li>
+            <li>微信小程序学生端：4 个 Tab（首页/刷题/错题/我的）、13 个页面、独立 /api/wx 接口和微信绑定登录。</li>
           </ul>
         </article>
       </section>
 
       <section class="panel">
         <div class="section-title">
-          <span>05</span>
+          <span>06</span>
           <h2>数据库主线</h2>
         </div>
         <div class="table-grid">
@@ -132,7 +177,7 @@
       <section class="two-column">
         <article class="panel">
           <div class="section-title">
-            <span>06</span>
+            <span>08</span>
             <h2>AI 密钥与安全</h2>
           </div>
           <ul class="plain-list">
@@ -146,7 +191,7 @@
 
         <article class="panel">
           <div class="section-title">
-            <span>07</span>
+            <span>09</span>
             <h2>RAG 设计</h2>
           </div>
           <ul class="plain-list">
@@ -161,7 +206,24 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>08</span>
+          <span>07</span>
+          <h2>数据质量与关联真题策略</h2>
+        </div>
+        <div class="table-grid">
+          <article v-for="item in dataQualityNotes" :key="item.title" class="mini-card">
+            <b>{{ item.title }}</b>
+            <p>{{ item.desc }}</p>
+            <code>{{ item.detail }}</code>
+          </article>
+        </div>
+        <p class="note">
+          当前产品策略是“列表轻、AI 重”：知识图谱右侧关联真题列表只展示题目摘要，避免页面拥挤；但当学生点击“结合真题讲解”时，后续应由后端加载完整题干、选项、答案、解析和来源，再交给 AI。这样既能保持界面清爽，也能避免 AI 拿半截题面讲题。
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <span>10</span>
           <h2>模型切换与调用链路</h2>
         </div>
         <div class="flow-grid">
@@ -179,7 +241,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>09</span>
+          <span>11</span>
           <h2>Agent、任务、卷子与 Memory</h2>
         </div>
         <div class="agent-grid">
@@ -199,7 +261,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>10</span>
+          <span>12</span>
           <h2>接口文档摘要</h2>
         </div>
         <div class="api-grid">
@@ -213,7 +275,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>11</span>
+          <span>13</span>
           <h2>部署说明</h2>
         </div>
         <div class="deploy-steps">
@@ -228,7 +290,7 @@
       <section class="two-column">
         <article class="panel">
           <div class="section-title">
-            <span>12</span>
+            <span>14</span>
             <h2>文档索引</h2>
           </div>
           <div class="doc-list">
@@ -242,7 +304,7 @@
 
         <article class="panel">
           <div class="section-title">
-            <span>13</span>
+            <span>15</span>
             <h2>工程协作</h2>
           </div>
           <ul class="timeline">
@@ -257,7 +319,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>14</span>
+          <span>16</span>
           <h2>近期完成</h2>
         </div>
         <div class="work-grid">
@@ -269,6 +331,8 @@
 </template>
 
 <script setup>
+const assetBase = import.meta.env.BASE_URL || '/'
+
 const summaryCards = [
   { label: 'Product', value: '408Master', desc: '408 刷题 + AI 学习辅助' },
   { label: 'Backend', value: 'Spring Boot 2.1.6', desc: 'Java 8 + MyBatis' },
@@ -306,6 +370,103 @@ const tableGroups = [
     title: '数据管线层',
     desc: '原始爬虫、OCR、清洗结果和规范导入数据分层管理。',
     tables: 'data/raw, data/staging, data/canonical, data/exports'
+  }
+]
+
+const umlViews = [
+  {
+    title: '标准用例图：系统对谁提供什么能力',
+    desc: '用 actor 和 use case 表达学生、管理员、开发者/评审与系统能力之间的关系。',
+    src: `${assetBase}uml/use-case.svg`,
+    source: 'docs/06-uml-standard/puml/use-case.puml'
+  },
+  {
+    title: '标准组件图：模块边界与依赖',
+    desc: '用组件和依赖关系说明客户端、API、应用服务、领域层和基础设施适配层的边界。',
+    src: `${assetBase}uml/component.svg`,
+    source: 'docs/06-uml-standard/puml/component.puml'
+  },
+  {
+    title: '标准时序图：一次 AI/RAG 流式请求',
+    desc: '用 lifeline、调用消息、返回消息和 alt 分支说明一次 AI 请求的检索、降级和 SSE 输出过程。',
+    src: `${assetBase}uml/sequence-ai-rag.svg`,
+    source: 'docs/06-uml-standard/puml/sequence-ai-rag.puml'
+  },
+  {
+    title: '标准类图：核心学习领域',
+    desc: '用类、属性、方法、多重性和中间关联类描述题目、试卷、知识点、学生答题与学习状态。',
+    src: `${assetBase}uml/domain-class.svg`,
+    source: 'docs/06-uml-standard/puml/domain-class.puml'
+  },
+  {
+    title: '标准类图：RAG 元数据模型',
+    desc: '单独说明 RAG 文档、切片、embedding、检索日志和引用关系，避免和核心题库领域混在一起。',
+    src: `${assetBase}uml/rag-class.svg`,
+    source: 'docs/06-uml-standard/puml/rag-class.puml'
+  },
+  {
+    title: '标准类图：AI Runtime 配置模型',
+    desc: '单独说明 AI Provider、Skill、Agent、Prompt 和运行日志，它是运行时配置模型，不是核心题库领域。',
+    src: `${assetBase}uml/ai-runtime-class.svg`,
+    source: 'docs/06-uml-standard/puml/ai-runtime-class.puml'
+  },
+  {
+    title: '标准部署图：Docker 与外部服务',
+    desc: '用 node、artifact、database 和 cloud 表达 Nginx、Backend、MySQL、Qdrant 与 AI Provider 的部署关系。',
+    src: `${assetBase}uml/deployment.svg`,
+    source: 'docs/06-uml-standard/puml/deployment.puml'
+  }
+]
+
+const umlGuide = [
+  {
+    question: 'UML 是什么？',
+    answer: 'UML 是统一建模语言，用图来描述软件系统。它不是某种框架，也不是必须生成代码；它的价值是让需求、模块、流程和数据关系能被看懂、讨论和复盘。'
+  },
+  {
+    question: '这个项目最该画哪些 UML？',
+    answer: '四张就够：用例图讲用户目标，组件图讲模块边界，时序图讲 AI/RAG 调用链路，领域类图讲题目、知识点、学生图谱、RAG 和 Agent 的核心对象。'
+  },
+  {
+    question: '什么时候不该画 UML？',
+    answer: '不要把每个 Controller、Mapper、字段都画进去，那会变成噪音。UML 应该服务于解释系统，而不是复印代码。'
+  },
+  {
+    question: '怎么向评审讲？',
+    answer: '先用用例图说明系统服务学生和管理员，再用组件图说明模块化单体架构，然后用时序图讲 AI 流式/RAG 过程，最后用领域类图说明数据库为什么要从旧表走向规范模型。'
+  }
+]
+
+const dataQualityNotes = [
+  {
+    title: '关联真题为什么会截断',
+    desc: '知识图谱右侧列表目前使用轻量摘要，后端会把题干缩短用于展示，因此列表里的题目不是完整题面。',
+    detail: 'KnowledgeGraphServiceImpl.trimToLength(..., 72)'
+  },
+  {
+    title: '选项从哪里来',
+    desc: '选择题选项主要保存在旧题库 JSON 的 questionItemObjects，部分新字段也有 options；综合应用题天然可能没有选项。',
+    detail: 't_text_content.content.questionItemObjects / t_question.options'
+  },
+  {
+    title: 'AI 讲题应该拿完整上下文',
+    desc: '列表可以保持摘要，但点击关联真题讲解时，应由后端加载完整题干、选项、答案、解析和来源，再交给 AI。',
+    detail: 'list summary, prompt full context'
+  },
+  {
+    title: '知识点过长如何处理',
+    desc: '知识点列表展示会摘要化，避免页面过挤；AI 上下文不应直接依赖展示摘要，而应读取规范知识点正文或 RAG chunk。',
+    detail: 'knowledgeSummary() for UI only'
+  },
+  {
+    title: '数据治理方向',
+    desc: '后续应把旧 JSON 中的题干、选项、答案、解析解析进 question_content，保证题库、RAG 和 AI 讲题使用同一份权威内容。',
+    detail: 'question_content as canonical source'
+  },
+  {
+    title: '质量判断',
+    desc: '不是简单的数据坏了，而是旧表兼容、展示摘要和 AI 输入上下文边界没有完全分开；这是渐进改造阶段的典型问题。',
+    detail: 'compatibility + serving contract'
   }
 ]
 
@@ -355,7 +516,7 @@ const agentRoadmap = [
   },
   {
     title: 'Agent 出卷子',
-    desc: '可以做，但应分两步：先生成“组卷方案”，由规则校验题型、难度、知识点覆盖和重复题；再写入 exam_paper。不要让模型直接写最终试卷。',
+    desc: '可以做，但必须限制为从题库已有题目中挑选 1-5 题。AI 只输出选题方案和候选题目 ID，后端规则服务校验题型、难度、知识点覆盖、来源和重复题后再写入 exam_paper。',
     tables: 'question_knowledge_point, question_content, exam_paper, exam_paper_question_customer_answer'
   },
   {
@@ -387,7 +548,7 @@ const aiDecisions = [
   },
   {
     question: 'Agent 能不能帮学生出任务和卷子？',
-    answer: '能。推荐让 Agent 输出结构化计划：目标、知识点覆盖、题目数量、难度比例、来源限制，然后由后端规则服务真正选题和落库。这样既能利用 AI 的规划能力，又不会让模型绕过题库、权限和组卷规则。'
+    answer: '能，但要限制边界。当前建议只让 Agent 从题库已有题目中挑选 1-5 题，并输出题目 ID、知识点和来源；如果没有题库候选，只能输出筛选条件，不能编造新题。真正选题、去重、校验和落库由后端规则服务完成。'
   },
   {
     question: '现在有 Memory 吗？',
@@ -404,26 +565,27 @@ const aiDecisions = [
 ]
 
 const apis = [
-  { method: 'POST', path: '/api/user/login', desc: '管理端登录' },
-  { method: 'POST', path: '/api/student/user/register', desc: '学生注册，年级字段默认兜底' },
-  { method: 'POST', path: '/api/admin/question/page', desc: '管理端题目分页' },
-  { method: 'POST', path: '/api/admin/question/edit', desc: '题目录入/编辑，同步 question_content' },
-  { method: 'POST', path: '/api/student/ai/analyze', desc: '学生端 AI 解析' },
-  { method: 'POST', path: '/api/student/ai/analyze-stream', desc: '学生端 AI 解析流式输出，SSE 事件：status/references/chunk/done/error' },
-  { method: 'POST', path: '/api/student/question/analyze-question-stream', desc: '错题本 AI 分析流式输出，前端逐段追加到解析区' },
+  { method: 'POST', path: '/api/user/login', desc: '管理端/学生端登录' },
+  { method: 'POST', path: '/api/student/user/register', desc: '学生注册' },
+  { method: 'POST', path: '/api/student/ai/analyze', desc: '学生端 AI 解析（非流式）' },
+  { method: 'POST', path: '/api/student/ai/analyze-stream', desc: '学生端 AI 解析 SSE 流式：status/references/chunk/done/error' },
+  { method: 'POST', path: '/api/student/chat', desc: 'AI 聊天对话，408Master 人设' },
+  { method: 'POST', path: '/api/student/question/analyze-question-stream', desc: '错题本 AI 分析 SSE 流式' },
+  { method: 'POST', path: '/api/student/question/analyze-image', desc: '拍照上传 → OCR → AI 解析' },
   { method: 'GET', path: '/api/student/ai/styles', desc: '四种 Skill 风格列表' },
-  { method: 'GET', path: '/api/student/knowledge-graph/graph', desc: '学生端知识图谱' },
+  { method: 'GET', path: '/api/student/user/stats', desc: '用户学习统计（题量、正确率、薄弱点）' },
+  { method: 'GET', path: '/api/student/knowledge-graph/graph', desc: '知识图谱节点与边' },
+  { method: 'GET', path: '/api/student/knowledge-graph/question/{id}/knowledge-points', desc: '题目关联知识点、子知识点和关联真题摘要' },
+  { method: 'GET', path: '/api/student/knowledge-graph/knowledge-point/{id}/questions', desc: '按知识点查关联真题列表，当前返回展示摘要，后续应补完整题面接口' },
   { method: 'POST', path: '/api/admin/ai-config/providers', desc: 'AI 供应商配置列表，密钥只返回掩码' },
   { method: 'POST', path: '/api/admin/ai-config/provider/save', desc: '保存供应商、模型和 API Key' },
   { method: 'POST', path: '/api/admin/ai-config/provider/{id}/test', desc: '后端测试供应商连接' },
   { method: 'POST', path: '/api/admin/ai-config/usage', desc: 'AI 请求、Token、费用、成功率统计' },
-  { method: 'GET', path: '/api/admin/ai-agent/rag/debug', desc: 'RAG 调试检索' },
-  { method: 'POST', path: '/api/student/agent/chat', desc: '建议新增：学生端 Agent 对话，支持模型路由、memory 和工具调用' },
-  { method: 'POST', path: '/api/student/agent/task-plan', desc: '建议新增：Agent 生成学习任务草稿' },
-  { method: 'POST', path: '/api/student/agent/paper-plan', desc: '建议新增：Agent 生成组卷方案，由后端规则服务落卷' },
-  { method: 'GET', path: '/api/student/memory/list', desc: '建议新增：学生查看自己的 AI 记忆' },
-  { method: 'POST', path: '/api/student/memory/save', desc: '建议新增：学生维护自己的偏好和长期记忆' },
-  { method: 'POST', path: '/api/student/ai-key/save', desc: '建议新增：学生保存个人专属 Key，只返回掩码' }
+  { method: 'GET', path: '/api/admin/ai-agent/templates', desc: 'Prompt 模板列表' },
+  { method: 'GET', path: '/api/admin/ai-agent/knowledge-base', desc: '知识库条目列表' },
+  { method: 'POST', path: '/api/admin/ai-agent/template/{id}/test', desc: '测试 Prompt 模板' },
+  { method: 'POST', path: '/api/wx/student/auth/bind', desc: '微信账号绑定登录' },
+  { method: 'POST', path: '/api/wx/student/auth/checkBind', desc: '检查微信是否已绑定' }
 ]
 
 const deploySteps = [
@@ -473,12 +635,22 @@ const recentWork = [
   '部署 Qdrant，并在后端增加 RagIndexService 抽象。',
   '使用智谱 embedding-2 写入 Qdrant：119 个 chunk 全部 indexed。',
   '新增 AI Provider 密钥管理、测试连接和用量分析页面。',
-  '根地址默认跳转 /student/index，学生端 Vue Router 使用 /student/ base，修复不带后缀访问出错。',
+  '根地址默认跳转 /student/index，学生端 Vue Router 使用 /student/ base。',
   'API Key 采用 AES/GCM 加密保存，前端只显示掩码。',
   'AI 解析和 embedding 调用写入 t_ai_usage_log。',
-  '新增 AI 回复 SSE 流式输出，408Master 和错题本解析可以边生成边展示。',
+  '新增 AI 回复 SSE 流式输出，知识图谱和错题本解析可以边生成边展示。',
   '管理端生产路径修正为 /admin/，Vue Router base 同步修正。',
-  '新增公开 Developer Brief 页面，用于答辩和演示。'
+  '新增公开 Developer Brief 页面，用于答辩和演示。',
+  '学生端 Dashboard AI 学习工作台重设计：hero 区、知识节点动画、快捷入口和技能模式面板。',
+  '学生端 UI 刷新：试卷列表、做题记录、错题本、AI 解析页面优化。',
+  'AI 工作台 prompt 解耦和稳定性修复，讲法切换和任务类型独立。',
+  '修复 AI 流式输出中 JSON null 被误当成正文 token 的问题，避免回答开头出现 nullnull。',
+  '修复 AI 失败态：流式失败和非流式重试都失败时，只显示明确失败信息，不再追加本地假回答。',
+  '补充 API Key 主密钥说明：本地 Docker backend 显式使用 AI_SECRET_MASTER_KEY，避免加密密钥随 application.yml 变化。',
+  '梳理关联真题和知识点摘要截断原因：列表展示使用摘要，AI 讲题应改为加载完整题面、选项、答案和解析。',
+  '限制 AI 练习/出卷边界：只能从题库已有题目中挑选 1-5 题，没有候选时只输出筛选条件，不能编造新题。',
+  '新增 AI 题目图片识别（拍照 → OCR → 解析），学生端 /question/ai-analyze 页面。',
+  'Canonical AI/RAG 架构整合提交：Agent/Provider/RAG/StudentGraph 服务、SSE 流式、5 个新数据库迁移脚本。'
 ]
 </script>
 
@@ -589,6 +761,13 @@ const recentWork = [
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.uml-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 16px;
+}
+
 .agent-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -597,7 +776,8 @@ const recentWork = [
 .panel,
 .mini-card,
 .work-item,
-.flow-card {
+.flow-card,
+.uml-card {
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -607,7 +787,8 @@ const recentWork = [
 .metric-card,
 .mini-card,
 .work-item,
-.flow-card {
+.flow-card,
+.uml-card {
   padding: 18px;
 }
 
@@ -625,6 +806,7 @@ const recentWork = [
 .metric-card p,
 .mini-card p,
 .flow-card p,
+.uml-card p,
 .doc-list p,
 .step p {
   margin: 8px 0 0;
@@ -693,7 +875,13 @@ const recentWork = [
 
 .architecture {
   display: grid;
-  grid-template-columns: 1fr 34px 1fr 34px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.arch-row {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr 34px 1fr;
   gap: 10px;
   align-items: center;
 }
@@ -718,6 +906,14 @@ const recentWork = [
   text-align: center;
   color: #64748b;
   font-size: 22px;
+}
+
+.arch-spacer {
+}
+
+.arch-center {
+  background: #e8f1ff;
+  border-color: #93c5fd;
 }
 
 .muted {
@@ -811,6 +1007,28 @@ code {
   overflow-wrap: anywhere;
 }
 
+.uml-image-frame {
+  margin: 14px 0 0;
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid #dbe3ee;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.uml-svg {
+  display: block;
+  width: 100%;
+  min-width: 900px;
+  height: auto;
+}
+
+.uml-source {
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
 .decision-list {
   display: grid;
   gap: 12px;
@@ -872,6 +1090,7 @@ code {
   .table-grid,
   .work-grid,
   .flow-grid,
+  .uml-grid,
   .agent-grid,
   .position-layout,
   .deploy-steps {

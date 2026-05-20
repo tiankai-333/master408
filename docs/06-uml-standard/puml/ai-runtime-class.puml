@@ -1,0 +1,65 @@
+@startuml
+!pragma layout smetana
+title 408Master AI Runtime 类图
+hide circle
+skinparam classAttributeIconSize 0
+
+class AiProviderConfig {
+  +id: Long
+  +code: String
+  +name: String
+  +baseUrl: String
+  +chatModel: String
+  +embeddingModel: String
+  +enabled: Boolean
+  +testConnection(): TestResult
+}
+
+class AiSkill {
+  +id: Long
+  +code: String
+  +name: String
+  +skillType: String
+  +enabled: Boolean
+}
+
+class AiAgent {
+  +id: Long
+  +code: String
+  +name: String
+  +agentType: String
+  +defaultModel: String
+  +enabled: Boolean
+}
+
+class AiAgentSkill {
+  +agentId: Long
+  +skillId: Long
+  +sortOrder: Integer
+  +enabled: Boolean
+}
+
+class AiPromptTemplate {
+  +id: Long
+  +code: String
+  +version: Integer
+  +scenario: String
+  +content: Text
+}
+
+class AiRunLog {
+  +id: Long
+  +userId: Integer
+  +providerCode: String
+  +model: String
+  +success: Boolean
+  +errorMessage: Text
+  +cost: Decimal
+}
+
+AiAgent "1" -- "0..*" AiAgentSkill
+AiSkill "1" -- "0..*" AiAgentSkill
+AiAgent "1" ..> "0..*" AiPromptTemplate : uses
+AiProviderConfig "1" -- "0..*" AiRunLog
+AiAgent "0..1" -- "0..*" AiRunLog
+@enduml

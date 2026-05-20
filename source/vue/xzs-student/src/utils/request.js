@@ -119,7 +119,7 @@ const postStream = async function (url, params, handlers = {}) {
     })
     const data = dataLines.join('\n')
     if (!data && eventName === 'message') return
-    if (eventName === 'chunk' && handlers.onChunk) handlers.onChunk(data)
+    if (eventName === 'chunk' && handlers.onChunk && data && data !== 'null') handlers.onChunk(data)
     if (eventName === 'status' && handlers.onStatus) handlers.onStatus(data)
     if (eventName === 'references' && handlers.onReferences) handlers.onReferences(data)
     if (eventName === 'done' && handlers.onDone) handlers.onDone(data)

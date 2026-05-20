@@ -1,0 +1,34 @@
+@startuml
+!pragma layout smetana
+title 408Master 用例图
+left to right direction
+
+actor "学生" as Student
+actor "管理员" as Admin
+actor "开发者/评审" as Developer
+
+rectangle "408Master 智能学习系统" {
+  usecase "刷题与提交答案" as UC_DoExam
+  usecase "查看错题本" as UC_Mistake
+  usecase "使用 AI 学习工作台" as UC_AiWorkbench
+  usecase "查看知识图谱" as UC_KnowledgeGraph
+  usecase "管理题库/试卷/用户" as UC_AdminData
+  usecase "配置 AI Provider" as UC_AiConfig
+  usecase "查看用量与运行状态" as UC_Usage
+  usecase "查看架构/接口/部署说明" as UC_DeveloperBrief
+}
+
+Student -- UC_DoExam
+Student -- UC_Mistake
+Student -- UC_AiWorkbench
+Student -- UC_KnowledgeGraph
+
+Admin -- UC_AdminData
+Admin -- UC_AiConfig
+Admin -- UC_Usage
+
+Developer -- UC_DeveloperBrief
+
+UC_AiWorkbench ..> UC_KnowledgeGraph : <<include>>
+UC_AiWorkbench ..> UC_Mistake : <<extend>>
+@enduml
