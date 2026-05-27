@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">A</span></strong><br/><p>由于是 <a href="/constitution_principle/storage/cache/#%e7%9b%b4%e6%8e%a5%e6%98%a0%e5%b0%84">直接映射</a>，所以物理地址的结构分为以下几个部分：</p><p>| Tag（17 bits） | Cache 块号（10 bits） | 块内偏移（5 bits） |</p><p>Cache 行包含以下几个部分：标记（tag 17bits）、有效位（valid 1bit）、修改位（dirty 1bit）、数据区（32B）</p><p>Cache 行的大小为 17 + 1 + 1 + 32 * 8 = 275</p>

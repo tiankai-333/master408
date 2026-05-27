@@ -1,0 +1,3 @@
+<strong>正确答案：<span class="correct-answer-text">A</span></strong><br/><p>本题参考 <a href="/data_structure/strings/match/#%e4%bf%ae%e6%ad%a3%e5%90%8e%e7%9a%84-next-%e6%95%b0%e7%bb%84">修正后的 next 数组</a>，传统 KMP 使用 next 数组，不过会存在 j=next[j]的情况，因此采用 next_val[] 来优化，处理
+好 next[] 和 next_val[] 后，举例即可，比如倒数第二个元素 a 匹配失败，会回到 -1 的位置，从 -1 的位
+置走到 4 的位置需要右滑的距离为 5 位。</p><table class="table td-initial"><thead><tr><th>下标</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody><tr><td>元素</td><td>a</td><td>a</td><td>b</td><td>a</td><td>a</td><td>b</td></tr><tr><td>next</td><td>-1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>2</td></tr><tr><td>next_val</td><td>-1</td><td>-1</td><td>1</td><td>-1</td><td>-1</td><td>1</td></tr></tbody></table>

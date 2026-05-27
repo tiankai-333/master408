@@ -1,0 +1,6 @@
+<p>信息在外存空间的排列也会影响存取等待时间。考虑几个逻辑记录 A、B、C、…、J，它们被存放在磁盘上，每个磁道存放 10 个记录，安排如表 1 所示。</p>
+<p><strong>表 1 每个磁道存放 10 个记录</strong></p>
+<table><thead><tr><th>物理块</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead><tbody><tr><td>逻辑记录</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>I</td><td>J</td></tr></tbody></table>
+<p>假定要经常顺序处理这些记录，磁盘旋转速度为 20ms/r，处理程序读出每个记录后花 4ms 进行处理。考虑对信息的分布进行优化，如表 2 所示，相比之前的信息分布，优化后的时间缩短了（ ）。</p>
+<p><strong>表 2 优化后磁道存放的 10 个记录</strong></p>
+<table><thead><tr><th>物理块</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead><tbody><tr><td>逻辑记录</td><td>A</td><td>H</td><td>E</td><td>B</td><td>I</td><td>F</td><td>C</td><td>J</td><td>G</td><td>D</td></tr></tbody></table>

@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">A</span></strong><br/>当 t 时刻发生超时时，根据 <a href="/computer_network/transport/tcp/#%e6%8b%a5%e5%a1%9e%e9%81%bf%e5%85%8d">拥塞避免</a> 算法，把 ssthresh 设为 8 的一半，即为 4，且拥塞窗口设为 1KB。然后经历 10 个 RTT 后，拥塞窗口的大小依次为 2,4,5,6,7,8,9,10,11,12，而发送窗口取当时的拥塞窗口和接收窗口的最小值，而接收窗口始终为 10KB，所以此时的发送窗口为 10KB，选 A。

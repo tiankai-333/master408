@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/>因为 R3 检测到网络 201.1.2.0/25 不可达，故将到该网络的距离设置为 16（距离为 16 表示不可达）。当 R2 从 R3 收到路由信息时，因为 R3 到该网络的距离为 16，则 R2 到该网络也不可达，但此时记录 R1 可达（由千 RIP 的特点 <a href="/computer_network/network/route/#%e5%9d%8f%e6%b6%88%e6%81%af%e4%bc%a0%e5%be%97%e6%85%a2">坏消息传得慢</a>，R1 并没有收到 R3 发来的路由信息），R1 到该网络的距离为 2，再加上从 R2 到 Rl 的 l 就是 R2 到该网络的距离 3。

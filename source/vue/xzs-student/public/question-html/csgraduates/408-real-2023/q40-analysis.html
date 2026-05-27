@@ -1,0 +1,6 @@
+<strong>正确答案：<span class="correct-answer-text">D</span></strong><br/><p>IPv4 是 32 位的地址长度，而 <a href="/computer_network/network/ip/#ipv6">IPv6</a> 是 128 位的地址长度，二者相差了 96 位，由于是二进制表示，所以地址数量相差了
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:.8141em"><span style="top:-3.063em;margin-right:.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">96</span></span></span></span></span></span></span></span></span></span></span></span>
+倍。因此 I 错误。</p><p>IPv4 的基本首部有选项字段，因此长度可变；
+IPv6 将可选字段移除，变成了扩展首部，但是扩展首部被放在了有效载荷中，因此基本首部长度是不可变的，Ⅱ错误。</p><p>在完全过渡到 IPv6 之前，Pv4 和 Pv6 并行使用，可以采用双协议栈技术和隧道技术进行。Ⅲ 正确。</p><p>IPv6 首部的 Hop-Limit 表示跳数限制，代表了 IPv6 数据报在网络中的最大跳数；
+而 IPv4 首部的 TTL 字段表示最大寿命，也表示了 IPv4 数据报在网络中的最大跳数，
+如果超出了 TTL，则该 P 数据报要被丢弃。V 正确。</p><p>综上所述，答案选择 D 选项。</p>

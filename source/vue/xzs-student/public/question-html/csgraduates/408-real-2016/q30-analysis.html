@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>P1 中对 a 进行赋值，并不影响最终的结果，故 a = l 与 a = 2 不需要互斥执行；a = x 与 b = x 执行先后不影响 a 与 b 的结果，无须互斥执行；x+=1 与 x+=2 执行先后会影响 x 的结果，需要互斥执行；P1 中的 x 和 P2 中的 x 是不同范围中的 X，互不影响，不需要互斥执行。

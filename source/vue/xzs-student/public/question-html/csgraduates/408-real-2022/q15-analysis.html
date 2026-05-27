@@ -1,0 +1,9 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>本题考察 <a href="/constitution_principle/storage/virtual/#%e5%8d%95%e7%ba%a7%e9%a1%b5%e8%a1%a8%e5%9c%b0%e5%9d%80%e7%bf%bb%e8%af%91">通过单级页表的地址翻译过程</a>。
+页大小为 4KB =
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:.8141em"><span style="top:-3.063em;margin-right:.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>
+B，按字节编址，故页内地址为 12 位。虚拟地址空间大小为
+4GB=23，故虚拟地址共 32 位，其中低 12 位为页内地址，高 20 位为虚页号。题中给出的
+虚拟地址为 00082840H，虚页号为高 20 位即 00082H（页内地址为低 12 位即 840H），82H 对
+应的十进制数为 130（注意题中页表的虚页号部分末尾未写 H，所以是十进制数，故查找时要
+先将虚页号转换为十进制数），查页表命中，且存在位为 1，对应页框号为 018H。将查找到的
+页框号 018H 和页内地址 840H 拼接，得到主存地址为 018840H。

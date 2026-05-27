@@ -1,0 +1,11 @@
+<p>2023 年 10 月 26 日，神州十七号载人飞船发射取得圆满成功，再次彰显了中国航天事业的辉煌成就。载人航天工程是包含众多子工程的复杂系统工程，为了保证工程的有序开展，需要明确各子工程的前导工程。以协调各子工程的实施。该问题可以简化、抽象为有向图的拓扑序列问题。已如有向图 G 采用邻接矩阵存储，类型定义如下：</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#204a87;font-weight:700">typedef</span> <span style="color:#204a87;font-weight:700">struct</span> <span style="color:#8f5902;font-style:italic">// 图的类型定义
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">numVertices</span><span style="color:#000;font-weight:700">,</span> <span style="color:#000">numEdges</span><span style="color:#000;font-weight:700">;</span> <span style="color:#8f5902;font-style:italic">// 图的顶点数和有向边数
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#204a87;font-weight:700">char</span> <span style="color:#000">verticesList</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">MAXV</span><span style="color:#000;font-weight:700">];</span>   <span style="color:#8f5902;font-style:italic">// 项点表，MAXV 为以定义常量
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">Edge</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">MAXV</span><span style="color:#000;font-weight:700">][</span><span style="color:#000">MAXV</span><span style="color:#000;font-weight:700">];</span>      <span style="color:#8f5902;font-style:italic">// 邻接矩阵
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:700">}</span> <span style="color:#000">MGraph</span>
+</span></span></code></pre></div>
+<p>请设计算法：int uniquely(MGraph G)。判定 G 是否存在唯一的拓扑序列，若是则返回 1，否则返回 0。要求：</p>
+<p>(1) 给出算法的基本设计思想（4 分）</p>
+<p>(2) 根据设计思想，采用 C 或 C++ 语言描述算法，关键之处给出注释（9 分）</p>

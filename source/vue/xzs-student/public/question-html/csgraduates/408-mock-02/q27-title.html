@@ -1,0 +1,21 @@
+<p>有两个优先级相同的并发程序 P1 和 P2，它们的执行过程如下所示，假设当前信号量 s1=0，s2=0。当前的 z=2，进程运行结束后，x、y 和 z 的值分别是（　）。</p>
+<p><strong>进程 P1</strong></p>
+<pre tabindex="0"><code>...
+y = 1;
+y = y + 2;
+z = y + 1;
+V(s1);
+P(s2);
+y = z + y;
+...
+</code></pre>
+<p><strong>进程 P2</strong></p>
+<pre tabindex="0"><code>...
+x = 1;
+x = x + 1;
+P(s1);
+x = x + y;
+z = x + z;
+V(s2);
+...
+</code></pre>

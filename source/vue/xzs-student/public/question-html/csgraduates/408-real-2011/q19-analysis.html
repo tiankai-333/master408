@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>由于不采用指令预取技术，每个 <a href="/constitution_principle/overview/performance/#cpi">指令周期</a> 都需要取指令，而不采用 Cache 技术，则每次取指令都至少要访问内存一次（当指令字长与存储字长相等且按边界对齐时），A 正确。时钟周期是 CPU 的最小时间单位，每个指令周期一定大于或等于 一个 CPU 时钟周期，B 正确。即使是空操作指令，在取指操作后，PC 也会自动加 1，C 错误。由于机器处于“开中断”状态，在 每条指令执行结束时都可能被外部中断而 打断。

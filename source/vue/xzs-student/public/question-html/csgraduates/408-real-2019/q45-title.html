@@ -1,0 +1,33 @@
+<p>已知
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.10764em">f</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6944em"></span><span class="mord mathnormal">n</span><span class="mclose">!</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6667em;vertical-align:-.0833em"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord">2</span><span class="mclose">)</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6667em;vertical-align:-.0833em"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">2</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+，计算
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.10764em">f</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>
+的 C 语言函数 f1 的源程序（阴影部分）及其在 32 位计算机 M 上的部分机器级代码如下：</p>
+<pre tabindex="0"><code>int f1(int n) {
+1   00401000   55             push ebp
+      ...           ...            ...
+   if(n&gt;1)
+11  00401018  83 7D 08 01    cmp   dword ptr [ebp+8],1
+12  0040101C  7E 17          jle   f1+35h (00401035)
+   return n*f1(n-1);
+13  0040101E  8B 45 08       mov   eax, dword ptr [ebp+8]
+14  00401021  83 E8 01       sub   eax, 1
+15  00401024  50             push  eax
+16  00401025  E8 D6 FF FF FF call  f1 ( 00401000)
+      ...           ...            ...
+19  00401030  0F AF C1       imul  eax, ecx
+20  00401033  EB 05          jmp   f1+3Ah (0040103a)
+   else return 1;
+}
+21  00401035  B8 01 00 00 00 mov   eax,1
+      ...           ...            ...
+26  00401040  3B EC          cmp   ebp, esp
+      ...           ...            ...
+30  0040104A  C3             ret
+</code></pre>
+<p>其中，机器级代码行包括行号、虚拟地址、机器指令和汇编指令，计算机 M 按字节编址，int 型数据占 32 位。请回答下列问题：</p>
+<p>(1) 计算 f(10) 需要调用函数 f1 多少次？执行哪条指令会递归调用 f1？</p>
+<p>(2) 上述代码中，哪条指令是条件转移指令？哪几条指令一定会使程序跳转执行？</p>
+<p>(3) 根据第 16 行的 call 指令，第 17 行指令的虚拟地址应是多少？已知第 16 行的 call 指令采用相对寻址方式，该指令中的偏移量应是多少（给出计算过程）？已知第 16 行的 call 指令的后 4 字节为偏移量，M 是采用大端方式还是采用小端方式？</p>
+<p>(4) f(13)=6227020800，但 f1(13) 的返回值为 1932053504，为什么两者不相等？要使 f1(13) 能返回正确的结果，应如何修改 f1 的源程序？</p>
+<p>(5) 第 19 行的 imul 指令（带符号整数乘）的功能是 R[eax]←R[eax]×R[ecx]，当乘法器输出的高、低 32 位乘积之间满足什么条件时，溢出标志 OF=1？要使 CPU 在发生溢出时转异常处理，编译器应在 imul 指令后应加一条什么指令？</p>

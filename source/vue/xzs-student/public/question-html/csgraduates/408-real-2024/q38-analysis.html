@@ -1,0 +1,3 @@
+<strong>正确答案：<span class="correct-answer-text">D</span></strong><br/><p>在 TCP 连接中，从建立连接到关闭连接的过程包括以下步骤：</p><ol><li>建立链接：这个过程通常为称为 <a href="/computer_network/transport/tcp/#%e4%b8%89%e6%ac%a1%e6%8f%a1%e6%89%8b">三次握手</a>，SYN、SYN-ACK、ACK，需要一个往返时间 RTT。</li><li>数据传输：主机 H 向服务器发送长度为 3000B 的报文。由于最大报文段长度 MSS=1000B，第一
+次拥塞窗口为 1 发送 1000B，第二次拥塞窗口为 2 发送 2000B，所以一共消耗 2 个最长报文段寿
+命，2 个 RTT。</li><li>关闭连接：这个过程通常称为 <a href="/computer_network/transport/tcp/#%e5%9b%9b%e6%ac%a1%e6%8c%a5%e6%89%8b">四次挥手</a> FIN、ACK、FIN、ACK。</li></ol><p>第一次挥手和第三次挥手构成一个 RTT，第二次和第三次是连续发送的，第四次发出去的时候和客户端等待的 2SL 时间重叠，所以需要 1 个 RTT。</p><p>所需时间 1RTT+2RTT+1RTT+2<em>MSL=4RTT+2</em>MSL。</p><p>将 RTT=10ms=0.01s 和 MSL=30s 代入上式，得到 60.04s。</p>

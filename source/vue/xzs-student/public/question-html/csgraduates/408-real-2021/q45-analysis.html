@@ -1,0 +1,12 @@
+<p>1）信号量
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.05764em">S</span></span></span></span>
+是能被多个进程共享的变量，多个进程都可通过 wait() 和 signal() 对
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.05764em">S</span></span></span></span>
+进行读、写操作。所以，wait() 和 signal() 操作中对 S 的访问必须是互斥的。</p><p>2）方法 1 错误。在 wait() 中，当
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8193em;vertical-align:-.136em"></span><span class="mord mathnormal" style="margin-right:.05764em">S</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">0</span></span></span></span>
+时，关中断后，其他进程无法修改 S 的值，while
+语句陷入死循环。方法 2 正确。方法 2 在循环体中有一个开中断操作，这样就可以使
+其他进程修改
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.05764em">S</span></span></span></span>
+的值，从而避免 while 语句陷入死循环。</p><p>3）用户程序不能使用开/关中断指令实现临界区互斥。因为开中断和关中断指令都是特权
+指令，不能在用户态下执行，只能在内核态下执行。</p>

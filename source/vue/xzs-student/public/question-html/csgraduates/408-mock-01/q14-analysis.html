@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/><strong>【解析】</strong><br/>在 C 语言中，<code>short</code> 类型默认为有符号整数，长度为 16 位。当将其值存入 32 位寄存器时，需要进行符号扩展以保持数值不变。给定 <code>x = 0x8FA0</code>，其二进制表示为 <code>1000 1111 1010 0000</code>，最高位为 1，表示负数。符号扩展时，高 16 位需用符号位（1）填充，因此扩展后的 32 位值为 <code>0xFFFF8FA0</code>。

@@ -1,0 +1,12 @@
+<p>关于临界区问题（critical section problem）的一个算法（假设只有进程 P0 和 P1 可能会进入该临界区）如下（i 为 0 或 1），该算法（ ）。</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-plaintext" data-lang="plaintext"><span style="display:flex"><span>Repeat
+</span></span><span style="display:flex"><span>    retry: if(turn!=i) turn=i;
+</span></span><span style="display:flex"><span>    if(turn!=i) goto retry;
+</span></span><span style="display:flex"><span>    turn=1-i;
+</span></span></code></pre></div>
+<p>临界区</p>
+<pre tabindex="0"><code>    turn=0;
+</code></pre>
+<p>剩余区</p>
+<pre tabindex="0"><code>    until false;
+</code></pre>

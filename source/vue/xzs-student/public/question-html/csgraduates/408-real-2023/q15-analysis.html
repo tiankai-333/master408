@@ -1,0 +1,7 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>由于 CPU 有 30 根地址线，每根地址线可以表示 2 个不同的状态（0 或 1）。因此，CPU
+的地址线共有
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:.8141em"><span style="top:-3.063em;margin-right:.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">30</span></span></span></span></span></span></span></span></span></span></span></span>
+个不同的地址。根据 RAM 和 ROM 的分配比，RAM 区占据整个地址空间的
+3/4，而 ROM 区占据剩下的 1/4，我们可以选取高位的两根地址线，00、01、10 分配给连续低
+地址的 RAM，则高位只剩下 11 可以分配，所以可以分配的地址范围为 110…00（28 个 0）~ 11…1
+（30 个 1)，十六进制表示为 300000000H ~ 3FFFFFFFFH。故本题的正确选项为 C。

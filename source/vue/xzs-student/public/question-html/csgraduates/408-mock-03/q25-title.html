@@ -1,0 +1,6 @@
+<p>系统拥有一个 CPU、IO1 和 IO2 为两个不同步的输入/输出装置，它们能够同时工作。当使用 CPU 之后控制转向 IO1、IO2 时，或者使用 IO1、IO2 之后控制转向 CPU 时，由控制程序执行中断处理，但这段处理时间忽略不计。有 A、B 两个进程同时被创建，进程 B 的调度优先权比进程 A 高，但是，当进程 A 正在占用 CPU 时，即使进程 B 需要占用 CPU，也不能打断进程 A 的执行。若在同一系统中分别单独执行，则需要占用 CPU、IO1、IO2 的时间如下图所示：</p>
+<p><strong>进程 A</strong></p>
+<table><thead><tr><th>CPU</th><th>IO1</th><th>CPU</th><th>IO2</th><th>CPU</th><th>IO1</th></tr></thead><tbody><tr><td>25ms</td><td>30ms</td><td>20ms</td><td>20ms</td><td>20ms</td><td>30ms</td></tr></tbody></table>
+<p><strong>进程 B</strong></p>
+<table><thead><tr><th>CPU</th><th>IO1</th><th>CPU</th><th>IO2</th><th>CPU</th><th>IO2</th><th>CPU</th></tr></thead><tbody><tr><td>20ms</td><td>30ms</td><td>20ms</td><td>20ms</td><td>10ms</td><td>20ms</td><td>45ms</td></tr></tbody></table>
+<p>经过计算可知，（ ）先结束。</p>

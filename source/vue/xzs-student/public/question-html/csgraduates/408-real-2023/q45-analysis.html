@@ -1,0 +1,4 @@
+<p>1）进入区中的语句 <code>if (key == TRUE) swap key，lock</code> 存在错误，修改为 <code>while (key ==TRUE) swap key, lock</code>。
+退出区中的语句 <code>lock=TRUE</code> 存在错误，修改为 <code>lock=FALSE</code>。</p><p>2）否。因为多个线程可以并发执行 <code>newSwap()</code>，<code>newSwap()</code> 执行时传递给形参 <code>b</code> 的是共享变
+量 <code>lock</code> 的地址，在 <code>newSwap()</code> 中对 <code>lock</code> 既有读操作又有写操作，并发执行时不能保证实现两
+个变量值的原子交换，从而会导致并发执行的线程同时进入临界区。</p>

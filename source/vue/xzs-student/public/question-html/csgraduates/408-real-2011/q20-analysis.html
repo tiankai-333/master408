@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>在取指令时，指令便是在数据线上传输的。操作数显然在数据线上传输。中断类型号用以指出 <a href="/constitution_principle/bus/io/#%e4%b8%ad%e6%96%ad%e5%90%91%e9%87%8f%e8%a1%a8">中断向量表</a> 的地址，CPU 响应中断请求后，将中断应答信号（INTR）发回到数据总线上，CPU 从数据总线上读取中断类型号后，查找中断向量表，找到相应的中断处理程序入口。而握手（应答）信号属于通信联络控制信号，应在通信总线上传输。

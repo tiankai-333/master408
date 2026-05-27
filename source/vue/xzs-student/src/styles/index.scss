@@ -1,3 +1,5 @@
+@import 'katex/dist/katex.min.css';
+
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
@@ -228,6 +230,77 @@ html {
     font-size: 15px !important;
     font-weight: 600 !important;
     color: #1f2f3d !important;
+  }
+}
+
+.q-title,
+.q-item-span-content,
+.question-show-item-analyze {
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 12px 0;
+  }
+
+  figure {
+    max-width: 100%;
+    margin: 14px 0;
+    overflow-x: auto;
+  }
+
+  figcaption {
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  table {
+    width: max-content;
+    max-width: 100%;
+    margin: 12px 0;
+    border-collapse: collapse;
+    overflow-x: auto;
+    display: block;
+  }
+
+  th,
+  td {
+    border: 1px solid #4b5563;
+    padding: 6px 10px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  pre {
+    max-width: 100%;
+    margin: 12px 0;
+    padding: 12px;
+    overflow-x: auto;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #0f172a !important;
+    color: #e5e7eb;
+    line-height: 1.6;
+  }
+
+  code {
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  pre code {
+    white-space: pre;
+  }
+
+  .katex-display,
+  .td-max-width-on-larger-screens {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 }
 

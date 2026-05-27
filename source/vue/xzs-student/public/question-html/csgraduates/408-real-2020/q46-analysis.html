@@ -1,0 +1,13 @@
+<p>1） ①页面大小=
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:.8141em"><span style="top:-3.063em;margin-right:.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>
+B = 4096B = 4KB。每个数组元素 4B，每个页面可以存放 4KB/4B=
+1024 个数组元素，正好是数组的一行，数组 a 按行优先方式存放。10800000H 的虚
+页号为 10800H，因此 a[0] 行存放在虚页号为 10800H 的页面中，a[1] 行存放在页号
+为 10801H 的页面中。a[1][2] 的虚拟地址为 10801000H+4×2=10801008H。</p><p>②转换为二进制 0001 0000 1000 0000 0001 0000 0000 1000，根据虚拟地址结构可知，对
+应的页目录号为 042H，页号为 001H。</p><p>③进程的页目录表起始地址为 00201000H，每个页目录项长 4B，因此 042H 号页目录
+项的物理地址是 00201000H+4×42H=00201108H。</p><p>④页目录项存放的页框号为 00301H，二级页表的起始地址为 00301000H，因此 a[1][2]
+所在页的页号为 001H，每个页表项 4B，因此对应的页表项物理地址是 00301000H + 001H×4 = 00301004H。</p><p>2）根据数组的随机存取特点，数组 a 在虚拟地址空间中所占的区域必须连续，由于数组 a
+不止占用一页，相邻逻辑页在物理上不一定相邻，因此数组 a 在物理地址空间中所占的
+区域可以不连续。</p><p>3）由 1）可知每个页面正好可以存放一整行的数组元素，“按行优先方式存放”意味着数
+组的同一行的所有元素都存放在同一个页面中，同一列的各个元素都存放在不同的页面
+中，因此数组 a 按行遍历的局部性较好。</p>

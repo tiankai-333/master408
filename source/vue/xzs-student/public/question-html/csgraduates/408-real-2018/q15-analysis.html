@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">A</span></strong><br/>按字节编址，采用 <a href="/constitution_principle/instruction/alignment/#%e5%b0%8f%e7%ab%af%e5%ba%8f">小端序</a>，低位的数据存储在低地址位、高位的数据存储在高地址位，并且按照一个字节相对不变的顺序存储。由题意知机器代码的地址是递减的，存储 0 的位数是后 32 位，那么我们只需要把 -64 的补码按字节存储在其中即可，而 -64 表示成 32 位的十六进制数是 FFFFFF CO, 根据小端方式的特点，高字节存储在低地址，就是 CO FF FF FF, 故选 A。

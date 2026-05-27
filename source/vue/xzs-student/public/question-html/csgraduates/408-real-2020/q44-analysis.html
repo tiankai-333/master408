@@ -1,0 +1,14 @@
+<p>1）主存块大小为 64B=2 字节，所以主存地址低 6 位为块内地址，Cache 组数为
+32KB/(64B×8) = 64 =
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:.8141em"><span style="top:-3.063em;margin-right:.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span>
+，故主存地址中间 6 位为 Cache 组号，主存地址中高 32-6-6
+=20 位为标记，采用 8 路组相联映射，故每行中的 LRU 位占 3 位，采用直写方式，故
+没有修改位。</p><p>2）0080 00C0H = 0000 0000 1000 0000 0000 0000 1100 0000B，主存地址的低 6 位为块内地
+址，为全 0，故 s 位于一个主存块的开始处，占 1024×4B/64B=64 个主存块：在执行程
+序段的过程中，每个主存块中的 64B/4B=16 个数组元素依次读、写 1 次，因而对每个
+主存块，总是第一次访问缺失，此时会将整个主存块调入 Cache，之后每次都命中。综
+上，数组 s 的数据 Cache 访问缺失次数为 64 次。</p><p>3）0001 0003H = 0000 0000 0000 0001 0000 0000 0000 0011B，根据主存地址划分可知，组
+索引为 0，故该地址所在主存块被映射到指令 Cache 的第 0 组；因为 Cache 初始为空，
+所有 Cache 行的有效位均为 O，所以 Cache 访问缺失。此时，将该主存块取出后存入指
+令 Cache 的第 0 组的任意一行，并将主存地址高 20 位（00010H）填入该行标记字段，
+设置有效位，修改 LRU 位，最后根据块内地址 000011B 从该行中取出相应的内容。</p>

@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">D</span></strong><br/>由于<a href="/computer_network/transport/tcp/#%e6%85%a2%e5%bc%80%e5%a7%8b">慢开始</a>门限 ssthresh 可以根据需求设置，为了求拥塞窗口从 8KB 增长到 32KB 所需的最长时间，可以假定慢开始门限小于等于 8KB，只要不出现拥塞，拥塞窗口就都是加法增大，每经历一个传输轮次（RTT），拥塞窗口逐次加 1，所需最长时间为 (32-8)x2ms=48ms。

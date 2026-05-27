@@ -1,0 +1,2 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/>本题考察 <a href="/computer_network/transport/tcp/#%e5%9b%9b%e6%ac%a1%e6%8c%a5%e6%89%8b">四次挥手</a> 的状态转换。
+当客户机收到服务器发送的 FIN 段并向服务器发送 ACK 段后，客户机的 TCP 状态变为 TIME_WAIT，此时 TCP 连接还未释放，必须经过时间等待计时器设置的时间 2MSL（最长报文段寿命）后，客户机才进入 CLOSED（连接关闭）状态。

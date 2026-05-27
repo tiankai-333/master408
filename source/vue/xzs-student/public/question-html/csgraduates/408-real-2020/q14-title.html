@@ -1,0 +1,7 @@
+<p>在按字节编址，采用小端方式的 32 位计算机中，按边界对齐方式为以下 C 语言结构型变量 a 分配存储空间。</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#204a87;font-weight:700">struct</span> <span style="color:#000">record</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">short</span> <span style="color:#000">x1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">x2</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span> <span style="color:#000">a</span><span style="color:#000;font-weight:700">;</span>
+</span></span></code></pre></div>
+<p>若 <code>a</code> 的首地址为 2020FE00H，a 的成员变量 <code>x2</code> 的机器数为 12340000H，则其中 34H 所在存储单元的地址是（ ）。</p>

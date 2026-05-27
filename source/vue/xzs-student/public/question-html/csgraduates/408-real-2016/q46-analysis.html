@@ -1,0 +1,2 @@
+<p>1）由于采用了静态优先数，当就绪队列中总有优先数较小的进程时，优先数较大的进程一直没有机会运行，因而会出现饥饿现象。（2 分）</p><p>2）优先数 priority 的计算公式为 priority = nice + k1 × cpuTime - k2 × waitTime，其中 k1 &gt; 0，k2 &gt; 0，用来分别调整 cpuTime 和 waitTime 在 priority 中所占的比例。（3 分）waitTime 可使长时间等待的进程优先数减少，从而避免出现饥饿现象。（1 分）</p><p>【评分说明】</p><p>①公式中包含 nice 给 1 分，利用 cpuTime 增大优先数给 1 分，利用 waitTime 减少优先数
+给 1 分；部分正确，酌情给分。</p><p>②若考生给出包含 nice、cpuTime 和 waitTime 的其他合理的优先数计算方法，同样给分。</p>

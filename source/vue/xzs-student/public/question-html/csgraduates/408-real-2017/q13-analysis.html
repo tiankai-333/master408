@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>由 4 个 DRAM 芯片采用 <a href="/constitution_principle/storage/memory/#%e5%a4%9a%e4%bd%93%e4%ba%a4%e5%8f%89%e5%ad%98%e5%82%a8%e5%99%a8">交叉编址方式</a> 构成主存可知主存地址最低二位表示该字节存储的芯片编号。double 型变量占 64 位，8 个字节。它的主存地址 804001AH 最低二位是 10，说明它从编号为 2 的 芯片开始存储（编号从 0 开始）。一个存储周期可以对所有芯片各读取一个字节，因此需要 3 轮，故选 C。

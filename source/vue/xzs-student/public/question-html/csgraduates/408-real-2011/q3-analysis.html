@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/>根据题意，第一个元素进入队列后存储在 <code>A[0]</code> 处，此时 <code>front</code> 和 <code>rear</code> 值都为 <code>0</code>。入队时由于要执行 <code>(rear+1) % n</code> 操作，所以如果入队后指针指向 0， 则 <code>rear</code> 初值为 <code>n-1</code>，而由于第一个元素在 <code>A[0]</code> 中，插入操作只改变 <code>rear</code> 指针，所以 <code>front</code> 为 0 不变。

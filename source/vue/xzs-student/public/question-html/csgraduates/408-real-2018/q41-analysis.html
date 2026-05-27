@@ -1,0 +1,121 @@
+<p>1）题目要求算法时间上尽可能高效，因此采用空间换时间的办法。分配一个用于标记的数组
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mclose">]</span></span></span></span>
+，用来记录
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中是否出现了
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+中的正整数，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>
+对应正整数
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>
+对应正整数
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+，初始化
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span></span></span></span>
+中全部为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">0</span></span></span></span>
+。由于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中含有
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+个整数，因此可能返回的值是
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6667em;vertical-align:-.0833em"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+，当
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+个数恰好为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+时返回
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6667em;vertical-align:-.0833em"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+。当数组
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中出现了小于等于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">0</span></span></span></span>
+或大于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+的值时，会导致
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+中出现空余位置，返回结果必然在
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+中，因此对于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中出现了小于等于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">0</span></span></span></span>
+或大于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+的值可以不采取任何操作。</p><p>经过以上分析可以得出算法流程：从
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal">A</span><span class="mopen">[</span><span class="mord">0</span><span class="mclose">]</span></span></span></span>
+开始遍历
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+，若
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6835em;vertical-align:-.0391em"></span><span class="mord">0</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal">A</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+，则令
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord mathnormal">A</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord">1</span><span class="mclose">]</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+；否则不进行操作。对
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+遍历结束后，开始遍历数组
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span></span></span></span>
+，若能查找到第一个满足
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">0</span></span></span></span>
+的下标
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6595em"></span><span class="mord mathnormal">i</span></span></span></span>
+，返回
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.7429em;vertical-align:-.0833em"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+即为结果，此时说明
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中未出现的最小正整数在
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+之间。若
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span></span></span></span>
+全部不为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">0</span></span></span></span>
+，返回
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.7429em;vertical-align:-.0833em"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+（跳出循环时
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6595em"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.7429em;vertical-align:-.0833em"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+等于
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6667em;vertical-align:-.0833em"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+），此时说明
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+中未出现的最小正整数是
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6667em;vertical-align:-.0833em"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+。</p><p>2）算法实现</p><div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">findMissMin</span><span style="color:#000;font-weight:700">(</span><span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">a</span><span style="color:#000;font-weight:700">[],</span> <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">n</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#8f5902;font-style:italic">// 来记录 1 ~ n 是否出现过
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">vis</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">n</span><span style="color:#000;font-weight:700">];</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">for</span> <span style="color:#000;font-weight:700">(</span><span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">&lt;</span> <span style="color:#000">n</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span><span style="color:#ce5c00;font-weight:700">++</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">vis</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:700">]</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>  <span style="color:#8f5902;font-style:italic">// 在 vis 数组中记录哪些正整数出现过
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:700">for</span> <span style="color:#000;font-weight:700">(</span><span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">&lt;</span> <span style="color:#000">n</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span><span style="color:#ce5c00;font-weight:700">++</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">num</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:700">];</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">if</span> <span style="color:#000;font-weight:700">(</span><span style="color:#000">num</span> <span style="color:#ce5c00;font-weight:700">&gt;</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>      <span style="color:#000">vis</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">num</span><span style="color:#ce5c00;font-weight:700">-</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">]</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>  <span style="color:#8f5902;font-style:italic">// 遍历 vis 来找到最小消失的正整数
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:700">for</span> <span style="color:#000;font-weight:700">(</span><span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">&lt;</span> <span style="color:#000">n</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span><span style="color:#ce5c00;font-weight:700">++</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">if</span> <span style="color:#000;font-weight:700">(</span><span style="color:#000">vis</span><span style="color:#000;font-weight:700">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:700">]</span> <span style="color:#ce5c00;font-weight:700">==</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>      <span style="color:#204a87;font-weight:700">return</span> <span style="color:#000">i</span><span style="color:#ce5c00;font-weight:700">+</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">return</span> <span style="color:#000">n</span><span style="color:#ce5c00;font-weight:700">+</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span></code></pre></div><p>3）时间复杂度：遍历
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal">A</span></span></span></span>
+一次，遍历
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span></span></span></span>
+一次，两次循环内操作步骤为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.02778em">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>
+量级，因此时间
+复杂度为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.02778em">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>
+。空间复杂度：额外分配了
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.05017em">B</span><span class="mopen">[</span><span class="mord mathnormal">n</span><span class="mclose">]</span></span></span></span>
+, 空间复杂度为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:1em;vertical-align:-.25em"></span><span class="mord mathnormal" style="margin-right:.02778em">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>
+。</p>

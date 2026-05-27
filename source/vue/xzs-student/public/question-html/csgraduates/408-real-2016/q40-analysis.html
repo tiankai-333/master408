@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>最少情况下：当本机 <a href="/computer_network/application/dns/#dns-%e7%bc%93%e5%ad%98">DNS 缓存</a> 中存有该域名的 DNS 信息时，则不 需要查询任何域名服务器，这样最少发出 0 次 DNS 查询。最多情况下：因为均采用迭代查询的方式，在最坏的情况下，需要依次迭代地向本地域名服务器、根域名服务器 (.com)、顶级域名服务器 (xyz.com)、权限域名服务器 (abc.xyz.com) 发出 DNS 查询 请求，因此 最多发出 4 次 DNS 查询。

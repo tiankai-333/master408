@@ -1,0 +1,5 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/><p><strong>背景知识：</strong></p><ul><li><p><strong><a href="/operating_system/files/dir/#%e7%a1%ac%e9%93%be%e6%8e%a5">硬链接</a></strong>：f1 和 f2 是同一个 inode 的两个目录项（即它们指向同一个文件的 inode），共享 <strong>相同的索引节点（inode）</strong> 和数据块。</p></li><li><p><strong>打开文件的过程</strong>：
+每个进程在打开文件时会创建：</p><ul><li>一个对应的 <strong>用户级打开文件表项</strong>（即 <code>fd</code> 指向它）</li><li>用户打开文件表项再指向 <strong>系统级打开文件表项</strong>（Open File Table）</li><li>系统级表项包含文件的读写偏移量（读写指针）和对 inode 的引用</li></ul></li></ul><hr/><p><strong>分析选项：</strong></p><p>Ⅰ. f1 和 f2 的读写指针位置保持相同</p><p>❌ <strong>错误</strong>。
+虽然 f1 和 f2 是同一个文件（硬链接），但两个进程分别打开它们时，会在系统级打开文件表中<strong>生成两个不同的表项</strong>，每个表项维护<strong>独立的文件偏移量</strong>（读写指针），所以<strong>互不影响</strong>。</p><p>Ⅱ. f1 和 f2 共享同一个内存索引结点</p><p>✅ <strong>正确</strong>。
+硬链接的本质就是多个目录项共享同一个 inode。即使路径不同（f1 和 f2），它们最终指向的是同一个 inode。</p><p>Ⅲ. fd1 和 fd2 分别指向各自的用户打开文件表中的一项</p><p>✅ <strong>正确</strong>。
+每个进程维护自己的文件描述符表（用户级文件表），<code>fd1</code> 和 <code>fd2</code> 分别是两个不同进程打开文件得到的描述符，它们自然是指向各自进程的用户打开文件表项。</p><p><strong>Ⅱ 和 Ⅲ 正确</strong>，因此，正确答案为 B。</p>

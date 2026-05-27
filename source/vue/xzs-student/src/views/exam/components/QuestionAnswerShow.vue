@@ -2,39 +2,39 @@
   <div v-loading="qLoading" style="line-height:1.8">
     <div v-if="qType === 1 || qType === 2 || qType === 3 || qType === 4 || qType === 5">
       <div v-if="qType === 1">
-        <div class="q-title" v-html="question.title" />
+        <QuestionHtml class="q-title" :content="question.title" />
         <div class="q-content">
           <el-radio-group v-model="answer.content">
             <el-radio v-for="item in question.items" :key="item.prefix" :label="item.prefix">
               <span class="question-prefix">{{ item.prefix }}.</span>
-              <span v-html="item.content" class="q-item-span-content"></span>
+              <QuestionHtml :content="item.content" inline class="q-item-span-content" />
             </el-radio>
           </el-radio-group>
         </div>
       </div>
       <div v-else-if="qType === 2">
-        <div class="q-title" v-html="question.title" />
+        <QuestionHtml class="q-title" :content="question.title" />
         <div class="q-content">
           <el-checkbox-group v-model="answer.contentArray">
             <el-checkbox v-for="item in question.items" :label="item.prefix" :key="item.prefix">
               <span class="question-prefix">{{ item.prefix }}.</span>
-              <span v-html="item.content" class="q-item-span-content"></span>
+              <QuestionHtml :content="item.content" inline class="q-item-span-content" />
             </el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
       <div v-else-if="qType === 3">
-        <div class="q-title" v-html="question.title" style="display: inline;margin-right: 10px" />
+        <QuestionHtml class="q-title" :content="question.title" inline style="display: inline;margin-right: 10px" />
         <span style="padding-right: 10px;">(</span>
         <el-radio-group v-model="answer.content">
           <el-radio v-for="item in question.items" :key="item.prefix" :label="item.prefix">
-            <span v-html="item.content" class="q-item-span-content"></span>
+            <QuestionHtml :content="item.content" inline class="q-item-span-content" />
           </el-radio>
         </el-radio-group>
         <span style="padding-left: 10px;">)</span>
       </div>
       <div v-else-if="qType === 4">
-        <div class="q-title" v-html="question.title" />
+        <QuestionHtml class="q-title" :content="question.title" />
         <div v-if="answer.contentArray !== null">
           <el-form-item :label="item.prefix" :key="item.prefix" v-for="item in question.items" label-width="50px" style="margin-top: 10px;margin-bottom: 10px;">
             <el-input v-model="answer.contentArray[item.prefix - 1]" />
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div v-else-if="qType === 5">
-        <div class="q-title" v-html="question.title" />
+        <QuestionHtml class="q-title" :content="question.title" />
         <div>
           <el-input v-model="answer.content" type="textarea" rows="5" />
         </div>
@@ -64,12 +64,12 @@
       <br />
       <div class="question-answer-show-item" style="line-height: 1.8">
         <span class="question-show-item">解析：</span>
-        <span v-html="question.analyze" class="q-item-span-content" />
+        <QuestionHtml :content="question.analyze" inline class="q-item-span-content" />
       </div>
       <div class="question-answer-show-item">
         <span class="question-show-item">正确答案：</span>
-        <span v-if="qType === 1 || qType === 2 || qType === 5" v-html="question.correct" class="q-item-span-content" />
-        <span v-if="qType === 3" v-html="trueFalseFormatter(question)" class="q-item-span-content" />
+        <QuestionHtml v-if="qType === 1 || qType === 2 || qType === 5" :content="question.correct" inline class="q-item-span-content" />
+        <QuestionHtml v-if="qType === 3" :content="trueFalseFormatter(question)" inline class="q-item-span-content" />
         <span v-if="qType === 4">{{ question.correctArray }}</span>
       </div>
     </div>
@@ -80,6 +80,7 @@
 
 <script setup>
 import { useEnumItemStore } from '@/store/modules/enumItem'
+import QuestionHtml from './QuestionHtml.vue'
 
 const enumItemStore = useEnumItemStore()
 

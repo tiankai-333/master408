@@ -1,0 +1,33 @@
+<p><strong>【答案】</strong>
+信号量定义：</p><ul><li>mutex：初值为 1，用于保护共享变量。</li><li>rope：初值为 1，用于控制绳索的访问。</li></ul><p>共享变量：</p><ul><li>SN_count：从南向北的猴子数量，初值为 0。</li><li>NS_count：从北向南的猴子数量，初值为 0。</li></ul><pre tabindex="0"><code>semaphore mutex = 1;
+semaphore rope = 1;
+semaphore SN_count = 0;
+semaphore NS_count = 0;
+</code></pre><p>从南向北的猴子执行以下操作：</p><pre tabindex="0"><code>south_monkey() {
+    P(mutex)
+    SN_count++
+    if (SN_count == 1) P(rope)
+    V(mutex)
+
+    // 通过绳索
+
+    P(mutex)
+    SN_count--
+    if (SN_count == 0) V(rope)
+    V(mutex)
+}
+</code></pre><p>从北向南的猴子执行以下操作：</p><pre tabindex="0"><code>north_monkey() {
+    P(mutex)
+    NS_count++
+    if (NS_count == 1) P(rope)
+    V(mutex)
+
+    // 通过绳索
+
+    P(mutex)
+    NS_count--
+    if (NS_count == 0) V(rope)
+    V(mutex)
+}
+</code></pre><p><strong>【解析】</strong>
+该问题本质上是单车道桥梁同步问题的变体，需要防止两个方向的猴子同时使用绳索导致死锁，同时允许同一方向的多只猴子共享绳索。使用 P、V 操作（信号量）来实现同步。</p><p>首先，定义信号量 mutex 用于互斥访问共享变量 SN_count 和 NS_count，确保计数操作原子性。信号量 rope 用于控制绳索的访问权限，初值为 1 表示绳索空闲。</p><p>对于从南向北的猴子：当第一只猴子到达时，在 mutex 保护下增加 SN_count，由于 SN_count 从 0 变为 1，它执行 P(rope) 获取绳索访问权，阻止北向南的猴子进入。之后释放 mutex，允许其他南向北猴子进入，它们增加 SN_count 但不会再次 P(rope)，因此同一方向多只猴子可以同时通过绳索。当猴子通过后，在 mutex 保护下减少 SN_count，如果 SN_count 变为 0，表示该方向没有猴子了，则执行 V(rope) 释放绳索访问权，允许另一方向猴子使用。</p><p>对于从北向南的猴子，操作对称：第一只猴子获取 rope，后续猴子共享访问，最后一只猴子释放 rope。</p><p>这种设计确保：只要有一个方向的猴子在使用绳索，rope 信号量就被持有，另一方向的猴子会在执行 P(rope) 时阻塞，直到当前方向所有猴子离开并释放 rope。因此，相反方向的猴子不会同时通过，避免了死锁。同一方向的猴子可以共享绳索，符合问题要求。整个过程通过 P、V 操作实现了同步，且不会产生饥饿，除非一个方向持续有猴子到达，但问题未要求公平性，故解法可行。</p>

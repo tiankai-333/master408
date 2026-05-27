@@ -1,0 +1,9 @@
+<p>（9 分）TCP 的拥塞窗口 cwnd 大小与传输轮次 n 的关系如下所示：</p>
+<table><thead><tr><th>cwnd</th><th>1</th><th>2</th><th>4</th><th>8</th><th>16</th><th>32</th><th>33</th><th>34</th><th>35</th><th>36</th><th>37</th><th>38</th><th>39</th></tr></thead><tbody><tr><td>n</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr></tbody></table>
+<table><thead><tr><th>cwnd</th><th>40</th><th>41</th><th>42</th><th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>1</th><th>2</th><th>4</th><th>8</th></tr></thead><tbody><tr><td>n</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr></tbody></table>
+<p>（1）画出 TCP 的拥塞窗口与传输轮次的关系曲线。</p>
+<p>（2）分别指明 TCP 工作在慢开始阶段和拥塞避免阶段的时间间隔。</p>
+<p>（3）在第 16 轮次和第 22 轮次之后发送方是通过收到三个重复的确认还是通过超时检测到丢失了报文段？</p>
+<p>（4）在第 1 轮次、第 18 轮次和第 24 轮次发送时，门限 ssthresh 分别被设置为多大？</p>
+<p>（5）在第几轮次发送出第 70 个报文段？</p>
+<p>（6）假定在第 26 轮次之后收到了三个重复的确认，因而检测出了报文段的丢失，那么拥塞窗口 cwnd 和门限 ssthresh 应设置为多大？</p>

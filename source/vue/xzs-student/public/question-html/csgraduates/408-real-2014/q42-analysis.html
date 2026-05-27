@@ -1,0 +1,38 @@
+<p>很多考生乍看之下以为是网络的题目，其实该题本身并没有涉及太多的网络知识点，只是
+应用了网络的模型，实际上考查的还是数据结构的内容。</p><p>1）图（1 分）</p><p>题中给出的是一个简单的网络拓扑图，可以抽象为无向图。</p><p>【评分说明】只要考生的答案中给出与图含义相似的描述，例如，“网状结构”“非线性结构”等，同样
+给分。</p><p>2）链式存储结构的如下图所示。</p><div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#204a87;font-weight:700">struct</span> <span style="color:#000">Arc</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">uint32_t</span> <span style="color:#000">id</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">uint32_t</span> <span style="color:#000">ip</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">metric</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">};</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#204a87;font-weight:700">struct</span> <span style="color:#000">Net</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">uint32_t</span> <span style="color:#000">prefix</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">uint32_t</span> <span style="color:#000">mask</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">metric</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">};</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#204a87;font-weight:700">struct</span> <span style="color:#000">LNode</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000">LNode</span> <span style="color:#ce5c00;font-weight:700">*</span><span style="color:#000">next</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#8f5902;font-style:italic">// flag == 1：链路连接到路由器
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#8f5902;font-style:italic">// flag == 2：链路连接到子网
+</span></span></span><span style="display:flex"><span><span style="color:#8f5902;font-style:italic"></span>  <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">flag</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">union</span> <span style="color:#000">NetOrArc</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">Net</span> <span style="color:#000">net</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">Arc</span> <span style="color:#000">arc</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000;font-weight:700">};</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">};</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#204a87;font-weight:700">struct</span> <span style="color:#000">HNode</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">uint32_t</span> <span style="color:#000">router_id</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000">LNode</span> <span style="color:#ce5c00;font-weight:700">*</span><span style="color:#000">next</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000">HNode</span> <span style="color:#ce5c00;font-weight:700">*</span><span style="color:#000">next_hnode</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">};</span>
+</span></span></code></pre></div><p>【评分说明】</p><p>① 若考生给出的答案是将链表中的表头结点保存在一个一维数组中（即采用邻接表形
+式），同样给分。</p><p>② 若考生给出的答案中，弧结点没有使用 union 定义，而是采用两种不同的结构分别表示
+Link 和 Net，同时在表头结点中定义了两个指针，分别指向由这两种类型的结点构成的两个链
+表，同样给分。</p><p>③考生所给答案的弧结点中，可以在单独定义的域中保存各直连网络 P 地址的前缀长度，
+也可以与网络地址保存在同一个域中。</p><p>④数据类型定义中，只要采用了可行的链式存储结构，并保存了题目中所给的 LS 信息，
+如将网络抽象为一类结点，写出含 8 个表头结点的链式存储结构，均可参照①③的标准给分。</p><p>⑤若考生给出的答案中，图示部分与其数据类型定义部分一致，图示只要能够体现链式
+存储结构和网络连接关系（可以不给出结点内细节信息），即可给分。</p><p>⑥若解答不完全正确，酌情给分。</p><p>3）计算结果如下表所示：</p><table><thead><tr><th style="text-align:center"></th><th style="text-align:center">目的网络</th><th style="text-align:center">路径</th><th style="text-align:center">代价（费用）</th></tr></thead><tbody><tr><td style="text-align:center">步骤 1</td><td style="text-align:center">192.1.1.0/24</td><td style="text-align:center">直接到达</td><td style="text-align:center">1</td></tr><tr><td style="text-align:center">步骤 2</td><td style="text-align:center">192.1.5.0/24</td><td style="text-align:center">R1→R3→192.1.5.0/24</td><td style="text-align:center">3</td></tr><tr><td style="text-align:center">步骤 3</td><td style="text-align:center">192.1.6.0/24</td><td style="text-align:center">R1→R2→192.1.6.0/24</td><td style="text-align:center">4</td></tr><tr><td style="text-align:center">步骤 4</td><td style="text-align:center">192.1.7.0/24</td><td style="text-align:center">R1→R2→R4→192.1.7.0/24</td><td style="text-align:center">8</td></tr></tbody></table><p>【评分说明】</p><p>①若考生给出的各条最短路径的结果部分正确，可酌情给分。</p><p>②若考生给出的从 R1 到达子网 192.1.x.x 的最短路径及代价正确，但不完全符合代价不减
+的次序，可酌情给分。</p>

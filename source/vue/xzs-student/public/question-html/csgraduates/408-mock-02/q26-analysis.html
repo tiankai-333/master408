@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/><strong>【解析】</strong> 互斥信号量 mutex 用于控制进程对临界区的访问，其初始值通常为 1，表示没有进程进入临界区。当 mutex=0 时，表示有一个进程已经成功执行了 P(mutex) 操作（即 wait 操作），将 mutex 减 1 后变为 0，这意味着该进程进入了临界区，且当前没有其他进程在等待进入临界区（因为等待时 mutex 会变为负值）。因此，选项 B 正确。选项 A 错误，因为 mutex=0 表示有进程在临界区内；选项 C 和 D 错误，因为 mutex=0 时没有进程等待，等待发生时 mutex 值会小于 0。

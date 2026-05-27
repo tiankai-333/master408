@@ -1,0 +1,12 @@
+<p>接上题，R0~R4 为通用寄存器，SEXT 表示按符号扩展，M 中补码除法器，逻辑结构图如下：</p>
+<div class="img-container" oncontextmenu="return!1" style="height:auto;width:80%"><img alt="" draggable="false" src="question-assets/csgraduates/408-real-2025/44.drawio-62d7cb5c945532d1.svg" style="width:100%;height:auto"/></div>
+<p>机器级代码：</p>
+<pre tabindex="0"><code>// x 在 R2 中，i 在 R4 中
+// 数组 d 的首地址在 R3 中
+mov R1,(R3+R4*4) // R1 ← d[i]
+scov R1          // {R0,R1} ← SEXT(R1)
+idiv R1          // R1&lt;-({R0,R1}/R2)
+</code></pre>
+<p>(1) 若执行 idiv 指令时，d[i]=0x87654321，x=0xff，则补码除法器中 R、Q、Y 的初始值分别为多少（用十六进制表示）？
+图 b 中哪个部分包含计数器？在补码除法器执行过程中，ALUop 所控制的 ALU 运算有哪几种？</p>
+<p>(2) 假设 idiv 执行过程中会检测并触发除法异常，则执行 idiv 指令时，哪些情况下会发生除法异常（要求给出此时 d[i] 和 x 的十六进制机器数）。发生除法异常时，在异常响应过程中，CPU 需要完成哪些操作？</p>

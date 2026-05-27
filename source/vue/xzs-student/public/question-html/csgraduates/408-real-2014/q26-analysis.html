@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">A</span></strong><br/>本题考察 <a href="/operating_system/process/process_thread/#%e7%8a%b6%e6%80%81%e7%a7%8d%e7%b1%bb">状态种类</a>，进程申请读磁盘操作的时候，因为要等待 I/O 操作完成，会把自身阻塞，此时进程就变为了阻塞状态，当 I/O 操作完成后，进程得到了想要的资源，就会从阻塞态转换到就绪态（这是操作系统的行为）。而降低进程优先级、分配用户内存空间和增加进程的时间片大小都不一定会发生，选 A。

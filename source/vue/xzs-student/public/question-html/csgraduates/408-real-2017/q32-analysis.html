@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/>在开始 <a href="/constitution_principle/bus/io/#dma-%e6%96%b9%e5%bc%8f">DMA</a> 传输时，主机向内存写入 DMA 命令块，向 DMA 控制器写入该命令块的地址，启动 I/O 设备。然后，CPU 继续其他工作，DMA 控制器则继续下去直接操作内存总线，将地址放到总线上开始传输。当整个传输完成后，DMA 控制器中断 CPU。因此执行顺序是 ②→③→①→④ 选 B。

@@ -1,0 +1,9 @@
+<p>在有 n(n&gt;1000) 个元素的升序数组 A 中查找关键字 x。查找算法的伪代码如下所示。</p>
+<pre tabindex="0"><code>k = 0;
+while (k &lt; n 且 A[k] &lt; x) k = k + 3;
+if (k &lt; n 且 A[k] == x) 查找成功；
+else if (k - 1 &lt; n 且 A[k - 1] == x) 查找成功；
+else if (k - 2 &lt; n 且 A[k - 2] == x) 查找成功；
+else 查找失败；
+</code></pre>
+<p>本算法与折半查找算法相比，有可能具有更少比较次数的情形是（）</p>

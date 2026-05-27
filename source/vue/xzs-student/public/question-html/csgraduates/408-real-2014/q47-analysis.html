@@ -1,0 +1,35 @@
+<p>这是典型的生产者和消费者问题，只对典型问题加了一个条件，只需在标准模型上新加一
+个信号量，即可完成指定要求。</p><p>设置四个变量 consumer_mutex、buffer_mutex、empty 和 full, consumer_mutex 用于一个控制一个消费者进程一个
+周期（10 次）内对于缓冲区的控制，初值为 1；buffer_mutex 用于进程单次互斥的访问缓冲区，初值
+为 1；empty 代表缓冲区的空位数，初值为 0；full 代表缓冲区的产品数，初值为 1000，具体进
+程的描述如下：</p><div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#000">semaphore</span> <span style="color:#000">consumer_mutex</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000">semaphore</span> <span style="color:#000">buffer_mutex</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000">semaphore</span> <span style="color:#000">full</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000">semaphore</span> <span style="color:#000">empty</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">1000</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">Consumer</span><span style="color:#000;font-weight:700">()</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">while</span> <span style="color:#000;font-weight:700">(</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">P</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">consumer_mutex</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">for</span> <span style="color:#000;font-weight:700">(</span><span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:700">&lt;</span> <span style="color:#0000cf;font-weight:700">10</span><span style="color:#000;font-weight:700">;</span> <span style="color:#000">i</span><span style="color:#ce5c00;font-weight:700">++</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>      <span style="color:#000">P</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">full</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>      <span style="color:#000">P</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">buffer_mutex</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>      <span style="color:#a40000">从缓冲区取出产品</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>      <span style="color:#000">V</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">buffer_mutex</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>      <span style="color:#000">V</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">empty</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>      <span style="color:#a40000">消费产品</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">V</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">consumer_mutex</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">Producer</span><span style="color:#000;font-weight:700">()</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>  <span style="color:#204a87;font-weight:700">while</span> <span style="color:#000;font-weight:700">(</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">P</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">empty</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">生产产品</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">P</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">buffer_mutex</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">将产品放入缓冲区</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">V</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">buffer_mutex</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">V</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">full</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>  <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span></code></pre></div><p>【评分说明】</p><p>①信号量的初值和含义都正确给 2 分。</p><p>②生产者之间的互斥操作正确给 1 分；生产者与消费者之间的同步操作正确给 2 分；消费者之间互斥操作正确给 1 分。</p><p>③控制消费者连续取产品数量正确给 2 分。</p><p>④仅给出经典生产者 - 消费者问题的信号量定义和伪代码描述最多给 3 分。</p><p>⑤若考生将题意理解成缓冲区至少有 10 件产品，消费者才能开始取，其他均正确，得 6 分。</p><p>⑥部分完全正确，酌情给分。</p>

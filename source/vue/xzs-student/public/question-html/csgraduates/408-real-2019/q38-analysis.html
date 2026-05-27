@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>TCP 规定当发送方收到对同一个报文段的 3 个重复的确认时，就可以认为跟在这个被确认报文段之后的报文已经丢失，立即执行 <a href="/computer_network/transport/tcp/#%e5%bf%ab%e9%80%9f%e9%87%8d%e4%bc%a0">快速重传</a> 算法。t3 时刻连续收到了来自服务器的三个确认序列号 ack_seq = 100 的段。发送方认为 seq = 100 的段已经丢失，执行快速重传算法，重新发送 seq = 100 段。

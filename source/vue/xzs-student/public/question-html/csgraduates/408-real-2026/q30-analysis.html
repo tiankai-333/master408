@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">B</span></strong><br/><p><strong>【解析】</strong><br/>进程 P1 和 P2 共享文件 R，这意味着它们通过各自的页表项 R1 和 R2 将虚拟地址 W1 和 W2 映射到相同的物理内存区域，因此 W1 和 W2 映射的物理地址相同。</p><ul><li>选项 A 错误，因为页表项 R1 和 R2 至少物理地址部分相同，内容并非完全不同；</li><li>选项 C 错误，由于共享物理内存，P1 对 W1 的修改会影响 P2 对 W2 的访问；</li><li>选项 D 错误，虚拟地址是进程独立的，W1 和 W2 不一定相同。</li></ul>

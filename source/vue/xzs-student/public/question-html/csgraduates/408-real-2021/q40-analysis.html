@@ -1,0 +1,2 @@
+<strong>正确答案：<span class="correct-answer-text">C</span></strong><br/>本题考察 TCP 的<a href="/computer_network/transport/tcp/#%e6%bb%91%e5%8a%a8%e7%aa%97%e5%8f%a3%e6%9c%ba%e5%88%b6">滑动窗口机制</a>。
+依题意，甲发送完 200B 报文后，继续发送的报文段中序号字段 seq=701。由于乙告知接收窗口为 500，且甲未收到乙对 seq =501 报文段的确认，那么甲还能发送的报文段字节数为 500-200=300B，因此甲在未收到新的确认段之前，还能发送的数据序号范围是 701~1000。

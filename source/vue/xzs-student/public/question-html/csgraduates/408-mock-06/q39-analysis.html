@@ -1,0 +1,2 @@
+<strong>正确答案：<span class="correct-answer-text">D</span></strong><br/><p><strong>【解析】</strong>
+在慢开始控制策略中，拥塞窗口（cwnd）初始值为 1 个 MSS（2KB），每经过一个 RTT，cwnd 翻倍。接收窗口大小为 24KB。发送窗口取 cwnd 和接收窗口的最小值。当 cwnd 增长到等于或超过 24KB 时，发送窗口达到 24KB。</p><p>计算 cwnd 增长过程：经过第一个 RTT 后，cwnd=4KB；第二个 RTT 后，cwnd=8KB；第三个 RTT 后，cwnd=16KB，仍小于 24KB；第四个 RTT 后，cwnd=32KB，超过 24KB，此时发送窗口被接收窗口限制为 24KB，即完全窗口。</p><p>每个 RTT 为 10ms，因此达到完全窗口需要经过 4 个 RTT，总时间为 4 × 10ms = 40ms。</p>

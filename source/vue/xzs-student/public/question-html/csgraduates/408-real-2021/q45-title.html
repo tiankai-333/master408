@@ -1,0 +1,60 @@
+<p>下表给出了整型信号量 S 的 wait() 和 signal() 操作的功能描述，以及采用开/关中断指令实现信号量操作互斥的两种方法。</p>
+<div class="td-card-group card-group p-0 mb-4"><div class="td-card card border me-4"><div class="card-header code">功能描述</div><div class="card-body code p-0 m-0"><div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-C" data-lang="C"><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">Semaphore</span> <span style="color:#000">S</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">wait</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">while</span> <span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">&lt;=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">S</span><span style="color:#ce5c00;font-weight:700">-</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">signal</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">S</span><span style="color:#ce5c00;font-weight:700">+</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span></code></pre></div></div></div><div class="td-card card border me-4"><div class="card-header code">方法 1</div><div class="card-body code p-0 m-0"><div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-C" data-lang="C"><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">Semaphore</span> <span style="color:#000">S</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">wait</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">关中断；</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">while</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">&lt;=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">);</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">S</span><span style="color:#ce5c00;font-weight:700">-</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">开中断；</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">signal</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">关中断；</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">S</span><span style="color:#ce5c00;font-weight:700">+</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">开中断；</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>
+</span></span></code></pre></div></div></div><div class="td-card card border me-4"><div class="card-header code">方法 2</div><div class="card-body code p-0 m-0"><div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-C" data-lang="C"><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">Semaphore</span> <span style="color:#000">S</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">wait</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">关中断；</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">while</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">&lt;=</span> <span style="color:#0000cf;font-weight:700">0</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>        <span style="color:#a40000">开中断；</span>
+</span></span><span style="display:flex"><span>        <span style="color:#a40000">关中断；</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">S</span><span style="color:#ce5c00;font-weight:700">-</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">开中断；</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span><span style="display:flex"><span>
+</span></span><span style="display:flex"><span><span style="color:#000">signal</span><span style="color:#000;font-weight:700">(</span><span style="color:#000">S</span><span style="color:#000;font-weight:700">)</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">关中断；</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">S</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">S</span><span style="color:#ce5c00;font-weight:700">+</span><span style="color:#0000cf;font-weight:700">1</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#a40000">开中断；</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span>
+</span></span></code></pre></div></div></div></div>
+<p>请回答下列问题。</p>
+<p>(1) 为什么在 wait() 和 signal() 操作中对信号量 S 的访问必须互斥执行？</p>
+<p>(2) 分别说明方法 1 和方法 2 是否正确。若不正确，请说明理由。</p>
+<p>(3) 用户程序能否使用开/关中断指令实现临界区互斥？为什么？</p>

@@ -1,0 +1,85 @@
+<p><strong>【答案】</strong>
+将固定入栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:.1667em"></span><span class="mspace" style="margin-right:.1667em"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord mathnormal">n</span></span></span></span>
+视为二叉树的前序遍历序列，而将出栈序列视为同一二叉树的中序遍历序列。由于二叉树的前序遍历和中序遍历可以唯一确定二叉树的结构，因此每个合法的出栈序列对应一种二叉树形态。</p><p><strong>【解析】</strong>
+对于入栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:.1667em"></span><span class="mspace" style="margin-right:.1667em"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord mathnormal">n</span></span></span></span>
+，其出栈序列的个数等于结点个数为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+的二叉树的个数，即第
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span></span></span></span>
+个卡特兰数。这一一对应可通过二叉树遍历序列建立：入栈序列固定为前序遍历序列，出栈序列作为中序遍历序列。具体地，前序遍历序列确定了根结点的访问顺序，中序遍历序列确定了左子树和右子树的划分，从而唯一重建二叉树。</p><p>以
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">3</span></span></span></span>
+为例，入栈序列为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，作为前序遍历序列。合法的出栈序列有
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">5</span></span></span></span>
+种，分别作为中序遍历序列，重建二叉树如下：</p><ul><li>出栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+：前序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，中序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，重建得二叉树为根结点
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+的右孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+的右孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">3</span></span></span></span>
+。</li><li>出栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span></span></span></span>
+：前序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，中序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span></span></span></span>
+，重建得根结点
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+的右孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+的左孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">3</span></span></span></span>
+。</li><li>出栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+：前序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，中序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，重建得根结点
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+的左孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+，右孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">3</span></span></span></span>
+。</li><li>出栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">1</span></span></span></span>
+：前序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，中序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">1</span></span></span></span>
+，重建得根结点
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+的左孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+的右孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">3</span></span></span></span>
+。</li><li>出栈序列
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">1</span></span></span></span>
+：前序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">3</span></span></span></span>
+，中序
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.8389em;vertical-align:-.1944em"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:.1667em"></span><span class="mord">1</span></span></span></span>
+，重建得根结点
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1</span></span></span></span>
+的左孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+，
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">2</span></span></span></span>
+的左孩子为
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">3</span></span></span></span>
+。</li></ul><p>这五种二叉树形态恰好对应所有合法的出栈序列，验证了一一对应关系。</p>

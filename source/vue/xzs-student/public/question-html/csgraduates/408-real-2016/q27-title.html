@@ -1,0 +1,10 @@
+<p>使用 TSL (Test and Set Lock) 指令实现进程互斥的伪代码如下所示。</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#204a87;font-weight:700">do</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000;font-weight:700">...</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">while</span> <span style="color:#000;font-weight:700">(</span><span style="color:#000">TSL</span><span style="color:#000;font-weight:700">(</span><span style="color:#ce5c00;font-weight:700">&amp;</span><span style="color:#000">lock</span><span style="color:#000;font-weight:700">));</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">critical</span> <span style="color:#000">section</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000">lock</span> <span style="color:#ce5c00;font-weight:700">=</span> <span style="color:#000">FALSE</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#000;font-weight:700">...</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span> <span style="color:#204a87;font-weight:700">while</span> <span style="color:#000;font-weight:700">(</span><span style="color:#000">TRUE</span><span style="color:#000;font-weight:700">);</span>
+</span></span></code></pre></div>
+<p>下列与该实现机制相关的叙述中，正确的是（ ）。</p>

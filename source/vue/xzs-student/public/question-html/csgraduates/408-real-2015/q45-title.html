@@ -1,0 +1,31 @@
+<p>有 A、B 两人通过信箱进行辩论，每个人都从自己的信箱中取得对方的问题，将答案和向对方提出的新问题组成一个邮件放人对方的信箱中。假设 A 的信箱最多放
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.10903em">M</span></span></span></span>
+个邮件，B 的信箱最多放
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.10903em">N</span></span></span></span>
+个邮件。初始时 A 的信箱中有
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.4306em"></span><span class="mord mathnormal">x</span></span></span></span>
+个邮件 (
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6835em;vertical-align:-.0391em"></span><span class="mord">0</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.5782em;vertical-align:-.0391em"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.10903em">M</span></span></span></span>
+)，B 的的信箱中有
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.625em;vertical-align:-.1944em"></span><span class="mord mathnormal" style="margin-right:.03588em">y</span></span></span></span>
+个邮件 (
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.6835em;vertical-align:-.0391em"></span><span class="mord">0</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.7335em;vertical-align:-.1944em"></span><span class="mord mathnormal" style="margin-right:.03588em">y</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6833em"></span><span class="mord mathnormal" style="margin-right:.10903em">N</span></span></span></span>
+)。辩论者每取出一个邮件，邮件数减 1。A 和 B 两人的操作过程描述如下：</p>
+<div class="td-card-group card-group p-0 mb-4"><div class="td-card card border me-4"><div class="card-body code p-0 m-0"><pre tabindex="0"><code>
+A {
+    while (true) {
+        从 A 的信箱中取出一个邮件；
+        回答问题并提出一个新问题；
+        将新邮件放入 B 的信箱；
+    }
+}
+</code></pre></div></div><div class="td-card card border me-4"><div class="card-body code p-0 m-0"><pre tabindex="0"><code>
+B {
+    while (true) {
+        从 B 的信箱中取出一个邮件；
+        回答问题并提出一个新问题；
+        将新邮件放入 A 的信箱；
+    }
+}
+</code></pre></div></div></div>
+<p>当信箱不为空时，辩论者才能从信箱中取邮件，否则等待。当信箱不满时，辩论者才能将新邮件放入信箱，否则等待。请添加必要的信号量和 P、V（或 wait、signal）操作，以实现上述过程的同步。要求写出完整的过程，并说明信号量的含义和初值。</p>

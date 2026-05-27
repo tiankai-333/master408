@@ -1,0 +1,17 @@
+<p>1）在该文件系统中，目录项由文件名和索引结点号构成。由图 a 可知，stu 目录下有两个文
+件，分别是 course 和 doc。由图 b 可知，这两个文件分别对应索引结点号 2 和 10。因此，
+目录文件 stu 中两个目录项的内容是</p><p>2）由图 b 可知，文件 doc 和文件 course1 对应的索引结点号都是 10。说明 doc 和 course1 两
+个目录项共享同一个索引结点，本质上对应同一个文件。而文件 course1 存储在 30 号磁盘
+块，因此文件 doc 占用的磁盘块的块号 x 为 30。</p><p>3）需要读 2 个磁盘块。先读 course1 的索引结点所在的磁盘块，再读 course1 的内容所在的
+磁盘块。目录文件 course 的内容已在内存中，即 coursel、course2 对应的目录项己在内存
+中，根据 coursel 对应的目录项可以知道其索引结点号，即可读入 course1 的索引结点所
+在的磁盘块：根据 course1 的索引结点可知该文件存储在 30 号磁盘块，因此可再读入
+coursel 的内容所在的磁盘块。</p><p>4）存取 course2 需要使用索引结点的一级和二级间接地址项。6MB 大小的文件需要占用
+6MB/4KB=1536 个磁盘块。直接地址项可以记录 10 个磁盘块号，一级间接地址块可以记
+录 4KB/4B=1024 个磁盘块号，二级间接地址块可以记录 1024×1024 个磁盘块号，而
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">10</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6835em;vertical-align:-.0391em"></span><span class="mord">1024</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.6835em;vertical-align:-.0391em"></span><span class="mord">1536</span><span class="mspace" style="margin-right:.2778em"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:.2778em"></span></span><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">10</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">1024</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">1024</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1024</span></span></span></span>
+。因此，6MB 大小的文件，需要使用一级间接地址
+项和二级间接地址项（拓展：若文件的总大小超出
+<span class="katex"><span aria-hidden="true" class="katex-html"><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">10</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">1024</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.7278em;vertical-align:-.0833em"></span><span class="mord">1024</span><span class="mspace" style="margin-right:.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:.2222em"></span></span><span class="base"><span class="strut" style="height:.6444em"></span><span class="mord">1024</span></span></span></span>
+块，则还需使
+用三级间接地址项）。</p>

@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">A</span></strong><br/>按照 <a href="/computer_network/transport/tcp/#%e6%85%a2%e5%bc%80%e5%a7%8b">慢开始算法</a>，发送窗口 = min{ 拥塞窗口，接收窗口｝，初始的拥塞窗口为最大报文段长度 1KB 海经过一个 RTT，拥塞窗口翻倍，因此需至少经过 5 个 RTT，发送窗口才能达到 32KB，所以选 A。这里假定乙能及时处理接收到的数据，空闲的接收缓存 ≥ 32KB。

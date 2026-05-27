@@ -1,0 +1,1 @@
+<strong>正确答案：<span class="correct-answer-text">D</span></strong><br/><a href="/constitution_principle/storage/virtual/#%e7%bc%ba%e9%a1%b5%e4%b8%ad%e6%96%ad">缺页中断</a> 产生后，需要在内存中找到空闲页框并分配给需要访问的页（可能涉及页面置换），之后缺页中断处理程序调用设备驱动程序做磁盘/O，将位于外存上的页面调入内存，调入后需要修改页表，将页表中代表该页是否在内存的标志位（或有效位）置为 1，并将物理页框号填入相应位置，若必要还需修改其他相关表项等。

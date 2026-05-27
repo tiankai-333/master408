@@ -1,0 +1,8 @@
+<p>某 32 计算机按字节编址，采用小端方式存放数据，编译器按边界对齐方式为下列 C 语言结构型数组变量 employce 分配储存空间。</p>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4" tabindex="0"><code class="language-c" data-lang="c"><span style="display:flex"><span><span style="color:#204a87;font-weight:700">struct</span> <span style="color:#000">record</span> <span style="color:#000;font-weight:700">{</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">id</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">char</span> <span style="color:#000">name</span><span style="color:#000;font-weight:700">[</span><span style="color:#0000cf;font-weight:700">10</span><span style="color:#000;font-weight:700">];</span>
+</span></span><span style="display:flex"><span>    <span style="color:#204a87;font-weight:700">int</span> <span style="color:#000">salary</span><span style="color:#000;font-weight:700">;</span>
+</span></span><span style="display:flex"><span><span style="color:#000;font-weight:700">}</span> <span style="color:#000">employee</span><span style="color:#000;font-weight:700">[</span><span style="color:#0000cf;font-weight:700">200</span><span style="color:#000;font-weight:700">];</span>
+</span></span></code></pre></div>
+<p>数组 employee 的起始地址为 0000A0B0H，employee[1].id 的机器数为 12345678H，问 56H 的地址是多少？（ ）。</p>
