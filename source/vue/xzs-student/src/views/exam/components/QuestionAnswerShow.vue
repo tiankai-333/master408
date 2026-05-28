@@ -1,47 +1,49 @@
 <template>
   <div v-loading="qLoading" class="question-answer-show">
-    <div v-if="qType === 1 || qType === 2 || qType === 3 || qType === 4 || qType === 5">
-      <div v-if="qType === 1">
+    <div v-if="effectiveQType === 1 || effectiveQType === 2 || effectiveQType === 3 || effectiveQType === 4 || effectiveQType === 5">
+      <div v-if="effectiveQType === 1">
         <QuestionHtml class="q-title" :content="question.title" />
         <div class="q-content">
           <el-radio-group v-model="answer.content">
-            <el-radio v-for="item in question.items" :key="item.prefix" :label="item.prefix">
+            <el-radio v-for="(item, index) in choiceItems" :key="choiceKey(item, index)" :label="item.prefix">
               <span class="question-prefix">{{ item.prefix }}.</span>
-              <QuestionHtml :content="item.content" inline class="q-item-span-content" />
+              <QuestionHtml v-if="item.content" :content="item.content" inline class="q-item-span-content" />
+              <span v-else class="q-item-span-content">选项 {{ item.prefix }}</span>
             </el-radio>
           </el-radio-group>
         </div>
       </div>
-      <div v-else-if="qType === 2">
+      <div v-else-if="effectiveQType === 2">
         <QuestionHtml class="q-title" :content="question.title" />
         <div class="q-content">
-          <el-checkbox-group v-model="answer.contentArray">
-            <el-checkbox v-for="item in question.items" :label="item.prefix" :key="item.prefix">
+          <el-checkbox-group v-model="displayedMultipleAnswer">
+            <el-checkbox v-for="(item, index) in choiceItems" :label="item.prefix" :key="choiceKey(item, index)">
               <span class="question-prefix">{{ item.prefix }}.</span>
-              <QuestionHtml :content="item.content" inline class="q-item-span-content" />
+              <QuestionHtml v-if="item.content" :content="item.content" inline class="q-item-span-content" />
+              <span v-else class="q-item-span-content">选项 {{ item.prefix }}</span>
             </el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
-      <div v-else-if="qType === 3">
+      <div v-else-if="effectiveQType === 3">
         <QuestionHtml class="q-title" :content="question.title" inline style="display: inline;margin-right: 10px" />
         <span style="padding-right: 10px;">(</span>
         <el-radio-group v-model="answer.content">
-          <el-radio v-for="item in question.items" :key="item.prefix" :label="item.prefix">
+          <el-radio v-for="(item, index) in choiceItems" :key="choiceKey(item, index)" :label="item.prefix">
             <QuestionHtml :content="item.content" inline class="q-item-span-content" />
           </el-radio>
         </el-radio-group>
         <span style="padding-left: 10px;">)</span>
       </div>
-      <div v-else-if="qType === 4">
+      <div v-else-if="effectiveQType === 4">
         <QuestionHtml class="q-title" :content="question.title" />
         <div v-if="answer.contentArray !== null">
-          <el-form-item :label="item.prefix" :key="item.prefix" v-for="item in question.items" label-width="50px" style="margin-top: 10px;margin-bottom: 10px;">
-            <el-input v-model="answer.contentArray[item.prefix - 1]" />
+          <el-form-item :label="String(item.prefix)" :key="choiceKey(item, index)" v-for="(item, index) in gapItems" label-width="50px" style="margin-top: 10px;margin-bottom: 10px;">
+            <el-input v-model="answer.contentArray[index]" />
           </el-form-item>
         </div>
       </div>
-      <div v-else-if="qType === 5">
+      <div v-else-if="effectiveQType === 5">
         <QuestionHtml class="q-title" :content="question.title" />
         <div>
           <el-input v-model="answer.content" type="textarea" rows="5" />
@@ -72,6 +74,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useEnumItemStore } from '@/store/modules/enumItem'
 import QuestionHtml from './QuestionHtml.vue'
 
@@ -103,6 +106,90 @@ const doRightTagFormatter = (status) => {
 const doRightTextFormatter = (status) => {
   return enumItemStore.enumFormat(enumItemStore.exam.question.answer.doRightEnum, status)
 }
+
+const rawItems = computed(() => Array.isArray(props.question.items) ? props.question.items : [])
+
+const titleText = computed(() => String(props.question.title || props.question.titleContent || ''))
+
+const correctText = computed(() => String(props.question.correct || '').toUpperCase())
+
+const isStoredSingleButMultiple = computed(() => {
+  return props.qType === 1 && (
+    titleText.value.includes('多项选择题') ||
+    /^[A-Z]{2,}$/.test(correctText.value)
+  )
+})
+
+const effectiveQType = computed(() => isStoredSingleButMultiple.value ? 2 : props.qType)
+
+const choiceItems = computed(() => {
+  if (rawItems.value.length > 0) {
+    return rawItems.value
+  }
+  if (effectiveQType.value === 1 || effectiveQType.value === 2) {
+    return fallbackChoiceItems()
+  }
+  return rawItems.value
+})
+
+const gapItems = computed(() => {
+  if (rawItems.value.length > 0) {
+    return rawItems.value
+  }
+  return Array.from({ length: inferGapCount() }, (_, index) => ({
+    prefix: index + 1,
+    content: ''
+  }))
+})
+
+const displayedMultipleAnswer = computed({
+  get() {
+    if (Array.isArray(props.answer.contentArray) && props.answer.contentArray.length > 0) {
+      return props.answer.contentArray
+    }
+    return splitAnswerLetters(props.answer.content)
+  },
+  set(value) {
+    props.answer.contentArray = value
+    if (isStoredSingleButMultiple.value) {
+      props.answer.content = [...value].sort().join('')
+    }
+  }
+})
+
+const fallbackChoiceItems = () => {
+  const letters = ['A', 'B', 'C', 'D']
+  const maxLetter = correctText.value.match(/[A-Z]/g)?.sort().pop()
+  if (maxLetter && maxLetter > 'D') {
+    const maxCode = Math.min(maxLetter.charCodeAt(0), 'G'.charCodeAt(0))
+    for (let code = 'E'.charCodeAt(0); code <= maxCode; code++) {
+      letters.push(String.fromCharCode(code))
+    }
+  }
+  return letters.map(prefix => ({ prefix, content: '' }))
+}
+
+const inferGapCount = () => {
+  const correct = String(props.question.correct || '')
+  if (correct.trim().startsWith('[')) {
+    try {
+      const parsed = JSON.parse(correct)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.length
+      }
+    } catch (e) {
+      // Keep the one-input fallback below for legacy data.
+    }
+  }
+  const blanks = titleText.value.match(/_{2,}|（\s*）|\(\s*\)/g)
+  return Math.max(1, blanks?.length || 1)
+}
+
+const splitAnswerLetters = (value) => {
+  return String(value || '').toUpperCase().match(/[A-Z]/g) || []
+}
+
+const choiceKey = (item, index) => `${item.prefix || 'item'}-${index}`
 </script>
 
 <style lang="scss" scoped>
