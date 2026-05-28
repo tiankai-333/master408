@@ -1,0 +1,17 @@
+<wxs module="enumItem" src="../../../wxs/enumItem.wxs"></wxs>
+<view>
+  <i-cell-group>
+    <i-cell wx:for="{{tableData}}" wx:key="{{item.id}}"
+      title="{{item.shortTitle}}"
+      is-link
+      url="/pages/error-book/detail/index?id={{item.id}}"
+      label="{{item.subjectName}}  {{item.createTime}}">
+      <view slot="footer">
+        <i-tag>{{enumItem.format(enumItem.state.exam.question.typeEnum, item.questionType)}}</i-tag>
+      </view>
+    </i-cell>
+  </i-cell-group>
+  <i-load-more tip="{{loadMoreTip}}" loading="{{loadMoreLoad}}" />
+  <i-spin size="large" fix wx:if="{{spinShow}}"></i-spin>
+  <i-message id="message" />
+</view>

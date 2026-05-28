@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg id="svg2" width="400" height="400" version="1.0" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" >
+<rect id="matrix" x="190" y="10" width="200" height="200" fill="lightblue" />
+<path id="gridH" d="M190,10 l200,0 M190,30 l200,0 M190,50 l200,0 M190,70 l200,0 M190,90 l200,0 M190,110 l200,0 M190,130 l200,0 M190,150 l200,0 M190,170 l200,0 M190,190 l200,0 M190,210 l200,0" fill="none" stroke="black" stroke-width="2" />
+<path id="gridV" d="M190,10 l0,200 M210,10 l0,200 M230,10l0,200 M250,10l0,200 M270,10l0,200 M290,10l0,200 M310,10l0,200 M330,10l0,200 M350,10l0,200 M370,10l0,200 M390,10l0,200" fill="none" stroke="black" stroke-width="2" />
+<rect id="buffer" x="190" y="240" width="200" height="20" fill="red" stroke="black" stroke-width="2" />
+<rect id="ras decoder" x="100" y="60" width="10" height="100" fill="lightgreen" />
+<rect id="cas decoder" x="240" y="300" width="100" height="10" fill="lightgreen" />
+<path id="adR" d="M110,65 L190,20 M110,75 L190,40 M110,85 L190,60 M110,95 L190,80 M110,105 L190,100 M110,115 L190,120 M110,125 L190,140 M110,135 L190,160 M110,145 L190,180 M110,155 L190,200" fill="none" stroke="black" stroke-width="2" />
+<path id="adC" d="M200,210 l0,30 -10,0 0,20 10,0L240,300 M220,210 l0,30 -10,0 0,20 10,0L250,300 M240,210l0,30 -10,0 0,20 10,0L260,300 M260,210l0,30 -10,0 0,20 10,0L270,300 M280,210l0,30 -10,0 0,20 10,0L280,300 M300,210l0,30 -10,0 0,20 10,0L290,300 M320,210l0,30 -10,0 0,20 10,0L300,300 M340,210l0,30 -10,0 0,20 10,0L310,300 M360,210l0,30 -10,0 0,20 10,0L320,300 M380,210l0,30 -10,0 0,20 10,0L330,300 " fill="none" stroke="black" stroke-width="2" />
+<path id="addressR" d="M50,400 L50,110 100,110" fill="none" stroke="black" stroke-width="8" />
+<path id="addressC" d="M50,400 L50,340 290,340 290,310" fill="none" stroke="black" stroke-width="8" />
+<path id="RAS" d="M105,400 L105,160" fill="none" stroke="black" stroke-width="2" />
+<path id="CAS" d="M370,400 L370,305 340,305" fill="none" stroke="black" stroke-width="2" />
+<path id="data" d="M150,400 L150,245 190,245" fill="none" stroke="black" stroke-width="2" />
+<path id="rw" d="M160,400 L160,255 190,255" fill="none" stroke="black" stroke-width="2" />
+<text id="text" fill="black" stroke="none" stroke-width="1px" font-family="Bitstream Vera Sans" font-size="18px" font-style="normal" font-weight="normal" stroke-linecap="butt" stroke-linejoin="miter" xml:space="preserve" >
+<tspan id="textA" x="32" y="380" >A
+</tspan>
+<tspan id="textRAS" x="65" y="380" >RAS
+</tspan>
+<tspan id="textCAS" x="325" y="380" >CAS
+</tspan>
+<tspan id="textData" x="110" y="380" >Data
+</tspan>
+<tspan id="textRw" x="165" y="380" >R/W
+</tspan>
+</text>
+</svg>

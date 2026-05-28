@@ -12,7 +12,10 @@
     "pages/my/message/info/index",
     "pages/my/message/list/index",
     "pages/my/log/index",
-    "pages/user/register/index"
+    "pages/user/register/index",
+    "pages/error-book/index/index",
+    "pages/error-book/detail/index",
+    "pages/ai-analyze/index/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",

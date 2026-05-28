@@ -99,8 +99,8 @@ const capsTooltip = ref(false)
 const loading = ref(false)
 
 const validateUsername = (rule, value, callback) => {
-  if (value.length < 5) {
-    callback(new Error('用户名不能少于5个字符'))
+  if (!String(value || '').trim()) {
+    callback(new Error('请输入用户名'))
   } else {
     callback()
   }

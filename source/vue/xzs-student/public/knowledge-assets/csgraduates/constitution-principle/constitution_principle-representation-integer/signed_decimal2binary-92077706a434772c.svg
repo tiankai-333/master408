@@ -1,0 +1,93 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #2c3e50; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #34495e; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #2c3e50; }
+      .formula { font-family: 'Courier New', monospace; font-size: 13px; fill: #8e44ad; }
+      .binary { font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; }
+      .positive { fill: #27ae60; }
+      .negative { fill: #e74c3c; }
+      .highlight { fill: #f39c12; }
+      .arrow { stroke: #3498db; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .box { stroke: #bdc3c7; stroke-width: 1; fill: none; rx: 5; }
+      .method-box { stroke: #3498db; stroke-width: 2; fill: #ecf0f1; rx: 8; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db" />
+    </marker>
+  </defs>
+  
+  <!-- 标题 -->
+  <text x="400" y="30" class="title" text-anchor="middle">十进制负数 → 补码二进制转换</text>
+  
+  <!-- 示例数字 -->
+  <rect x="50" y="50" width="120" height="40" class="box" />
+  <text x="110" y="75" class="subtitle" text-anchor="middle">十进制: -73</text>
+  
+  <!-- 方法一：直接观察法 -->
+  <rect x="30" y="110" width="360" height="200" class="method-box" />
+  <text x="210" y="135" class="subtitle" text-anchor="middle">方法一：基于公式直接观察</text>
+  
+  <!-- 公式 -->
+  <text x="50" y="160" class="formula">S = Σ(i=0 to n-2) 2^i × bi - 2^(n-1) × bn-1</text>
+  
+  <!-- 分解过程 -->
+  <text x="50" y="185" class="text">-73 = -128 + 55</text>
+  <text x="50" y="205" class="text">    = -128 + 32 + 16 + 4 + 2 + 1</text>
+  <text x="50" y="225" class="text">    = -2^7 + 2^5 + 2^4 + 2^2 + 2^1 + 2^0</text>
+  
+  <!-- 位置对应 -->
+  <text x="50" y="250" class="text">位置:</text>
+  <text x="120" y="250" class="formula">  7   6   5   4   3   2   1   0</text>
+  <text x="50" y="275" class="text">补码:</text>
+  <text x="120" y="275" class="binary negative">  1</text>
+  <text x="142" y="275" class="binary positive">   0</text>
+  <text x="164" y="275" class="binary highlight">   1</text>
+  <text x="186" y="275" class="binary highlight">   1</text>
+  <text x="208" y="275" class="binary positive">   0</text>
+  <text x="230" y="275" class="binary highlight">   1</text>
+  <text x="252" y="275" class="binary highlight">   1</text>
+  <text x="274" y="275" class="binary highlight">   1</text>
+  
+  <!-- 方法二：取反加一法 -->
+  <rect x="410" y="110" width="360" height="200" class="method-box" />
+  <text x="590" y="135" class="subtitle" text-anchor="middle">方法二：取反加一法</text>
+  
+  <!-- 步骤1 -->
+  <text x="430" y="165" class="text">步骤1: |-73| = 73 的纯二进制</text>
+  <text x="450" y="185" class="formula">73 = 64 + 8 + 1 = 2^6 + 2^3 + 2^0</text>
+  <text x="450" y="205" class="binary positive">01001001</text>
+  
+  <!-- 箭头 -->
+  <line x1="590" y1="215" x2="590" y2="235" class="arrow" />
+  
+  <!-- 步骤2 -->
+  <text x="430" y="255" class="text">步骤2: 取反 (0↔1)</text>
+  <text x="450" y="275" class="binary negative">10110110</text>
+  
+  <!-- 箭头 -->
+  <line x1="590" y1="285" x2="590" y2="305" class="arrow" />
+  
+  <!-- 步骤3 -->
+  <text x="430" y="325" class="text">步骤3: 加1</text>
+  <text x="450" y="345" class="formula">10110110 + 1 = </text>
+  <text x="600" y="345" class="binary negative" style="font-size: 16px;">10110111</text>
+  
+  <!-- 结果对比 -->
+  <rect x="200" y="370" width="400" height="80" style="stroke: #27ae60; stroke-width: 3; fill: #d5f4e6; rx: 10;" />
+  <text x="400" y="395" class="subtitle" text-anchor="middle" style="fill: #27ae60;">两种方法得到相同结果</text>
+  <text x="250" y="420" class="text">方法一结果:</text>
+  <text x="370" y="420" class="binary negative" style="font-size: 18px;">10110111</text>
+  <text x="250" y="440" class="text">方法二结果:</text>
+  <text x="370" y="440" class="binary negative" style="font-size: 18px;">10110111</text>
+  
+  <!-- 验证 -->
+  <text x="50" y="490" class="subtitle">验证: 10110111(补码) → 十进制</text>
+  <text x="50" y="515" class="formula">= 1×2^0 + 1×2^1 + 1×2^2 + 0×2^3 + 1×2^4 + 1×2^5 + 0×2^6 - 1×2^7</text>
+  <text x="50" y="535" class="formula">= 1 + 2 + 4 + 0 + 16 + 32 + 0 - 128</text>
+  <text x="50" y="555" class="formula">= 55 - 128 = -73 ✓</text>
+  
+  <!-- 说明文字 -->
+  <text x="50" y="580" class="text" style="font-size: 12px; fill: #7f8c8d;">注: 最高位为符号位，1表示负数，0表示非负数</text>
+</svg>

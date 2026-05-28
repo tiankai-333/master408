@@ -14,6 +14,10 @@ const props = defineProps({
   inline: {
     type: Boolean,
     default: false
+  },
+  stripLeadingAnswer: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -34,6 +38,13 @@ const resolveAssetUrl = (src) => {
   return `${base.replace(/\/$/, '')}/${src.replace(/^\//, '')}`
 }
 
+const stripLeadingCorrectAnswer = (html) => {
+  if (!props.stripLeadingAnswer || !html) return html
+  return String(html)
+    .replace(/^\s*<p>\s*(?:<strong>)?\s*(?:正确答案|答案)\s*[:：]\s*(?:[A-Z]+|正确|错误|对|错)\s*(?:<\/strong>)?\s*<\/p>\s*/i, '')
+    .replace(/^\s*(?:<strong>)?\s*(?:正确答案|答案)\s*[:：]\s*(?:[A-Z]+|正确|错误|对|错)\s*(?:<\/strong>)?\s*(?:<br\s*\/?>)?\s*/i, '')
+}
+
 const renderContent = async (content) => {
   const current = ++requestId
   if (!content) {
@@ -46,7 +57,7 @@ const renderContent = async (content) => {
   const refs = Array.from(doc.querySelectorAll('.question-html-ref[data-src]'))
 
   if (!refs.length) {
-    rendered.value = content
+    rendered.value = stripLeadingCorrectAnswer(content)
     return
   }
 
@@ -55,14 +66,14 @@ const renderContent = async (content) => {
     try {
       const response = await fetch(resolveAssetUrl(ref.getAttribute('data-src')), { cache: 'force-cache' })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      ref.outerHTML = await response.text()
+      ref.outerHTML = stripLeadingCorrectAnswer(await response.text())
     } catch (e) {
       ref.outerHTML = `<p>${escapeHtml(fallback)}</p>`
     }
   }
 
   if (current === requestId) {
-    rendered.value = doc.body.firstElementChild?.innerHTML || content
+    rendered.value = stripLeadingCorrectAnswer(doc.body.firstElementChild?.innerHTML || content)
   }
 }
 

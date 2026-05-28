@@ -8,11 +8,11 @@
       </div>
       <div class="header-actions">
         <button @click="draftLearningProfile">
-          <el-icon><MagicStick /></el-icon>
+          <el-icon><Search /></el-icon>
           生成学习画像
         </button>
-        <button @click="draftTargetedPractice">
-          <el-icon><Edit /></el-icon>
+        <button @click="draftGeneratePaper">
+          <el-icon><MagicStick /></el-icon>
           生成针对练习
         </button>
       </div>
@@ -79,24 +79,78 @@
           <div>
             <span class="eyebrow">AI Conversation</span>
             <h2>{{ activeContextTitle }}</h2>
-            <p>
-              当前讲法：{{ currentStyle.name }}
-              <template v-if="activeContextTag"> · {{ activeContextTag }}</template>
-            </p>
+            <p>当前讲法：{{ currentStyle.name }}</p>
           </div>
           <el-tag v-if="activeContextTag" effect="plain">{{ activeContextTag }}</el-tag>
         </div>
 
-        <div v-if="hasActiveContext" class="context-card">
-          <div>
+        <div class="conversation-actions">
+          <button :class="{ active: activeQuickAction === 'knowledge' }" @click="pickRandomKnowledgePoint">
+            <span>知识点</span>
+            <strong>{{ randomKnowledgeButtonText }}</strong>
+          </button>
+          <button :class="{ active: activeQuickAction === 'exam' }" @click="pickRandomExamQuestion">
+            <span>真题</span>
+            <strong>{{ randomExamButtonText }}</strong>
+          </button>
+          <button :class="{ active: activeQuickAction === 'wrong' }" @click="pickRandomWrongQuestion">
+            <span>错题</span>
+            <strong>{{ randomWrongButtonText }}</strong>
+          </button>
+          <button :class="{ active: activeQuickAction === 'paste' }" @click="focusPasteInput">
+            <span>输入</span>
+            <strong>粘贴</strong>
+          </button>
+        </div>
+
+        <div v-if="hasActiveContext" class="context-card" :class="{ 'knowledge-context-card': contextMode === 'knowledge' }">
+          <div v-if="contextMode === 'knowledge'">
             <strong>{{ activeContextTitle }}</strong>
-            <p>{{ activeContextDescription }}</p>
+            <KnowledgeHtml
+              v-if="selectedPointDetail.htmlRef"
+              class="knowledge-html-content"
+              :src="selectedPointDetail.htmlRef"
+              :fallback="activeContextDescription"
+            />
+            <p v-else>{{ activeContextDescription }}</p>
           </div>
+          <p v-else class="question-context-text">{{ activeContextDescription }}</p>
         </div>
 
         <div ref="messagesRef" class="chat-messages">
           <div v-for="(msg, index) in messages" :key="index" :class="['message-bubble', msg.role]">
-            <div v-html="formatMessage(msg.content)"></div>
+            <div v-if="msg.agentDraft" class="agent-draft-card">
+              <div class="draft-card-title">
+                <span>Agent 草案</span>
+                <strong>{{ msg.agentDraft.title || 'AI 练习草案' }}</strong>
+              </div>
+              <p>{{ msg.agentDraft.confirmText || msg.agentDraft.reason }}</p>
+              <div class="draft-meta">
+                <span>题量：{{ msg.agentDraft.questionCount }} 题</span>
+                <span>限时：{{ msg.agentDraft.minutes }} 分钟</span>
+                <span>候选：{{ (msg.agentDraft.candidateQuestionIds || []).length }} 道</span>
+                <span v-if="msg.agentDraft.knowledgePoint">知识点：{{ msg.agentDraft.knowledgePoint }}</span>
+              </div>
+              <div v-if="msg.agentDraft.reason" class="draft-reason">{{ msg.agentDraft.reason }}</div>
+              <div v-if="msg.agentDraft.fallbackKnowledgePoints && msg.agentDraft.fallbackKnowledgePoints.length" class="draft-fallback">
+                可放宽到：{{ msg.agentDraft.fallbackKnowledgePoints.join('、') }}
+              </div>
+              <div v-if="msg.agentDraft.candidateQuestionIds && msg.agentDraft.candidateQuestionIds.length" class="draft-ids">
+                题目 ID：{{ msg.agentDraft.candidateQuestionIds.join(', ') }}
+              </div>
+              <div class="draft-actions">
+                <el-button
+                  type="primary"
+                  size="small"
+                  :disabled="isTyping || !(msg.agentDraft.candidateQuestionIds || []).length"
+                  @click="confirmAgentDraft(msg)"
+                >
+                  确认生成
+                </el-button>
+                <el-button size="small" :disabled="isTyping" @click="reviseAgentDraft(msg)">调整条件</el-button>
+              </div>
+            </div>
+            <div v-else v-html="formatMessage(msg.content)"></div>
           </div>
           <div v-if="isTyping" class="typing-line">
             <span></span><span></span><span></span>
@@ -105,10 +159,11 @@
 
         <div class="chat-input">
           <el-input
+            ref="inputRef"
             v-model="inputMessage"
             type="textarea"
             :rows="4"
-            placeholder="问一个 408 问题，或围绕当前知识点继续追问..."
+            placeholder="粘贴题目，或围绕当前上下文向 AI 提问..."
             @keydown.enter.ctrl="sendMessage"
           />
           <div class="input-footer">
@@ -182,9 +237,15 @@
           <div class="related-block">
             <h3>关联真题</h3>
             <div v-if="relatedQuestions.length" class="question-list">
-              <button v-for="question in relatedQuestions" :key="question.id" class="question-row" @click="draftRelatedQuestion(question)">
-                <span>{{ question.title || question.name || `题目 #${question.id}` }}</span>
-                <em>{{ question.source || question.difficult ? `${question.source || '真题'} · 难度 ${question.difficult || '-'}` : '点击加入输入框' }}</em>
+              <button
+                v-for="question in relatedQuestions"
+                :key="question.id"
+                class="question-row"
+                :class="{ active: contextMode === 'question' && selectedQuestion && selectedQuestion.id === question.id }"
+                @click="draftRelatedQuestion(question)"
+              >
+                <span>{{ getQuestionSourceTitle(question) }}</span>
+                <em>{{ getQuestionBody(question) || '点击设为题目上下文' }}</em>
               </button>
             </div>
             <p v-else>点击知识点后会显示已关联真题；直接提交题目时，AI 会优先围绕题目本身回答。</p>
@@ -202,8 +263,10 @@
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowDown, Edit, MagicStick, Search } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { ArrowDown, MagicStick, Search } from '@element-plus/icons-vue'
 import { get, post, postStream } from '@/utils/request'
+import KnowledgeHtml from '@/components/KnowledgeHtml.vue'
 
 const router = useRouter()
 
@@ -213,6 +276,8 @@ const selectedStyle = ref(localStorage.getItem('master408-default-skill') || 'de
 const selectedSubjectName = ref('全部')
 const contextMode = ref('none')
 const questionContext = ref('')
+const selectedQuestion = ref(null)
+const activeQuickAction = ref('')
 const selectedPoint = ref(null)
 const selectedPointDetail = reactive({})
 const relatedQuestions = ref([])
@@ -222,6 +287,7 @@ const draftTaskType = ref('chat')
 const isTyping = ref(false)
 const messages = ref([])
 const messagesRef = ref(null)
+const inputRef = ref(null)
 const expandedGroups = ref([])
 let selectPointSeq = 0
 
@@ -239,6 +305,7 @@ const userStats = reactive({
 })
 
 const subjectColors = ['#2563eb', '#059669', '#ea580c', '#7c3aed', '#0891b2', '#dc2626']
+const core408SubjectNames = ['数据结构', '计算机组成原理', '操作系统', '计算机网络']
 
 const aiStyles = [
   { id: 'default', short: '常', name: '常规解析', description: '考点清晰，适合作为默认' },
@@ -259,17 +326,17 @@ const activeContextTitle = computed(() => {
     return selectedPointDetail.name || selectedPoint.value.name
   }
   if (contextMode.value === 'question' && questionContext.value) {
-    return '当前题目 / 问题'
+    return selectedQuestion.value?.source || selectedQuestion.value?.title || '当前题目 / 问题'
   }
   return '先输入题目，或从右侧选择知识点'
 })
 
 const activeContextDescription = computed(() => {
   if (contextMode.value === 'knowledge' && selectedPoint.value) {
-    return cleanKnowledgeDescription(selectedPointDetail.description || selectedPoint.value.description) || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。'
+    return cleanKnowledgeDescription(selectedPointDetail.summaryText || selectedPointDetail.description || selectedPoint.value.description) || '这个知识点还缺少详细描述，可以先让 AI 结合知识库补全。'
   }
   if (contextMode.value === 'question' && questionContext.value) {
-    return questionContext.value
+    return selectedQuestion.value?.body || questionContext.value
   }
   return ''
 })
@@ -279,9 +346,38 @@ const activeContextTag = computed(() => {
     return selectedPoint.value.subjectName
   }
   if (contextMode.value === 'question' && questionContext.value) {
-    return '题目上下文'
+    return selectedQuestion.value?.subjectName || currentSubjectScopeName.value || '题目上下文'
   }
   return ''
+})
+
+const currentSubjectScopeName = computed(() => {
+  const name = selectedSubjectName.value
+  return name && name !== '全部' ? name : ''
+})
+
+const subjectIdByName = computed(() => {
+  const map = new Map()
+  normalizedSubjectStats.value.forEach(subject => {
+    const id = Number(subject.id)
+    if (subject.name && Number.isFinite(id)) {
+      map.set(subject.name, id)
+    }
+  })
+  return map
+})
+
+const currentSubjectScopeIds = computed(() => {
+  const scope = currentSubjectScopeName.value
+  if (!scope) return []
+  if (scope.includes('408综合')) {
+    const ids = core408SubjectNames
+      .map(name => subjectIdByName.value.get(name))
+      .filter(id => Number.isFinite(id))
+    return ids.length ? ids : [1, 2, 3, 4]
+  }
+  const id = subjectIdByName.value.get(scope)
+  return Number.isFinite(id) ? [id] : []
 })
 
 const totalKnowledgePoints = computed(() => {
@@ -344,9 +440,7 @@ const groupedKnowledge = computed(() => {
 
 const filteredGroups = computed(() => {
   const kw = keyword.value.trim().toLowerCase()
-  const groups = selectedSubjectName.value === '全部'
-    ? groupedKnowledge.value
-    : groupedKnowledge.value.filter(group => group.name === selectedSubjectName.value)
+  const groups = scopedKnowledgeGroups.value
 
   if (!kw) return groups
 
@@ -360,6 +454,43 @@ const filteredGroups = computed(() => {
     }))
     .filter(group => group.points.length)
 })
+
+const isInCurrentSubjectScope = (subjectName) => {
+  const scope = currentSubjectScopeName.value
+  if (!scope) return true
+  if (scope.includes('408综合')) {
+    return core408SubjectNames.includes(subjectName)
+  }
+  return subjectName === scope
+}
+
+const isQuestionInCurrentSubjectScope = (question) => {
+  if (!currentSubjectScopeName.value) return true
+  const id = Number(question?.subjectId)
+  if (Number.isFinite(id) && currentSubjectScopeIds.value.length) {
+    return currentSubjectScopeIds.value.includes(id)
+  }
+  return isInCurrentSubjectScope(question?.subjectName || question?.subject)
+}
+
+const scopedKnowledgeGroups = computed(() => {
+  if (!currentSubjectScopeName.value) return groupedKnowledge.value
+  return groupedKnowledge.value.filter(group => isInCurrentSubjectScope(group.name))
+})
+
+const allKnowledgePoints = computed(() => groupedKnowledge.value.flatMap(group => group.points))
+const scopedKnowledgePoints = computed(() => scopedKnowledgeGroups.value.flatMap(group => group.points))
+
+const randomScopeLabel = computed(() => {
+  if (selectedPoint.value) {
+    return selectedPointDetail.name || selectedPoint.value.name
+  }
+  return currentSubjectScopeName.value
+})
+
+const randomKnowledgeButtonText = computed(() => currentSubjectScopeName.value || '随机知识点')
+const randomExamButtonText = computed(() => randomScopeLabel.value || '随机真题')
+const randomWrongButtonText = computed(() => randomScopeLabel.value || '随机错题')
 
 const isUsefulKnowledgeName = (name) => {
   const value = String(name || '').trim()
@@ -492,6 +623,14 @@ const loadUserStats = async () => {
 
 const selectSubject = (subject) => {
   selectedSubjectName.value = subject.name
+  if (subject.name === '全部') {
+    clearKnowledgeContext()
+    return
+  }
+  const groupNames = groupedKnowledge.value
+    .filter(group => isInCurrentSubjectScope(group.name))
+    .map(group => group.name)
+  expandedGroups.value = Array.from(new Set([...expandedGroups.value, ...groupNames]))
 }
 
 const toggleGroup = (name) => {
@@ -509,10 +648,48 @@ const clearKnowledgeContext = () => {
   childPoints.value = []
 }
 
-const setQuestionContext = (question) => {
+const setQuestionContext = (question, meta = null, quickAction = '') => {
   contextMode.value = 'question'
   questionContext.value = question
-  clearKnowledgeContext()
+  selectedQuestion.value = meta
+  if (quickAction) activeQuickAction.value = quickAction
+}
+
+const getQuestionSourceTitle = (question) => {
+  return question?.source || question?.paperName || question?.title || question?.name || `题目 #${question?.id || ''}`.trim()
+}
+
+const getQuestionBody = (question) => {
+  const source = getQuestionSourceTitle(question)
+  const body = question?.body || question?.title || question?.name || question?.shortTitle || ''
+  return body === source ? '' : body
+}
+
+const loadQuestionDetail = async (questionId) => {
+  if (!questionId) return null
+  try {
+    const response = await post('/api/student/question/select/' + questionId)
+    return response.code === 1 ? response.response : null
+  } catch (error) {
+    return null
+  }
+}
+
+const setRelatedQuestionContext = async (question, quickAction = '') => {
+  const source = getQuestionSourceTitle(question)
+  const detail = await loadQuestionDetail(question.id)
+  const fullBody = detail ? formatQuestionContext(detail) : ''
+  const body = fullBody || getQuestionBody(question) || source
+  contextMode.value = 'question'
+  questionContext.value = body
+  selectedQuestion.value = {
+    ...question,
+    source,
+    title: source,
+    body,
+    subjectName: question.subjectName || question.subject || selectedPoint.value?.subjectName || currentSubjectScopeName.value || '题目上下文'
+  }
+  if (quickAction) activeQuickAction.value = quickAction
 }
 
 const stripDraftInstruction = (text) => {
@@ -539,13 +716,15 @@ const getCurrentTarget = (preferDraft = true) => {
 
 const getKnowledgeText = () => {
   if (contextMode.value !== 'knowledge' || !selectedPoint.value) return ''
-  return `${selectedPoint.value.name}\n${cleanKnowledgeDescription(selectedPointDetail.description || selectedPoint.value.description)}`
+  return `${selectedPoint.value.name}\n${cleanKnowledgeDescription(selectedPointDetail.summaryText || selectedPointDetail.description || selectedPoint.value.description)}`
 }
 
 const selectPoint = async (point, announce = true) => {
   const seq = ++selectPointSeq
   contextMode.value = 'knowledge'
   questionContext.value = ''
+  selectedQuestion.value = null
+  if (announce) activeQuickAction.value = ''
   selectedPoint.value = point
   Object.keys(selectedPointDetail).forEach(key => delete selectedPointDetail[key])
   relatedQuestions.value = []
@@ -558,6 +737,7 @@ const selectPoint = async (point, announce = true) => {
       Object.assign(selectedPointDetail, response.response || {})
       selectedPointDetail.subjectName = selectedPointDetail.subjectName || point.subjectName
       selectedPointDetail.description = cleanKnowledgeDescription(selectedPointDetail.description)
+      selectedPointDetail.summaryText = cleanKnowledgeDescription(selectedPointDetail.summaryText)
       relatedQuestions.value = response.response?.relatedQuestions || []
       childPoints.value = response.response?.children || []
     }
@@ -591,6 +771,205 @@ const setDefaultStyle = (styleId) => {
 const draftPrompt = (content, taskType = 'chat') => {
   inputMessage.value = content
   draftTaskType.value = taskType
+}
+
+const currentKnowledgeName = () => {
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+    return selectedPointDetail.name || selectedPoint.value.name
+  }
+  return ''
+}
+
+const randomItem = (items) => {
+  if (!items || !items.length) return null
+  return items[Math.floor(Math.random() * items.length)]
+}
+
+const shuffleItems = (items) => {
+  return [...items].sort(() => Math.random() - 0.5)
+}
+
+const stripHtml = (text) => {
+  const raw = String(text || '')
+  const fallbackMatch = raw.match(/data-fallback=(["'])(.*?)\1/)
+  const source = fallbackMatch?.[2] || raw
+  return source
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const formatQuestionContext = (question, answer = null) => {
+  const lines = []
+  const title = stripHtml(question?.title || question?.titleContent || question?.content || question?.shortTitle)
+  if (title) lines.push(title)
+
+  if (Array.isArray(question?.items) && question.items.length) {
+    question.items.forEach(item => {
+      const optionText = stripHtml(item.content)
+      if (optionText) {
+        lines.push(`${item.prefix ? item.prefix + '. ' : ''}${optionText}`)
+      }
+    })
+  }
+
+  const correct = stripHtml(question?.correct || (Array.isArray(question?.correctArray) ? question.correctArray.join('、') : ''))
+  const userAnswer = stripHtml(answer?.content || (Array.isArray(answer?.contentArray) ? answer.contentArray.join('、') : ''))
+  if (correct) lines.push(`正确答案：${correct}`)
+  if (userAnswer) lines.push(`我的作答：${userAnswer}`)
+
+  return lines.filter(Boolean).join('\n')
+}
+
+const expandGroupForPoint = (point) => {
+  if (point?.subjectName && !expandedGroups.value.includes(point.subjectName)) {
+    expandedGroups.value = [...expandedGroups.value, point.subjectName]
+  }
+}
+
+const pickRandomKnowledgePoint = async () => {
+  const point = randomItem(scopedKnowledgePoints.value)
+  if (!point) {
+    ElMessage.warning(currentSubjectScopeName.value ? `「${currentSubjectScopeName.value}」下暂时没有可选择的知识点` : '当前还没有可选择的知识点')
+    return
+  }
+  expandGroupForPoint(point)
+  await selectPoint(point)
+  activeQuickAction.value = 'knowledge'
+  ElMessage.success(`已选择知识点：${point.name}`)
+}
+
+const pickRandomExamQuestion = async () => {
+  const canUseCurrentRelated = Boolean(selectedPoint.value)
+  const localQuestion = canUseCurrentRelated
+    ? randomItem(relatedQuestions.value.filter(question => isQuestionInCurrentSubjectScope(question)))
+    : null
+  if (localQuestion) {
+    await setRelatedQuestionContext(localQuestion, 'exam')
+    draftTaskType.value = 'exam'
+    ElMessage.success('已选择一道关联真题')
+    return
+  }
+
+  const candidates = shuffleItems(scopedKnowledgePoints.value).slice(0, 12)
+  for (const point of candidates) {
+    await selectPoint(point, false)
+    const question = randomItem(relatedQuestions.value)
+    if (question) {
+      expandGroupForPoint(point)
+      await setRelatedQuestionContext(question, 'exam')
+      draftTaskType.value = 'exam'
+      ElMessage.success('已选择一道随机真题')
+      return
+    }
+  }
+
+  ElMessage.warning(currentSubjectScopeName.value ? `「${currentSubjectScopeName.value}」下暂时没有可用的关联真题` : '暂时没有可用的关联真题，请先从右侧选择一个知识点')
+}
+
+const pickRandomWrongQuestion = async () => {
+  try {
+    const scopeIds = currentSubjectScopeIds.value
+    const payload = {
+      pageIndex: 1,
+      pageSize: 50
+    }
+    if (scopeIds.length === 1) {
+      payload.subjectId = scopeIds[0]
+    } else if (scopeIds.length > 1) {
+      payload.subjectIds = scopeIds
+    }
+    const response = await post('/api/student/question/answer/page', {
+      ...payload
+    })
+    let wrongItems = (response.response?.list || []).filter(item => isQuestionInCurrentSubjectScope(item))
+    if (selectedPoint.value && relatedQuestions.value.length) {
+      const relatedIds = new Set(relatedQuestions.value.map(item => Number(item.id || item.questionId)).filter(Number.isFinite))
+      wrongItems = wrongItems.filter(item => relatedIds.has(Number(item.questionId || item.id)))
+    }
+    const wrong = randomItem(wrongItems)
+    if (!wrong) {
+      ElMessage.warning(currentSubjectScopeName.value ? `「${currentSubjectScopeName.value}」下暂时没有可选择的错题` : '错题本里暂时没有可选择的错题')
+      return
+    }
+
+    const detail = await post('/api/student/question/answer/select/' + wrong.id)
+    if (detail.code !== 1 || !detail.response?.questionVM) {
+      ElMessage.warning('这道错题暂时无法读取详情')
+      return
+    }
+
+    const question = detail.response.questionVM
+    const answer = detail.response.questionAnswerVM
+    const context = formatQuestionContext(question, answer) || stripHtml(wrong.shortTitle) || `错题 #${wrong.id}`
+    setQuestionContext(context, {
+      id: wrong.questionId || question.id || wrong.id,
+      title: `错题 #${wrong.id}`,
+      source: `错题 #${wrong.id}`,
+      body: context,
+      subjectName: wrong.subjectName || question.subjectName || '错题'
+    }, 'wrong')
+    draftTaskType.value = 'exam'
+    ElMessage.success('已选择一道随机错题')
+  } catch (error) {
+    ElMessage.error('随机错题读取失败，请稍后重试')
+  }
+}
+
+const focusPasteInput = async () => {
+  try {
+    const text = await navigator.clipboard?.readText?.()
+    const pasted = String(text || '').trim()
+    if (pasted) {
+      setQuestionContext(pasted, {
+        title: '粘贴题目',
+        source: '粘贴题目',
+        body: pasted,
+        subjectName: selectedSubjectName.value !== '全部' ? selectedSubjectName.value : '题目上下文'
+      }, 'paste')
+      draftTaskType.value = 'chat'
+      ElMessage.success('已粘贴到当前上下文')
+      return
+    }
+  } catch (error) {
+    // 浏览器可能禁止读取剪贴板，退回手动粘贴。
+  }
+  await nextTick()
+  inputRef.value?.focus?.()
+  ElMessage.info('可以直接粘贴题目，Ctrl + Enter 发送')
+}
+
+const draftLearningProfile = () => {
+  const subjectLines = normalizedSubjectStats.value
+    .filter(subject => subject.name !== '全部')
+    .map(subject => `${subject.name}：已做 ${subject.done || 0} 题，正确率 ${subject.accuracy || 0}%`)
+    .join('\n')
+  const context = hasActiveContext.value
+    ? `当前上下文：${activeContextTitle.value}\n${activeContextDescription.value}`
+    : '当前上下文：未选择具体知识点或题目'
+
+  draftPrompt(`请根据下面的学习数据，生成我的 408 学习画像，并给出下一步复习建议。
+
+总体数据：
+已做题：${userStats.totalQuestions || 0}
+综合正确率：${safePercent(userStats.accuracy)}%
+
+分科表现：
+${subjectLines || '暂无分科做题数据'}
+
+${context}
+
+请输出：
+1. 当前学习画像
+2. 可能薄弱点
+3. 建议优先复习的知识点
+4. 下一组针对练习应该怎么选题`, 'profile')
 }
 
 const explainKnowledge = () => {
@@ -629,17 +1008,28 @@ const generatePractice = () => {
   }
 }
 
-const draftLearningProfile = () => {
-  draftPrompt(`请根据我的学习状态、做题记录、错题和薄弱学科，生成一份 408 学习画像。要求包括：\n1. 当前整体水平判断\n2. 四门科目的掌握情况\n3. 最值得优先补的知识点\n4. 接下来一周的复习安排`, 'chat')
+const draftGeneratePaper = () => {
+  const knowledgeName = currentKnowledgeName()
+  draftPrompt(`请帮我生成一份 408 针对练习草案。
+题量：3 题。
+限时：10 分钟。
+选题：${knowledgeName ? `围绕「${knowledgeName}」` : '优先结合我的错题和薄弱点'}。
+约束：先给出草案，确认后再生成试卷；只能使用题库中已经存在的题目，不要编造新题。`, 'practice')
 }
 
-const draftTargetedPractice = () => {
-  draftPrompt(`请根据我的错题、薄弱知识点和近期做题情况，从题库已经存在的题目中挑选 1-5 道针对性 408 练习题。要求标注题目 ID、知识点和题目来源；如果当前上下文没有可选题目，请只给筛选条件，不要编造新题。`, 'practice')
+const draftComposePaperCommand = () => {
+  const knowledgeName = currentKnowledgeName()
+  draftPrompt(`/compose paper
+目标：直接生成一张 408 限时练习卷。
+题量：3 题。
+限时：10 分钟。
+选题：${knowledgeName ? `围绕「${knowledgeName}」` : '优先结合我的错题和薄弱点'}。
+约束：只能使用题库中已经存在的题目，不要编造新题。`, 'practice')
 }
 
 const draftRelatedQuestion = (question) => {
-  const title = question.title || question.name || `题目 #${question.id}`
-  draftPrompt(`请结合这道关联真题讲解考点、解题步骤和易错点：\n${title}`, 'exam')
+  setRelatedQuestionContext(question)
+  draftTaskType.value = 'exam'
 }
 
 const goAiAnalyze = () => {
@@ -652,11 +1042,36 @@ const sendMessage = () => {
   const taskType = draftTaskType.value || 'chat'
   const hasStableContext = (contextMode.value === 'knowledge' && selectedPoint.value) ||
     (contextMode.value === 'question' && questionContext.value)
-  if (!(taskType !== 'chat' && hasStableContext)) {
+  const isCurrentQuestionContext = contextMode.value === 'question' && questionContext.value === question
+  if (!isCurrentQuestionContext && !(taskType !== 'chat' && hasStableContext)) {
     setQuestionContext(question)
   }
   draftTaskType.value = 'chat'
   sendAnalyzeMessage(question, taskType)
+}
+
+const buildFunctionPayload = (question) => {
+  const lower = question.toLowerCase()
+  if (!lower.includes('/compose paper')) {
+    return {}
+  }
+
+  const knowledgeName = currentKnowledgeName()
+  return {
+    composePaper: true,
+    preferMistakes: true,
+    questionCount: 3,
+    minutes: 10,
+    name: knowledgeName ? `AI限时练习-${knowledgeName}` : 'AI限时练习',
+    knowledgePoint: knowledgeName
+  }
+}
+
+const shouldUseAgentPlan = (question, taskType, functionPayload) => {
+  if (functionPayload.composePaper) {
+    return false
+  }
+  return taskType === 'practice' && /练习|组卷|出题|挑选|生成|卷子|试卷/.test(question)
 }
 
 const sendAnalyzeMessage = async (question, taskType = 'chat') => {
@@ -664,6 +1079,7 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
 
   const userQuestion = question.trim()
   const knowledgeText = getKnowledgeText()
+  const functionPayload = buildFunctionPayload(userQuestion)
 
   messages.value.push({ role: 'user', content: userQuestion })
   const assistantMessage = { role: 'assistant', content: '' }
@@ -675,13 +1091,52 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
   scrollToBottom()
 
   try {
+    if (functionPayload.composePaper) {
+      const response = await post('/api/student/ai/analyze', {
+        style: selectedStyle.value,
+        taskType,
+        question: userQuestion,
+        knowledgePoints: knowledgeText,
+        ...functionPayload
+      })
+
+      if (response.code === 1) {
+        const result = response.response || {}
+        updateAssistantMessage(assistantMessage, result.analysis || '')
+      } else {
+        updateAssistantMessage(assistantMessage, normalizeComposeError(response.message))
+      }
+      return
+    }
+
+    if (shouldUseAgentPlan(userQuestion, taskType, functionPayload)) {
+      const response = await post('/api/student/ai/agent/plan', {
+        message: userQuestion,
+        contextKnowledgePoint: currentKnowledgeName(),
+        mode: 'compose_paper',
+        questionCount: 3,
+        minutes: 10,
+        preferMistakes: true
+      })
+
+      if (response.code === 1) {
+        assistantMessage.content = ''
+        assistantMessage.agentDraft = response.response
+        messages.value = messages.value.slice()
+      } else {
+        updateAssistantMessage(assistantMessage, normalizeComposeError(response.message))
+      }
+      return
+    }
+
     let received = ''
     let references = []
     await postStream('/api/student/ai/analyze-stream', {
       style: selectedStyle.value,
       taskType,
       question: userQuestion,
-      knowledgePoints: knowledgeText
+      knowledgePoints: knowledgeText,
+      ...functionPayload
     }, {
       onStatus: (status) => {
         if (!received) updateAssistantMessage(assistantMessage, status)
@@ -721,7 +1176,8 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
         style: selectedStyle.value,
         taskType,
         question: userQuestion,
-        knowledgePoints: knowledgeText
+        knowledgePoints: knowledgeText,
+        ...functionPayload
       })
 
     if (response.code === 1) {
@@ -735,16 +1191,76 @@ const sendAnalyzeMessage = async (question, taskType = 'chat') => {
       }
         updateAssistantMessage(assistantMessage, content)
     } else {
-        updateAssistantMessage(assistantMessage, 'AI 服务暂时不可用，请稍后重试。')
+        updateAssistantMessage(assistantMessage, normalizeAiError(response.message))
       }
     } catch (error) {
-      updateAssistantMessage(assistantMessage, 'AI 服务暂时不可用，请稍后重试。')
+      updateAssistantMessage(assistantMessage, normalizeAiError(error.message))
     }
   } finally {
     isTyping.value = false
     await nextTick()
     scrollToBottom()
   }
+}
+
+const confirmAgentDraft = async (message) => {
+  if (!message.agentDraft || isTyping.value) return
+
+  const draft = message.agentDraft
+  const assistantMessage = { role: 'assistant', content: '正在生成限时练习卷...' }
+  messages.value.push(assistantMessage)
+  isTyping.value = true
+
+  await nextTick()
+  scrollToBottom()
+
+  try {
+    const response = await post('/api/student/ai/agent/confirm', {
+      title: draft.title,
+      knowledgePoint: draft.knowledgePoint,
+      questionCount: draft.questionCount,
+      minutes: draft.minutes,
+      preferMistakes: draft.preferMistakes,
+      questionIds: draft.candidateQuestionIds,
+      runLogId: draft.runLogId
+    })
+
+    if (response.code === 1) {
+      const paper = response.response
+      updateAssistantMessage(assistantMessage, formatPaperResult(paper))
+      message.agentDraft.status = 'confirmed'
+      messages.value = messages.value.slice()
+    } else {
+      updateAssistantMessage(assistantMessage, normalizeComposeError(response.message))
+    }
+  } catch (error) {
+    updateAssistantMessage(assistantMessage, normalizeComposeError(error.message))
+  } finally {
+    isTyping.value = false
+    await nextTick()
+    scrollToBottom()
+  }
+}
+
+const reviseAgentDraft = (message) => {
+  const draft = message.agentDraft || {}
+  draftPrompt(`请调整这份练习草案：
+知识点：${draft.knowledgePoint || '不限'}
+当前候选题：${(draft.candidateQuestionIds || []).join(', ') || '无'}
+我想调整为：`, 'practice')
+}
+
+const formatPaperResult = (paper) => {
+  if (!paper) return '练习卷已生成。'
+  return `## 已生成限时练习
+
+- 试卷：${paper.paperName}
+- 题量：${paper.questionCount} 道
+- 限时：${paper.minutes} 分钟
+- 选题策略：${paper.strategy || 'Agent 草案确认'}
+- 题目 ID：${(paper.questionIds || []).join(', ')}
+
+[开始答题](${paper.url})`
 }
 
 const updateAssistantMessage = (message, content) => {
@@ -761,6 +1277,18 @@ const cleanAiDisplayContent = (content) => {
   return String(content || '').replace(/^(?:null\s*)+/i, '').trimStart()
 }
 
+const normalizeComposeError = (message) => {
+  const cleaned = String(message || '').replace(/^AI分析失败[:：]\s*/, '').trim()
+  return cleaned || '没有生成练习卷，请放宽知识点、年份或题型限制后重试。'
+}
+
+const normalizeAiError = (message) => {
+  if (String(message || '').includes('没有找到符合条件的题目')) {
+    return normalizeComposeError(message)
+  }
+  return 'AI 服务暂时不可用，请稍后重试。'
+}
+
 const escapeHtml = (text) => {
   return String(text)
     .replace(/&/g, '&amp;')
@@ -773,7 +1301,7 @@ const renderInlineMarkdown = (text) => {
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
 }
 
 const normalizeMarkdown = (content) => {
@@ -968,11 +1496,13 @@ onMounted(async () => {
 
 .side-column,
 .catalog-column {
+  min-width: 0;
   display: grid;
   gap: 16px;
 }
 
 .panel-card {
+  min-width: 0;
   padding: 18px;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
@@ -1128,6 +1658,7 @@ onMounted(async () => {
 }
 
 .chat-panel {
+  min-width: 0;
   min-height: 780px;
   display: grid;
   grid-template-rows: auto auto minmax(360px, 1fr) auto;
@@ -1142,14 +1673,67 @@ onMounted(async () => {
   }
 }
 
+.conversation-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+
+  button {
+    display: grid;
+    gap: 4px;
+    min-height: 64px;
+    padding: 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 14px;
+    color: #334155;
+    background: #f8fbff;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      border-color: #60a5fa;
+      background: #eff6ff;
+      transform: translateY(-1px);
+    }
+
+    &.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18);
+    }
+
+    span {
+      color: #2563eb;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    strong {
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+  }
+}
+
 .context-card {
   display: grid;
   gap: 14px;
+  min-width: 0;
+  max-width: 100%;
   margin-bottom: 14px;
   padding: 16px;
+  overflow: hidden;
   border: 1px solid #bfdbfe;
   border-radius: 18px;
   background: #eff6ff;
+
+  > div {
+    min-width: 0;
+    max-width: 100%;
+  }
 
   strong {
     font-size: 17px;
@@ -1159,6 +1743,141 @@ onMounted(async () => {
     margin: 7px 0 0;
     color: #475569;
     line-height: 1.7;
+  }
+
+  .question-context-text {
+    white-space: pre-wrap;
+  }
+
+  :deep(.knowledge-html-content) {
+    min-width: 0;
+    max-width: 100%;
+    margin-top: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    color: #334155;
+    line-height: 1.75;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  :deep(.knowledge-html-content *) {
+    box-sizing: border-box;
+  }
+
+  :deep(.knowledge-html-content h1),
+  :deep(.knowledge-html-content h2),
+  :deep(.knowledge-html-content h3),
+  :deep(.knowledge-html-content h4) {
+    margin: 16px 0 8px;
+    color: #172033;
+    line-height: 1.35;
+  }
+
+  :deep(.knowledge-html-content h1:first-child),
+  :deep(.knowledge-html-content h2:first-child),
+  :deep(.knowledge-html-content h3:first-child),
+  :deep(.knowledge-html-content p:first-child) {
+    margin-top: 0;
+  }
+
+  :deep(.knowledge-html-content p),
+  :deep(.knowledge-html-content ul),
+  :deep(.knowledge-html-content ol) {
+    margin: 8px 0;
+  }
+
+  :deep(.knowledge-html-content ul),
+  :deep(.knowledge-html-content ol) {
+    padding-left: 22px;
+  }
+
+  :deep(.knowledge-html-content img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    border-radius: 10px;
+  }
+
+  :deep(.knowledge-html-content svg) {
+    display: none;
+  }
+
+  :deep(.knowledge-html-content .svg-wrapper svg),
+  :deep(.knowledge-html-content .svg-container svg) {
+    display: block;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 10px 0 !important;
+  }
+
+  :deep(.knowledge-html-content table) {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    margin: 12px 0;
+    overflow-x: auto;
+    border-collapse: collapse;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  :deep(.knowledge-html-content th),
+  :deep(.knowledge-html-content td) {
+    padding: 8px 10px;
+    border: 1px solid #bfdbfe;
+    vertical-align: top;
+  }
+
+  :deep(.knowledge-html-content th) {
+    background: #dbeafe;
+  }
+
+  :deep(.knowledge-html-content pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #111827;
+    white-space: pre;
+    overscroll-behavior-x: contain;
+  }
+
+  :deep(.knowledge-html-content code) {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: rgba(37, 99, 235, 0.1);
+  }
+
+  :deep(.knowledge-html-content pre code) {
+    padding: 0;
+    background: transparent;
+  }
+}
+
+.knowledge-context-card {
+  max-height: 560px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+
+  :deep(.knowledge-html-content) {
+    overflow: visible;
+  }
+
+  :deep(.knowledge-html-content table) {
+    max-width: none;
+  }
+
+  :deep(.knowledge-html-content pre) {
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    overflow: visible;
   }
 }
 
@@ -1437,6 +2156,11 @@ onMounted(async () => {
     background: #eff6ff;
   }
 
+  &.active {
+    border-color: #2563eb;
+    background: #dbeafe;
+  }
+
   span {
     color: #334155;
     line-height: 1.5;
@@ -1462,6 +2186,61 @@ onMounted(async () => {
   color: #fff;
   background: linear-gradient(135deg, #2563eb, #7c3aed);
   cursor: pointer;
+}
+
+.agent-draft-card {
+  display: grid;
+  gap: 12px;
+  min-width: min(560px, 76vw);
+
+  p {
+    margin: 0;
+    line-height: 1.7;
+  }
+}
+
+.draft-card-title {
+  display: grid;
+  gap: 4px;
+
+  span {
+    color: #93c5fd;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    font-size: 18px;
+  }
+}
+
+.draft-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  span {
+    padding: 5px 8px;
+    border-radius: 999px;
+    color: #dbeafe;
+    background: rgba(37, 99, 235, 0.28);
+    font-size: 12px;
+  }
+}
+
+.draft-reason,
+.draft-fallback,
+.draft-ids {
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 @keyframes typing {
@@ -1498,6 +2277,10 @@ onMounted(async () => {
     align-items: stretch;
   }
 
+  .conversation-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .message-bubble {
     max-width: 94%;
   }
@@ -1513,7 +2296,8 @@ onMounted(async () => {
   }
 
   .profile-summary,
-  .skill-grid {
+  .skill-grid,
+  .conversation-actions {
     grid-template-columns: 1fr;
   }
 }

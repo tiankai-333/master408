@@ -18,8 +18,8 @@
       <el-form-item label="题干：" prop="title" required>
         <el-input v-model="form.title" type="textarea" :rows="3"/>
       </el-form-item>
-      <el-form-item label="参考答案：" prop="answer" required>
-        <el-input v-model="form.answer" type="textarea" :rows="5"/>
+      <el-form-item label="参考答案：" prop="correct" required>
+        <el-input v-model="form.correct" type="textarea" :rows="5"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">提交</el-button>
@@ -51,7 +51,7 @@ const form = reactive({
   difficult: 1,
   score: 10,
   title: '',
-  answer: ''
+  correct: ''
 })
 
 const subjectFilter = ref(null)
@@ -69,7 +69,7 @@ const rules = {
   difficult: [{ required: true, message: '请选择难度', trigger: 'change' }],
   score: [{ required: true, message: '请输入分数', trigger: 'blur' }],
   title: [{ required: true, message: '请输入题干', trigger: 'blur' }],
-  answer: [{ required: true, message: '请输入参考答案', trigger: 'blur' }]
+  correct: [{ required: true, message: '请输入参考答案', trigger: 'blur' }]
 }
 
 const submitForm = () => {
@@ -103,7 +103,7 @@ const resetForm = () => {
     difficult: 1,
     score: 10,
     title: '',
-    answer: ''
+    correct: ''
   })
   form.id = lastId
 }

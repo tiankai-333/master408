@@ -23,6 +23,16 @@
 
 <view>
   <i-cell-group i-class="my-group-margin">
+    <i-cell title="错题本" is-link url="/pages/error-book/index/index">
+      <i-icon type="browse_fill" slot="icon" size="20" />
+    </i-cell>
+    <i-cell title="AI题目识别" is-link url="/pages/ai-analyze/index/index">
+      <i-icon type="camera_fill" slot="icon" size="20" />
+    </i-cell>
+  </i-cell-group>
+
+  <view>
+  <i-cell-group i-class="my-group-margin">
     <i-cell title="学习设置" is-link url="/pages/dashboard/index">
       <i-icon type="setup_fill" slot="icon" size="20" />
     </i-cell>

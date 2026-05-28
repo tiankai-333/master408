@@ -1,0 +1,22 @@
+<h1>传输层</h1><div class="lead">本章是计算机网络中的重点，需熟练掌握 TCP 的滑动窗口机制、连接断开与建立、流量和拥塞控制。</div><header class="article-meta"></header><p>学习思维导图</p><pre tabindex="0"><code class="language-markmap" data-lang="markmap"># 传输层
+
+## 提供的服务
+
+- 传输层功能
+- 寻址和端口
+- 无连接和面向连接服务
+
+## UDP协议
+
+- UDP数据报
+- UDP校验
+
+## TCP协议
+
+- TCP段
+- 连接管理
+- 可靠传输
+- 流量控制
+- 拥塞控制
+</code></pre><span class="anchored-text anchored-block" id="传输层功能"><span class="anchor-label">传输层功能</span>
+<svg aria-hidden="true" class="anchor-icon" fill="currentColor" height="14" viewbox="0 0 24 24" width="14"><path d="M3.9 12a5 5 0 015-5h3v2h-3a3 3 0 000 6h3v2h-3a5 5 0 01-5-5zm6-1h4v2h-4v-2zM16 7a5 5 0 010 10h-3v-2h3a3 3 0 000-6h-3V7h3z"></path></svg></span><ol><li>数据分段与重组：传输层将上层应用层提供的数据流划分为较小的数据段，以便在网络中传输。在接收端，传输层负责将这些数据段重新组装成完整的数据流，以交付给应用层。</li><li>端口标识与多路复用：传输层使用端口号来标识不同的应用程序或服务。当多个应用程序同时运行时，传输层可以将它们的数据段混合在一起传输，并在接收端根据端口号将数据分发给正确的应用程序，从而实现多路复用。</li><li>会话管理：传输层还可以支持会话管理，包括建立、维护和终止与远程主机之间的通信会话。这是通过传输层协议中的握手和挥手过程来实现的，例如 TCP 握手过程。</li><li>差错检测与纠正：传输层可以检测并纠正数据传输过程中的错误，确保数据的完整性和正确性。这通常涉及使用校验和和纠错码等技术。</li></ol><div class="section-index"><hr class="panel-line"/><div class="entry"><h5><a href="/computer_network/transport/tcp/">TCP</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/transport/udp/">UDP</a></h5><p></p></div></div>

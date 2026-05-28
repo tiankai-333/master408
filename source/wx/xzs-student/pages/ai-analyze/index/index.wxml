@@ -1,0 +1,56 @@
+<view class="analyze-page">
+  <view class="upload-section">
+    <view class="upload-area" bind:tap="chooseImage" wx:if="{{!imageUrl}}">
+      <view class="upload-placeholder">
+        <text class="upload-icon">+</text>
+        <text class="upload-text">点击上传题目图片</text>
+        <text class="upload-hint">支持拍照或从相册选择</text>
+      </view>
+    </view>
+    <view class="preview-area" wx:else>
+      <image class="preview-image" src="{{imageUrl}}" mode="aspectFit" />
+      <view class="preview-actions">
+        <view class="preview-btn" bind:tap="clearImage">清除图片</view>
+        <view class="preview-btn" bind:tap="chooseImage">重新选择</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-section" wx:if="{{imageUrl}}">
+    <i-button type="primary" bind:click="analyzeImage" loading="{{isAnalyzing}}" disabled="{{isAnalyzing}}">
+      {{isAnalyzing ? '识别中...' : '开始识别'}}
+    </i-button>
+  </view>
+
+  <view class="error-section" wx:if="{{errorMessage}}">
+    <text class="error-text">{{errorMessage}}</text>
+  </view>
+
+  <view class="results-section" wx:if="{{results.length > 0}}">
+    <view class="result-card" wx:for="{{results}}" wx:for-index="idx" wx:key="idx">
+      <view class="result-header">
+        <text class="result-number">第 {{idx + 1}} 题</text>
+        <text class="result-type">{{item.questionType}}</text>
+      </view>
+      <view class="result-title" wx:if="{{item.title}}">
+        <rich-text nodes="{{item.title}}" />
+      </view>
+      <view class="result-options" wx:if="{{item.options.length > 0}}">
+        <view class="result-option" wx:for="{{item.options}}" wx:for-item="opt" wx:key="*this">
+          <text>{{opt}}</text>
+        </view>
+      </view>
+      <view class="result-answer" wx:if="{{item.correct}}">
+        <text class="result-label">正确答案：</text>
+        <text class="result-value">{{item.correct}}</text>
+      </view>
+      <view class="result-analyze" wx:if="{{item.analyze}}">
+        <text class="result-label">解析：</text>
+        <rich-text nodes="{{item.analyze}}" />
+      </view>
+    </view>
+  </view>
+
+  <i-spin size="large" fix wx:if="{{isAnalyzing}}"></i-spin>
+  <i-message id="message" />
+</view>

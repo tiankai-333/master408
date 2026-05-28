@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.KnowledgeContentMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.KnowledgeContent">
+        <id column="id" property="id"/>
+        <result column="knowledge_point_id" property="knowledgePointId"/>
+        <result column="html_ref" property="htmlRef"/>
+        <result column="summary_text" property="summaryText"/>
+        <result column="source_url" property="sourceUrl"/>
+        <result column="asset_dir" property="assetDir"/>
+        <result column="metadata" property="metadata"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="findCurrentByKnowledgePointId" resultMap="BaseResultMap">
+        SELECT *
+        FROM knowledge_content
+        WHERE knowledge_point_id = #{knowledgePointId}
+        ORDER BY update_time DESC, id DESC
+        LIMIT 1
+    </select>
+
+</mapper>

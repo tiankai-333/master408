@@ -82,6 +82,8 @@ watch(answerValue, (val) => {
 const submitForm = () => {
   formRef.value.validate((valid) => {
     if (valid) {
+      form.correct = answerValue.value === 1 ? '1' : '0'
+      form.items = [{ content: form.correct, isAnswer: answerValue.value === 1 }]
       formLoading.value = true
       questionApi.edit(form).then(re => {
         if (re.code === 1) {
@@ -126,7 +128,7 @@ onMounted(() => {
     formLoading.value = true
     questionApi.select(id).then(re => {
       Object.assign(form, re.response)
-      answerValue.value = form.items[0]?.isAnswer ? 1 : 0
+      answerValue.value = form.correct === '1' || form.correct === 'true' || form.items[0]?.isAnswer ? 1 : 0
       formLoading.value = false
     })
   }

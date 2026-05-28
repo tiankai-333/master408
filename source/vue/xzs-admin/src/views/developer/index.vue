@@ -45,10 +45,10 @@
             <b>推荐演示顺序</b>
             <ol>
               <li>打开本页讲总体架构。</li>
-              <li>进入学生端做一道 408 题。</li>
-              <li>展示 AI 解析和知识点关联。</li>
-              <li>切到管理端看题库与 AI 配置。</li>
-              <li>回到本页讲数据库、RAG、部署和协作记录。</li>
+              <li>进入学生端 408Master，演示讲解、真题、草案、工具四个按钮。</li>
+              <li>点击“草案”生成 Agent 组卷建议，再确认生成限时卷。</li>
+              <li>输入 <code>/compose paper</code> 展示显式工具调用。</li>
+              <li>切到管理端看题库、AI 配置、用量分析和本页工程记录。</li>
             </ol>
           </div>
         </div>
@@ -262,6 +262,26 @@
       <section class="panel">
         <div class="section-title">
           <span>12</span>
+          <h2>显式 AI 工具调用</h2>
+        </div>
+        <p class="lead">
+          学生端 AI 工作台已从“单纯聊天框”升级为受控工具入口：主对话区提供讲解、真题、草案、工具四类按钮；自然语言先生成组卷草案，学生点击确认后才写库；<code>/compose paper</code> 仍保留为显式快捷命令。
+        </p>
+        <div class="flow-grid">
+          <article v-for="item in toolCallFlow" :key="item.title" class="flow-card">
+            <b>{{ item.title }}</b>
+            <p>{{ item.desc }}</p>
+            <code>{{ item.detail }}</code>
+          </article>
+        </div>
+        <p class="note">
+          按钮语义：<code>讲解</code> 解释当前题目或知识点；<code>真题</code> 按 408 考法拆解；<code>草案</code> 进入 <code>/api/student/ai/agent/plan</code>；<code>工具</code> 填入 <code>/compose paper</code> 并走显式组卷函数。Agent 当前调用 <code>search_student_mistakes</code>、<code>search_questions</code>、<code>get_knowledge_graph_context</code> 和 <code>compose_paper</code> 四类内部工具。AI 只生成意图、参数和解释，题目真实性与落库由后端规则服务保证。
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <span>13</span>
           <h2>接口文档摘要</h2>
         </div>
         <div class="api-grid">
@@ -275,7 +295,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>13</span>
+          <span>14</span>
           <h2>部署说明</h2>
         </div>
         <div class="deploy-steps">
@@ -290,7 +310,7 @@
       <section class="two-column">
         <article class="panel">
           <div class="section-title">
-            <span>14</span>
+            <span>15</span>
             <h2>文档索引</h2>
           </div>
           <div class="doc-list">
@@ -304,7 +324,7 @@
 
         <article class="panel">
           <div class="section-title">
-            <span>15</span>
+            <span>16</span>
             <h2>工程协作</h2>
           </div>
           <ul class="timeline">
@@ -319,7 +339,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>16</span>
+          <span>17</span>
           <h2>近期完成</h2>
         </div>
         <div class="work-grid">
@@ -460,8 +480,8 @@ const dataQualityNotes = [
   },
   {
     title: '数据治理方向',
-    desc: '后续应把旧 JSON 中的题干、选项、答案、解析解析进 question_content，保证题库、RAG 和 AI 讲题使用同一份权威内容。',
-    detail: 'question_content as canonical source'
+    desc: '2026 模拟卷采用“数据库存引用 + 静态 HTML 片段渲染”的轻量方案，避免把超大 HTML、SVG、KaTeX 和表格直接塞进旧 TEXT 字段。',
+    detail: 'question-html-ref + /student/question-html/2026/'
   },
   {
     title: '质量判断',
@@ -493,8 +513,8 @@ const modelFlow = [
   },
   {
     title: '5. Agent 调用工具',
-    desc: 'Agent 可以调用题目推荐、错题查询、知识图谱、RAG 检索、任务生成等工具。',
-    detail: 'ai_agent + ai_skill + ai_tool + ai_run_log'
+    desc: '当前先落地显式 slash 指令：/compose paper 生成限时练习卷。后续再注册为 Agent Tool。',
+    detail: 'composePaper + AiPaperComposeService'
   },
   {
     title: '6. 用量与引用落库',
@@ -508,16 +528,44 @@ const modelFlow = [
   }
 ]
 
-const agentRoadmap = [
+const toolCallFlow = [
   {
-    title: 'Agent 出任务',
-    desc: '可以做。Agent 根据学生知识点掌握度、错题、近期练习和目标日期生成学习任务，最后落到现有 task/task_exam 体系或新的 ai_generated_task 草稿表。',
-    tables: 'student_knowledge_state, student_mistake_book, task_exam, ai_generated_task'
+    title: '1. 用户提出目标',
+    desc: '学生用自然语言说出薄弱点或点击“生成练习卷”，前端进入 Agent 草案流程。',
+    detail: '/api/student/ai/agent/plan'
   },
   {
-    title: 'Agent 出卷子',
-    desc: '可以做，但必须限制为从题库已有题目中挑选 1-5 题。AI 只输出选题方案和候选题目 ID，后端规则服务校验题型、难度、知识点覆盖、来源和重复题后再写入 exam_paper。',
-    tables: 'question_knowledge_point, question_content, exam_paper, exam_paper_question_customer_answer'
+    title: '2. Agent 查询工具',
+    desc: '后端先查错题，再查题库，并读取知识图谱上下文，生成可解释草案，不写数据库。',
+    detail: 'search_student_mistakes + search_questions'
+  },
+  {
+    title: '3. 学生确认草案',
+    desc: '草案卡片展示题量、限时、候选题、候选是否不足和推荐理由，学生点击确认才执行。',
+    detail: '/api/student/ai/agent/confirm'
+  },
+  {
+    title: '4. 规则服务落库',
+    desc: 'AiPaperComposeService 只使用草案中的已有题目 ID 创建限时卷，不允许编造题目。',
+    detail: 'compose_paper + ExamPaperService'
+  },
+  {
+    title: '5. 保留快捷命令',
+    desc: '手动输入 /compose paper 仍可直接创建限时卷，用于演示显式工具调用。',
+    detail: '/compose paper'
+  },
+  {
+    title: '6. 运行日志',
+    desc: '草案和确认动作写入 ai_run_log，记录工具调用、候选题和最终试卷结果。',
+    detail: 'ai_run_log.tool_call_json'
+  }
+]
+
+const agentRoadmap = [
+  {
+    title: '草案确认型 Agent',
+    desc: '已落地 agent/plan + agent/confirm。Agent 先查错题、题库和知识图谱生成草案，学生确认后才调用 compose_paper 写入限时卷。',
+    tables: 'ai_run_log, QuestionMapper.selectForAiPaper, t_exam_paper'
   },
   {
     title: 'Memory 处理',
@@ -548,7 +596,7 @@ const aiDecisions = [
   },
   {
     question: 'Agent 能不能帮学生出任务和卷子？',
-    answer: '能，但要限制边界。当前建议只让 Agent 从题库已有题目中挑选 1-5 题，并输出题目 ID、知识点和来源；如果没有题库候选，只能输出筛选条件，不能编造新题。真正选题、去重、校验和落库由后端规则服务完成。'
+    answer: '能。当前采用草案确认型 Agent：自然语言先生成组卷草案，学生确认后才调用 AiPaperComposeService。/compose paper 仍作为显式快捷命令保留。'
   },
   {
     question: '现在有 Memory 吗？',
@@ -569,6 +617,9 @@ const apis = [
   { method: 'POST', path: '/api/student/user/register', desc: '学生注册' },
   { method: 'POST', path: '/api/student/ai/analyze', desc: '学生端 AI 解析（非流式）' },
   { method: 'POST', path: '/api/student/ai/analyze-stream', desc: '学生端 AI 解析 SSE 流式：status/references/chunk/done/error' },
+  { method: 'POST', path: '/api/student/ai/agent/plan', desc: 'Agent 草案：查错题、题库和知识图谱，返回组卷建议但不落库' },
+  { method: 'POST', path: '/api/student/ai/agent/confirm', desc: '确认 Agent 草案：用已有题目 ID 创建限时卷' },
+  { method: 'POST', path: '/api/student/ai/compose-paper', desc: '显式 AI 工具调用：从题库已有题中生成 1-5 题限时卷' },
   { method: 'POST', path: '/api/student/chat', desc: 'AI 聊天对话，408Master 人设' },
   { method: 'POST', path: '/api/student/question/analyze-question-stream', desc: '错题本 AI 分析 SSE 流式' },
   { method: 'POST', path: '/api/student/question/analyze-image', desc: '拍照上传 → OCR → AI 解析' },
@@ -628,6 +679,21 @@ const docs = [
 ]
 
 const recentWork = [
+  '稳定版阶段收束：学生端试卷中心、错题本、AI 学习工作台、知识点 HTML 渲染和本地初始化脚本完成一轮可演示修复。',
+  '重建 CSGraduates HTML 真题与模拟卷导入链路：数据库仅保存 HTML 轻引用、来源、纯文本摘要和元数据，题干/解析片段与图片资源放入学生端 public 静态目录。',
+  '扩展题库范围：补齐 408 真题/模拟卷、数学一/二/三、英语一/二、思想政治理论的可见 HTML 题库导入脚本。',
+  '新增 408 四科知识点 HTML 化导入：knowledge_content 保存 html_ref、summary_text、source_url、asset_dir，知识点正文保留表格、公式、图片、代码块和层级标题。',
+  'AI 学习工作台改为“先选上下文，再生成画像/练习”：顶部保留生成学习画像、生成针对练习，中间提供随机知识点、随机真题、随机错题、粘贴四个上下文入口。',
+  'AI 工作台随机范围支持三层筛选：初始全库随机，点击左侧科目后限定到科目，选择知识点后限定到该知识点关联真题/错题。',
+  '优化 AI 工作台上下文展示：题目上下文显示科目标签、来源标题和题目正文，去掉重复来源；粘贴只进入上方上下文卡片，不再填充对话输入框。',
+  '修复知识点富文本过宽问题：中间列 min-width 归零，右侧栏固定，宽表格、代码块、大图在上下文卡片内部滚动，装饰性 SVG 图标不再撑爆阅读区。',
+  '试卷中心修复：左侧只使用真实科目，408 综合不再等同全部科目，分页按总页数显示，开始答题和科目切换改为一次点击生效。',
+  '补充 408 四科近年专项卷：数据结构、计算机组成原理、操作系统、计算机网络各生成近年固定练习卷，题目仍引用原始单科题。',
+  '错题本和题目详情体验修复：选项、解析、正确答案展示去重，解析布局不再和难度挤在一行，AI 分析 Provider 表缺失时后端安全降级。',
+  '整理初始化 SQL：新增 database/current/00_init_database_with_seed.sql 一键导入结构、题库、HTML 真题、知识点和演示数据。',
+  '测试账号更新：默认测试用户改为 test / 123456，演示数据脚本清理旧 231310423 引用并为 test 重建做题记录和错题样例。',
+  '登录注册体验修复：登录页取消用户名必须大于 5 个字符的限制，注册页继续走学生注册接口和默认年级兜底。',
+  '微信小程序补齐错题本与 AI 题目识别入口，复用学生端题目详情和 Markdown 渲染能力。',
   '注册取消年级强依赖，默认年级兜底为 1。',
   '修复学生端错题本分页切换问题。',
   '新增规范题目内容、RAG、学生图谱、Agent/Skill/Tool 表。',
@@ -649,6 +715,15 @@ const recentWork = [
   '补充 API Key 主密钥说明：本地 Docker backend 显式使用 AI_SECRET_MASTER_KEY，避免加密密钥随 application.yml 变化。',
   '梳理关联真题和知识点摘要截断原因：列表展示使用摘要，AI 讲题应改为加载完整题面、选项、答案和解析。',
   '限制 AI 练习/出卷边界：只能从题库已有题目中挑选 1-5 题，没有候选时只输出筛选条件，不能编造新题。',
+  '新增显式函数调用：学生端 /compose paper 生成限时练习卷，写库操作必须由按钮/指令授权。',
+  '新增草案确认型 Agent：/agent/plan 先生成组卷草案，/agent/confirm 经学生确认后创建限时卷。',
+  '408Master 交流页按钮重设计：输入框底部只保留发送，主对话区提供讲解、真题、草案、工具四类入口。',
+  '草案确认型 Agent 已接入前端：自然语言生成组卷草案，用户确认后才创建限时卷。',
+  '显式工具调用继续保留：/compose paper 仍作为可演示的直接组卷函数入口。',
+  '本地部署验证完成：学生端构建通过，静态资源同步到 Nginx，知识图谱和 AI 工作台页面可访问。',
+  '新增 AiPaperComposeService：支持优先错题、知识点过滤、来源年份、排除样题、限时分钟数和题量限制。',
+  '新增 2026 HTML 模拟卷轻量导入方案：数据库保存 question-html-ref、纯文本和内容标签，完整 HTML/KaTeX/表格/代码片段放在学生端静态资源中渲染。',
+  '新增 QuestionHtml 组件，让试卷页面、答案查看页面能加载外部 HTML 片段并复用 /images 静态图片路径。',
   '新增 AI 题目图片识别（拍照 → OCR → 解析），学生端 /question/ai-analyze 页面。',
   'Canonical AI/RAG 架构整合提交：Agent/Provider/RAG/StudentGraph 服务、SSE 流式、5 个新数据库迁移脚本。'
 ]

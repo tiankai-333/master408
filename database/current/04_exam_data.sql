@@ -23,7 +23,7 @@ INSERT INTO `t_user` (`id`, `user_uuid`, `user_name`, `password`, `real_name`, `
 (1, UUID(), 'admin', '$2a$10$BOJWNJAQUNeSL8GI2uD8Fu3iqDit8HDO3ct1Ig5i/Actg0mqwTHQq', '管理员', NULL, NULL, 1, 3, 1, b'0'),
 (2, UUID(), 'student', '$2a$10$a0UdBI6U5KbJJFWwEN6jXe4eZTaWZfwYAdu1QK9Pbdv6bAvv3GWFi', '学生用户', NULL, NULL, 1, 1, 1, b'0'),
 (3, UUID(), 'teacher', '$2a$10$BOJWNJAQUNeSL8GI2uD8Fu3iqDit8HDO3ct1Ig5i/Actg0mqwTHQq', '教师', NULL, NULL, 1, 2, 1, b'0'),
-(4, UUID(), '231310423', '$2a$10$a0UdBI6U5KbJJFWwEN6jXe4eZTaWZfwYAdu1QK9Pbdv6bAvv3GWFi', '学生用户', NULL, NULL, 1, 1, 1, b'0');
+(4, UUID(), 'test', '$2a$10$a0UdBI6U5KbJJFWwEN6jXe4eZTaWZfwYAdu1QK9Pbdv6bAvv3GWFi', '测试用户', NULL, NULL, 1, 1, 1, b'0');
 
 -- ============================================
 -- 文本内容（题目内容 + 试卷框架）

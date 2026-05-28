@@ -5,8 +5,10 @@ import com.mindskip.xzs.base.RestResponse;
 import com.mindskip.xzs.domain.ExamPaperQuestionCustomerAnswer;
 import com.mindskip.xzs.domain.Subject;
 import com.mindskip.xzs.domain.TextContent;
+import com.mindskip.xzs.domain.canonical.QuestionContent;
 import com.mindskip.xzs.domain.question.QuestionObject;
 import com.mindskip.xzs.service.ExamPaperQuestionCustomerAnswerService;
+import com.mindskip.xzs.service.QuestionContentService;
 import com.mindskip.xzs.service.QuestionService;
 import com.mindskip.xzs.service.SubjectService;
 import com.mindskip.xzs.service.TextContentService;
@@ -29,13 +31,15 @@ public class QuestionAnswerController extends BaseApiController {
 
     private final ExamPaperQuestionCustomerAnswerService examPaperQuestionCustomerAnswerService;
     private final QuestionService questionService;
+    private final QuestionContentService questionContentService;
     private final TextContentService textContentService;
     private final SubjectService subjectService;
 
     @Autowired
-    public QuestionAnswerController(ExamPaperQuestionCustomerAnswerService examPaperQuestionCustomerAnswerService, QuestionService questionService, TextContentService textContentService, SubjectService subjectService) {
+    public QuestionAnswerController(ExamPaperQuestionCustomerAnswerService examPaperQuestionCustomerAnswerService, QuestionService questionService, QuestionContentService questionContentService, TextContentService textContentService, SubjectService subjectService) {
         this.examPaperQuestionCustomerAnswerService = examPaperQuestionCustomerAnswerService;
         this.questionService = questionService;
+        this.questionContentService = questionContentService;
         this.textContentService = textContentService;
         this.subjectService = subjectService;
     }
@@ -49,12 +53,23 @@ public class QuestionAnswerController extends BaseApiController {
             vm.setCreateTime(DateTimeUtil.dateFormat(q.getCreateTime()));
             Subject subject = subjectService.selectById(q.getSubjectId());
             vm.setSubjectName(subject != null ? subject.getName() : "未知");
+            QuestionContent currentContent = questionContentService.getCurrent(q.getQuestionId());
+            if (currentContent != null) {
+                vm.setShortTitle(firstNotBlank(
+                        currentContent.getTitleText(),
+                        extractFallbackText(currentContent.getTitle()),
+                        HtmlUtil.clear(currentContent.getTitle())
+                ));
+            }
             TextContent textContent = textContentService.selectById(q.getQuestionTextContentId());
-            if (textContent != null && textContent.getContent() != null) {
+            if ((vm.getShortTitle() == null || vm.getShortTitle().trim().isEmpty()) && textContent != null && textContent.getContent() != null) {
                 try {
                     QuestionObject questionObject = JsonUtil.toJsonObject(textContent.getContent(), QuestionObject.class);
                     if (questionObject != null && questionObject.getTitleContent() != null) {
-                        vm.setShortTitle(HtmlUtil.clear(questionObject.getTitleContent()));
+                        vm.setShortTitle(firstNotBlank(
+                                extractFallbackText(questionObject.getTitleContent()),
+                                HtmlUtil.clear(questionObject.getTitleContent())
+                        ));
                     }
                 } catch (Exception ignored) {
                 }
@@ -62,6 +77,39 @@ public class QuestionAnswerController extends BaseApiController {
             return vm;
         });
         return RestResponse.ok(page);
+    }
+
+    private String firstNotBlank(String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            if (value != null) {
+                String trimmed = value.trim();
+                if (!trimmed.isEmpty()) {
+                    return trimmed;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String extractFallbackText(String html) {
+        if (html == null || !html.contains("data-fallback")) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("data-fallback=[\"']([^\"']*)[\"']")
+                .matcher(html);
+        if (!matcher.find()) {
+            return null;
+        }
+        return HtmlUtil.clear(matcher.group(1)
+                .replace("&quot;", "\"")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replace("&nbsp;", " "));
     }
 
 

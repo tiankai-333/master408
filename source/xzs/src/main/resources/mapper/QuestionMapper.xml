@@ -214,6 +214,73 @@
     </foreach>
   </select>
 
+  <sql id="AiPaperQuestionWhere">
+    q.deleted = 0
+    <if test="subjectId != null">
+      and q.subject_id = #{subjectId}
+    </if>
+    <if test="knowledgePoint != null and knowledgePoint != ''">
+      and (
+        q.knowledge_point like concat('%', #{knowledgePoint}, '%')
+        or q.tags like concat('%', #{knowledgePoint}, '%')
+        or q.title_text like concat('%', #{knowledgePoint}, '%')
+        or q.analysis_text like concat('%', #{knowledgePoint}, '%')
+      )
+    </if>
+    <if test="sourceYear != null">
+      and q.source_year = #{sourceYear}
+    </if>
+    <if test="questionTypes != null and questionTypes.size() > 0">
+      and q.question_type in
+      <foreach item="type" collection="questionTypes" open="(" separator="," close=")">
+        #{type}
+      </foreach>
+    </if>
+    <if test="excludeQuestionIds != null and excludeQuestionIds.size() > 0">
+      and q.id not in
+      <foreach item="id" collection="excludeQuestionIds" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    </if>
+    <if test="excludeSourceYears != null and excludeSourceYears.size() > 0">
+      and (q.source_year is null or q.source_year not in
+      <foreach item="year" collection="excludeSourceYears" open="(" separator="," close=")">
+        #{year}
+      </foreach>
+      )
+    </if>
+  </sql>
+
+  <select id="selectForAiPaper" resultMap="BaseResultMap">
+    SELECT q.id, q.question_type, q.subject_id, q.score, q.grade_level, q.difficult, q.correct, q.info_text_content_id,
+    q.create_user, q.status, q.create_time, q.deleted
+    FROM t_question q
+    <where>
+      <include refid="AiPaperQuestionWhere"/>
+    </where>
+    ORDER BY q.source_year DESC, RAND()
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectMistakesForAiPaper" resultMap="BaseResultMap">
+    SELECT q.id, q.question_type, q.subject_id, q.score, q.grade_level, q.difficult, q.correct, q.info_text_content_id,
+    q.create_user, q.status, q.create_time, q.deleted
+    FROM t_question q
+    INNER JOIN (
+      SELECT question_id, MAX(create_time) latest_time
+      FROM t_exam_paper_question_customer_answer
+      WHERE create_user = #{userId}
+        AND do_right = b'0'
+        AND question_id IS NOT NULL
+      GROUP BY question_id
+    ) wrong_answer ON wrong_answer.question_id = q.id
+    <where>
+      <include refid="AiPaperQuestionWhere"/>
+    </where>
+    ORDER BY wrong_answer.latest_time DESC, q.source_year DESC
+    LIMIT #{limit}
+  </select>
+
 
   <select id="selectAllCount"  resultType="java.lang.Integer">
 		SELECT count(*) from t_question where  deleted=0

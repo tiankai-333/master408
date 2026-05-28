@@ -5,6 +5,7 @@ import com.mindskip.xzs.repository.AiProviderConfigMapper;
 import com.mindskip.xzs.service.AiProviderConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -34,7 +35,12 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
 
     @Override
     public List<AiProviderConfig> listSafe() {
-        List<AiProviderConfig> configs = mapper.selectAll();
+        List<AiProviderConfig> configs;
+        try {
+            configs = mapper.selectAll();
+        } catch (DataAccessException e) {
+            return Collections.emptyList();
+        }
         for (AiProviderConfig config : configs) {
             hideSecret(config);
         }
@@ -152,7 +158,12 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
 
     @Override
     public AiProviderConfig getEnabled(String providerCode) {
-        AiProviderConfig config = mapper.selectByProviderCode(providerCode);
+        AiProviderConfig config;
+        try {
+            config = mapper.selectByProviderCode(providerCode);
+        } catch (DataAccessException e) {
+            return null;
+        }
         if (config == null || !Boolean.TRUE.equals(config.getEnabled())) {
             return null;
         }
@@ -161,7 +172,12 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
 
     @Override
     public AiProviderConfig getFirstEnabled() {
-        List<AiProviderConfig> configs = mapper.selectAll();
+        List<AiProviderConfig> configs;
+        try {
+            configs = mapper.selectAll();
+        } catch (DataAccessException e) {
+            return null;
+        }
         for (AiProviderConfig config : configs) {
             if (Boolean.TRUE.equals(config.getEnabled())) {
                 return config;

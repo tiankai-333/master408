@@ -1,0 +1,110 @@
+<svg width="600" height="370" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="600" height="370" fill="none"/>
+  
+  <!-- 标题 -->
+  <text x="300" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">数据链路层组帧</text>
+  
+  <!-- 网络层数据包 -->
+  <rect x="50" y="70" width="120" height="40" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="110" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">网络层报文</text>
+  <text x="110" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#34495e">(Packet)</text>
+  
+  <!-- 箭头1 -->
+  <path d="M 180 90 L 220 90" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="200" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#e74c3c">组帧</text>
+  
+  <!-- 帧结构 -->
+  <g transform="translate(240, 70)">
+    <!-- 帧头 -->
+    <rect x="0" y="0" width="60" height="40" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+    <text x="30" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">帧头</text>
+    
+    <!-- 数据部分 -->
+    <rect x="60" y="0" width="120" height="40" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+    <text x="120" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">数据</text>
+    
+    <!-- 帧尾 -->
+    <rect x="180" y="0" width="60" height="40" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+    <text x="210" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="white">帧尾</text>
+  </g>
+  
+  <text x="390" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#34495e">帧 (Frame)</text>
+  
+  <!-- 连续帧传输示例 -->
+  <text x="50" y="180" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">帧定界示例：</text>
+  
+  <!-- 发送端 -->
+  <text x="50" y="210" font-family="Arial, sans-serif" font-size="12" fill="#34495e">发送端：</text>
+  
+  <!-- 连续的三个帧 -->
+  <g transform="translate(120, 195)">
+    <!-- 帧1 -->
+    <rect x="0" y="0" width="20" height="25" fill="#e67e22"/>
+    <rect x="20" y="0" width="60" height="25" fill="#3498db"/>
+    <rect x="80" y="0" width="20" height="25" fill="#e67e22"/>
+    
+    <!-- 帧2 -->
+    <rect x="110" y="0" width="20" height="25" fill="#e67e22"/>
+    <rect x="130" y="0" width="60" height="25" fill="#27ae60"/>
+    <rect x="190" y="0" width="20" height="25" fill="#e67e22"/>
+    
+    <!-- 帧3 -->
+    <rect x="220" y="0" width="20" height="25" fill="#e67e22"/>
+    <rect x="240" y="0" width="60" height="25" fill="#9b59b6"/>
+    <rect x="300" y="0" width="20" height="25" fill="#e67e22"/>
+  </g>
+  
+  <text x="270" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">帧1    帧2    帧3</text>
+  
+  <!-- 箭头2 -->
+  <path d="M 300 250 L 300 280" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <text x="320" y="270" font-family="Arial, sans-serif" font-size="10" fill="#e74c3c">传输</text>
+  
+  <!-- 接收端 -->
+  <text x="50" y="310" font-family="Arial, sans-serif" font-size="12" fill="#34495e">接收端：</text>
+  
+  <!-- 连续数据流 -->
+  <g transform="translate(120, 295)">
+    <rect x="0" y="0" width="320" height="25" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+    
+    <!-- 帧边界标识 -->
+    <line x1="20" y1="0" x2="20" y2="25" stroke="#e74c3c" stroke-width="2"/>
+    <line x1="100" y1="0" x2="100" y2="25" stroke="#e74c3c" stroke-width="2"/>
+    <line x1="130" y1="0" x2="130" y2="25" stroke="#e74c3c" stroke-width="2"/>
+    <line x1="210" y1="0" x2="210" y2="25" stroke="#e74c3c" stroke-width="2"/>
+    <line x1="240" y1="0" x2="240" y2="25" stroke="#e74c3c" stroke-width="2"/>
+    <line x1="320" y1="0" x2="320" y2="25" stroke="#e74c3c" stroke-width="2"/>
+    
+    <text x="60" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">帧1</text>
+    <text x="170" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">帧2</text>
+    <text x="280" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">帧3</text>
+  </g>
+  
+  <text x="280" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">通过帧头/帧尾进行帧定界</text>
+  
+  <!-- 关键概念说明 -->
+  <g transform="translate(450, 180)">
+    <rect x="0" y="0" width="140" height="120" fill="#ffffff" stroke="#bdc3c7" stroke-width="1" rx="5"/>
+    <text x="70" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#2c3e50">关键概念</text>
+    
+    <circle cx="15" cy="40" r="3" fill="#e67e22"/>
+    <text x="25" y="45" font-family="Arial, sans-serif" font-size="10" fill="#34495e">帧头/帧尾：标识边界</text>
+    
+    <circle cx="15" cy="60" r="3" fill="#3498db"/>
+    <text x="25" y="65" font-family="Arial, sans-serif" font-size="10" fill="#34495e">数据：网络层报文</text>
+    
+    <circle cx="15" cy="80" r="3" fill="#e74c3c"/>
+    <text x="25" y="85" font-family="Arial, sans-serif" font-size="10" fill="#34495e">帧定界：区分帧边界</text>
+    
+    <circle cx="15" cy="100" r="3" fill="#27ae60"/>
+    <text x="25" y="105" font-family="Arial, sans-serif" font-size="10" fill="#34495e">组帧：添加控制信息</text>
+  </g>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+  </defs>
+</svg>

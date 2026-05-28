@@ -115,6 +115,8 @@ const removeItem = (index) => {
 const submitForm = () => {
   formRef.value.validate((valid) => {
     if (valid) {
+      const answerItem = form.items.find(item => item.isAnswer)
+      form.correct = answerItem ? answerItem.prefix : null
       formLoading.value = true
       questionApi.edit(form).then(re => {
         if (re.code === 1) {
@@ -163,6 +165,9 @@ onMounted(() => {
     formLoading.value = true
     questionApi.select(id).then(re => {
       Object.assign(form, re.response)
+      form.items.forEach(item => {
+        item.isAnswer = item.prefix === form.correct
+      })
       formLoading.value = false
     })
   }

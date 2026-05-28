@@ -2,6 +2,7 @@
 <view>
   <view>
     <i-cell-group>
+      <i-cell title="查看错题本" is-link url="/pages/error-book/index/index" value="按题目查看" />
       <i-cell wx:for="{{tableData}}" data-item="item" wx:key="{{item.id}}" title="{{item.paperName}}" is-link url="/pages/exam/read/index?id={{item.id}}" value="{{enumItem.format(enumItem.state.exam.examPaperAnswer.statusEnum,item.status)}}" label="{{item.subjectName}}  正确：{{item.questionCorrect}}/{{item.questionCount}} 时间：{{item.createTime}} "
       />
     </i-cell-group>

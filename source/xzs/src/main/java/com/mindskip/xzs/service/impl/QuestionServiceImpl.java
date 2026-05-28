@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -154,7 +155,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
                 questionEditRequestVM.setCorrectArray(ExamUtil.contentToArray(question.getCorrect()));
                 break;
             case GapFilling:
-                List<String> correctContent = questionObject.getQuestionItemObjects().stream().map(d -> d.getContent()).collect(Collectors.toList());
+                List<String> correctContent = safeQuestionItems(questionObject).stream().map(d -> d.getContent()).collect(Collectors.toList());
                 questionEditRequestVM.setCorrectArray(correctContent);
                 break;
             case ShortAnswer:
@@ -168,7 +169,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
 
 
         //题目项映射
-        List<QuestionEditItemVM> editItems = questionObject.getQuestionItemObjects().stream().map(o -> {
+        List<QuestionEditItemVM> editItems = safeQuestionItems(questionObject).stream().map(o -> {
             QuestionEditItemVM questionEditItemVM = modelMapper.map(o, QuestionEditItemVM.class);
             if (o.getScore() != null) {
                 questionEditItemVM.setScore(ExamUtil.scoreToVM(o.getScore()));
@@ -180,7 +181,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
     }
 
     public void setQuestionInfoFromVM(TextContent infoTextContent, QuestionEditRequestVM model) {
-        List<QuestionItemObject> itemObjects = model.getItems().stream().map(i ->
+        List<QuestionEditItemVM> vmItems = model.getItems() == null ? Collections.emptyList() : model.getItems();
+        List<QuestionItemObject> itemObjects = vmItems.stream().map(i ->
                 {
                     QuestionItemObject item = new QuestionItemObject();
                     item.setPrefix(i.getPrefix());
@@ -196,6 +198,13 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
         questionObject.setTitleContent(model.getTitle());
         questionObject.setCorrect(model.getCorrect());
         infoTextContent.setContent(JsonUtil.toJsonStr(questionObject));
+    }
+
+    private List<QuestionItemObject> safeQuestionItems(QuestionObject questionObject) {
+        if (questionObject == null || questionObject.getQuestionItemObjects() == null) {
+            return Collections.emptyList();
+        }
+        return questionObject.getQuestionItemObjects();
     }
 
     @Override

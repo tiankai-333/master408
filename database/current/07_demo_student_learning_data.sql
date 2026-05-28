@@ -1,17 +1,55 @@
 -- ============================================================
 -- 07_demo_student_learning_data.sql
--- 231310423 测试账号默认学习记录
+-- test 测试账号默认学习记录
 --
 -- 目的：
 -- 1. 新部署后，学生端首页 / AI 工作台能看到真实做题统计。
 -- 2. 做题记录、错题本、学习状态不再是空数据。
--- 3. 数据只作用于测试账号 231310423，可重复执行。
+-- 3. 清理旧测试账号 231310423，数据只作用于 test / 123456，可重复执行。
 -- ============================================================
 
 SET NAMES utf8mb4;
 
+SET @legacy_user_id := (
+  SELECT id FROM t_user WHERE user_name = '231310423' LIMIT 1
+);
+
+DELETE FROM t_exam_paper_question_customer_answer
+WHERE create_user = @legacy_user_id;
+
+DELETE FROM t_exam_paper_answer
+WHERE create_user = @legacy_user_id;
+
+DELETE FROM t_user_event_log
+WHERE user_id = @legacy_user_id;
+
+DELETE FROM t_user_token
+WHERE user_id = @legacy_user_id;
+
+DELETE FROM t_message_user
+WHERE receive_user_id = @legacy_user_id;
+
+DELETE FROM t_user
+WHERE id = @legacy_user_id;
+
+INSERT INTO t_user
+  (user_uuid, user_name, password, real_name, age, sex, user_level, role, status, deleted, create_time)
+SELECT
+  UUID(),
+  'test',
+  '$2a$10$a0UdBI6U5KbJJFWwEN6jXe4eZTaWZfwYAdu1QK9Pbdv6bAvv3GWFi',
+  '测试用户',
+  NULL,
+  NULL,
+  1,
+  1,
+  1,
+  b'0',
+  NOW()
+WHERE NOT EXISTS (SELECT 1 FROM t_user WHERE user_name = 'test');
+
 SET @demo_user_id := (
-  SELECT id FROM t_user WHERE user_name = '231310423' AND deleted = b'0' LIMIT 1
+  SELECT id FROM t_user WHERE user_name = 'test' AND deleted = b'0' LIMIT 1
 );
 
 DELETE FROM t_exam_paper_question_customer_answer
@@ -139,4 +177,4 @@ FROM (
 ) q
 WHERE @demo_user_id IS NOT NULL AND @demo_answer_id > 0;
 
-SELECT 'demo learning data ready for 231310423' AS status;
+SELECT 'demo learning data ready for test / 123456' AS status;

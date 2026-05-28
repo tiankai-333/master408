@@ -18,13 +18,13 @@
     </el-form>
     <el-table v-loading="listLoading" :data="tableData" border fit highlight-current-row style="width: 100%">
       <el-table-column prop="id" label="Id" width="80px"/>
-      <el-table-column prop="studentName" label="学生姓名" width="120px"/>
+      <el-table-column prop="userName" label="学生姓名" width="120px"/>
       <el-table-column prop="paperName" label="试卷名称"/>
       <el-table-column prop="subjectName" label="学科" width="100px"/>
-      <el-table-column prop="score" label="得分" width="80px"/>
-      <el-table-column prop="totalScore" label="总分" width="80px"/>
+      <el-table-column prop="userScore" label="得分" width="80px"/>
+      <el-table-column prop="paperScore" label="总分" width="80px"/>
       <el-table-column prop="status" label="状态" :formatter="statusFormatter" width="100px"/>
-      <el-table-column prop="submitTime" label="提交时间" width="160px"/>
+      <el-table-column prop="createTime" label="提交时间" width="160px"/>
       <el-table-column label="操作" align="center" width="160px">
         <template #default="{row}">
           <el-button size="mini" @click="router.push({path:'/answer/detail',query:{id:row.id}})">详情</el-button>

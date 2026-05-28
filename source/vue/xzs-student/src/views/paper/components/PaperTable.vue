@@ -10,7 +10,7 @@
     >
       <el-table-column prop="id" label="序号" width="76">
         <template #default="{ $index }">
-          <span class="row-index">{{ $index + 1 }}</span>
+          <span class="row-index">{{ rowIndex($index) }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="试卷名称" min-width="220">
@@ -21,13 +21,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="right" width="132">
+      <el-table-column align="right" width="160">
         <template #default="{ row }">
-          <router-link target="_blank" :to="{ path: '/do', query: { id: row.id } }">
-            <el-button type="primary" size="small" class="start-btn">
-              <el-icon><VideoPlay /></el-icon> 开始答题
-            </el-button>
-          </router-link>
+          <a class="start-btn" :href="examHref(row)" @click.stop>
+            <el-icon><VideoPlay /></el-icon> 开始答题
+          </a>
         </template>
       </el-table-column>
     </el-table>
@@ -38,21 +36,66 @@
     :total="total"
     :background="false"
     v-model:page="queryParam.pageIndex"
-    :limit="queryParam.pageSize"
+    v-model:limit="queryParam.pageSize"
+    :page-sizes="[20, 50, 100]"
+    layout="total, sizes, prev, pager, next, jumper"
     @pagination="$emit('search')"
     class="custom-pagination"
   />
+
+  <div v-if="data.length > 0" class="simple-page-actions">
+    <el-button :disabled="currentPage <= 1 || loading" @click="changePage(currentPage - 1)">
+      上一页
+    </el-button>
+    <span class="page-status">
+      第 {{ currentPage }} 页<span v-if="totalPages"> / 共 {{ totalPages }} 页</span>
+    </span>
+    <el-button :type="canGoNext && !loading ? 'primary' : 'default'" :disabled="!canGoNext || loading" @click="changePage(currentPage + 1)">
+      下一页
+    </el-button>
+  </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
   data: { type: Array, default: () => [] },
   loading: { type: Boolean, default: false },
   total: { type: Number, default: 0 },
   queryParam: { type: Object, default: () => ({}) }
 })
 
-defineEmits(['search'])
+const emit = defineEmits(['search'])
+
+const router = useRouter()
+
+const currentPage = computed(() => Number(props.queryParam.pageIndex || 1))
+const currentPageSize = computed(() => Number(props.queryParam.pageSize || 20))
+const totalPages = computed(() => {
+  const totalCount = Number(props.total || 0)
+  if (!totalCount) return 0
+  return Math.max(1, Math.ceil(totalCount / currentPageSize.value))
+})
+const canGoNext = computed(() => {
+  return totalPages.value > 0 && currentPage.value < totalPages.value
+})
+
+const rowIndex = (index) => {
+  return (currentPage.value - 1) * currentPageSize.value + index + 1
+}
+
+const examHref = (row) => {
+  if (!row?.id) return '#'
+  return router.resolve({ path: '/do', query: { id: row.id } }).href
+}
+
+const changePage = (page) => {
+  if (page < 1 || props.loading) return
+  props.queryParam.pageIndex = page
+  emit('search')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -100,11 +143,21 @@ defineEmits(['search'])
   }
 
   .start-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 110px;
+    min-height: 28px;
+    box-sizing: border-box;
     border-radius: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     padding: 8px 20px;
+    color: #fff;
     font-size: 13px;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
     .el-icon {
       margin-right: 5px;
     }
@@ -156,6 +209,32 @@ defineEmits(['search'])
       }
     }
   }
+}
+
+.simple-page-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px 12px 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), #fff 42%);
+}
+
+.page-status {
+  min-width: 96px;
+  color: #475569;
+  font-size: 14px;
+  text-align: center;
+}
+
+.simple-page-actions :deep(.el-button--primary) {
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
 }
 
 @media screen and (max-width: 768px) {

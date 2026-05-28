@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="qLoading" style="line-height:1.8">
+  <div v-loading="qLoading" class="question-answer-show">
     <div v-if="qType === 1 || qType === 2 || qType === 3 || qType === 4 || qType === 5">
       <div v-if="qType === 1">
         <QuestionHtml class="q-title" :content="question.title" />
@@ -61,16 +61,9 @@
         <span class="question-show-item">难度：</span>
         <el-rate disabled v-model="question.difficult" class="question-show-item" />
       </div>
-      <br />
-      <div class="question-answer-show-item" style="line-height: 1.8">
-        <span class="question-show-item">解析：</span>
-        <QuestionHtml :content="question.analyze" inline class="q-item-span-content" />
-      </div>
-      <div class="question-answer-show-item">
-        <span class="question-show-item">正确答案：</span>
-        <QuestionHtml v-if="qType === 1 || qType === 2 || qType === 5" :content="question.correct" inline class="q-item-span-content" />
-        <QuestionHtml v-if="qType === 3" :content="trueFalseFormatter(question)" inline class="q-item-span-content" />
-        <span v-if="qType === 4">{{ question.correctArray }}</span>
+      <div class="question-answer-show-item analysis-item">
+        <span class="question-show-item analysis-label">解析：</span>
+        <QuestionHtml :content="question.analyze" inline strip-leading-answer class="q-item-span-content analysis-content" />
       </div>
     </div>
     <div v-else>
@@ -103,10 +96,6 @@ const props = defineProps({
   }
 })
 
-const trueFalseFormatter = (question) => {
-  return question.items.filter(d => d.prefix === question.correct)[0].content
-}
-
 const doRightTagFormatter = (status) => {
   return enumItemStore.enumFormat(enumItemStore.exam.question.answer.doRightTag, status)
 }
@@ -115,3 +104,106 @@ const doRightTextFormatter = (status) => {
   return enumItemStore.enumFormat(enumItemStore.exam.question.answer.doRightEnum, status)
 }
 </script>
+
+<style lang="scss" scoped>
+.question-answer-show {
+  color: #1f2937;
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+.q-title {
+  display: block;
+  margin-bottom: 14px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.85;
+}
+
+.question-prefix,
+.question-show-item {
+  margin-right: 6px;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.question-answer-show-item {
+  margin: 8px 0;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.analysis-item {
+  clear: both;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.analysis-label {
+  float: none !important;
+}
+
+.analysis-content {
+  display: inline;
+}
+
+.q-item-span-content {
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+:deep(.el-radio__label),
+:deep(.el-checkbox__label),
+:deep(p),
+:deep(li),
+:deep(td),
+:deep(th) {
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+:deep(table) {
+  width: 100%;
+  margin: 12px 0;
+  border-collapse: collapse;
+}
+
+:deep(td),
+:deep(th) {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+}
+
+:deep(img) {
+  max-width: 100%;
+  height: auto;
+}
+
+:deep(code),
+:deep(pre) {
+  font-size: 16px;
+}
+
+:deep(pre) {
+  max-width: 100%;
+  margin: 14px 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f8fafc !important;
+  color: #111827 !important;
+  line-height: 1.7;
+}
+
+:deep(pre code),
+:deep(pre span) {
+  background: transparent !important;
+}
+
+:deep(.highlight) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+</style>

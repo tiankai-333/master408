@@ -5,6 +5,7 @@ import com.mindskip.xzs.ai.PromptTemplate;
 import com.mindskip.xzs.base.BaseApiController;
 import com.mindskip.xzs.base.RestResponse;
 import com.mindskip.xzs.service.QuestionService;
+import com.mindskip.xzs.viewmodel.admin.question.QuestionEditRequestVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,15 @@ public class QuestionController extends BaseApiController {
     public QuestionController(QuestionService questionService, AnalysisService analysisService) {
         this.questionService = questionService;
         this.analysisService = analysisService;
+    }
+
+    @RequestMapping(value = "/select/{id}", method = RequestMethod.POST)
+    public RestResponse<QuestionEditRequestVM> select(@PathVariable Integer id) {
+        QuestionEditRequestVM questionVM = questionService.getQuestionEditRequestVM(id);
+        if (questionVM == null) {
+            return RestResponse.fail(2, "题目不存在或已被删除");
+        }
+        return RestResponse.ok(questionVM);
     }
 
     @RequestMapping(value = "/analyze-image", method = RequestMethod.POST)

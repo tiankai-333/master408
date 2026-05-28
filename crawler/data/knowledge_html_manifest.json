@@ -1,0 +1,1165 @@
+{
+  "source": "csgraduates",
+  "pages": [
+    {
+      "title": "数据结构",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 230,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure",
+      "failures": []
+    },
+    {
+      "title": "线性数据结构",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 238,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/array/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-array.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-array",
+      "failures": []
+    },
+    {
+      "title": "绪论",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 231,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/basic/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-basic.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-basic",
+      "failures": []
+    },
+    {
+      "title": "图",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 249,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/graph/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-graph.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-graph",
+      "failures": []
+    },
+    {
+      "title": "线性表",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 234,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/linearlist/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-linearlist.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-linearlist",
+      "failures": []
+    },
+    {
+      "title": "查找",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 252,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/search/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-search.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-search",
+      "failures": []
+    },
+    {
+      "title": "排序",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 256,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/sort/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-sort.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-sort",
+      "failures": []
+    },
+    {
+      "title": "字符串",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 243,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/strings/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-strings.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-strings",
+      "failures": []
+    },
+    {
+      "title": "树与二叉树",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 246,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/tree/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-tree.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-tree",
+      "failures": []
+    },
+    {
+      "title": "栈和队列的应用",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 241,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/array/application/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-array-application.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-array-application",
+      "failures": []
+    },
+    {
+      "title": "数组和特殊矩阵",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 242,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/array/matrix/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-array-matrix.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-array-matrix",
+      "failures": []
+    },
+    {
+      "title": "队列",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 240,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/array/queue/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-array-queue.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-array-queue",
+      "failures": []
+    },
+    {
+      "title": "栈",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 239,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/array/stack/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-array-stack.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-array-stack",
+      "failures": []
+    },
+    {
+      "title": "算法基本概念",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 233,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/basic/algorithm/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-basic-algorithm.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-basic-algorithm",
+      "failures": []
+    },
+    {
+      "title": "数据结构基本概念",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 232,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/basic/ds/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-basic-ds.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-basic-ds",
+      "failures": []
+    },
+    {
+      "title": "定义",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 250,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/graph/defs/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-graph-defs.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-graph-defs",
+      "failures": []
+    },
+    {
+      "title": "算法和应用",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 251,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/graph/operation/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-graph-operation.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-graph-operation",
+      "failures": []
+    },
+    {
+      "title": "定义和基本操作",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 235,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/linearlist/def/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-linearlist-def.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-linearlist-def",
+      "failures": []
+    },
+    {
+      "title": "链式表示",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 237,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/linearlist/linked/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-linearlist-linked.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-linearlist-linked",
+      "failures": []
+    },
+    {
+      "title": "顺序表示",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 236,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/linearlist/sequential/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-linearlist-sequential.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-linearlist-sequential",
+      "failures": []
+    },
+    {
+      "title": "数组查找",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 253,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/search/array/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-search-array.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-search-array",
+      "failures": []
+    },
+    {
+      "title": "散列表查找",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 255,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/search/hash/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-search-hash.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-search-hash",
+      "failures": []
+    },
+    {
+      "title": "树形查找",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 254,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/search/tree/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-search-tree.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-search-tree",
+      "failures": []
+    },
+    {
+      "title": "外部排序",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 258,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/sort/external/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-sort-external.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-sort-external",
+      "failures": []
+    },
+    {
+      "title": "内部排序",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 257,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/sort/internal/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-sort-internal.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-sort-internal",
+      "failures": []
+    },
+    {
+      "title": "定义和实现",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 244,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/strings/def/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-strings-def.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-strings-def",
+      "failures": []
+    },
+    {
+      "title": "模式匹配",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 245,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/strings/match/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-strings-match.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-strings-match",
+      "failures": []
+    },
+    {
+      "title": "树的应用",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 248,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/tree/app/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-tree-app.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-tree-app",
+      "failures": []
+    },
+    {
+      "title": "二叉树",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 343,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/tree/btree/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-tree-btree.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-tree-btree",
+      "failures": []
+    },
+    {
+      "title": "树",
+      "subjectId": 1,
+      "subjectName": "数据结构",
+      "knowledgePointId": 247,
+      "sourceUrl": "https://www.csgraduates.com/data_structure/tree/tree/",
+      "htmlRef": "knowledge-html/csgraduates/data-structure/data_structure-tree-tree.html",
+      "assetDir": "knowledge-assets/csgraduates/data-structure/data_structure-tree-tree",
+      "failures": []
+    },
+    {
+      "title": "组成原理",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 259,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle",
+      "failures": []
+    },
+    {
+      "title": "总线和输入输出系统",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 284,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/bus/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-bus.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-bus",
+      "failures": []
+    },
+    {
+      "title": "中央处理器",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 278,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/cpu/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-cpu.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-cpu",
+      "failures": []
+    },
+    {
+      "title": "指令系统",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 273,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/instruction/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-instruction.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-instruction",
+      "failures": []
+    },
+    {
+      "title": "概述",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 260,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/overview/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-overview.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-overview",
+      "failures": []
+    },
+    {
+      "title": "数据表示和计算",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 263,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/representation/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-representation.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-representation",
+      "failures": []
+    },
+    {
+      "title": "存储系统",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 268,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/storage/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-storage.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-storage",
+      "failures": []
+    },
+    {
+      "title": "总线",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 285,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/bus/bus/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-bus-bus.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-bus-bus",
+      "failures": []
+    },
+    {
+      "title": "I/O 系统",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 286,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/bus/io/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-bus-io.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-bus-io",
+      "failures": []
+    },
+    {
+      "title": "控制器",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 280,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/cpu/controller/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-cpu-controller.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-cpu-controller",
+      "failures": []
+    },
+    {
+      "title": "异常与中断",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 281,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/cpu/interrupt/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-cpu-interrupt.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-cpu-interrupt",
+      "failures": []
+    },
+    {
+      "title": "多处理器",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 283,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/cpu/multicore/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-cpu-multicore.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-cpu-multicore",
+      "failures": []
+    },
+    {
+      "title": "指令流水线",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 282,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/cpu/pipeline/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-cpu-pipeline.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-cpu-pipeline",
+      "failures": []
+    },
+    {
+      "title": "功能和结构",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 279,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/cpu/structure/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-cpu-structure.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-cpu-structure",
+      "failures": []
+    },
+    {
+      "title": "数据对齐方式",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 274,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/instruction/alignment/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-instruction-alignment.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-instruction-alignment",
+      "failures": []
+    },
+    {
+      "title": "指令集种类",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 275,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/instruction/concepts/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-instruction-concepts.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-instruction-concepts",
+      "failures": []
+    },
+    {
+      "title": "格式和寻址方式",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 345,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/instruction/format/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-instruction-format.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-instruction-format",
+      "failures": []
+    },
+    {
+      "title": "高级语言和机器码",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 276,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/instruction/high_low_language/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-instruction-high_low_language.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-instruction-high_low_language",
+      "failures": []
+    },
+    {
+      "title": "指令操作码",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 277,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/instruction/instruction_ops/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-instruction-instruction_ops.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-instruction-instruction_ops",
+      "failures": []
+    },
+    {
+      "title": "计算机性能指标",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 262,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/overview/performance/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-overview-performance.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-overview-performance",
+      "failures": []
+    },
+    {
+      "title": "计算机系统层次结构",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 261,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/overview/structure/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-overview-structure.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-overview-structure",
+      "failures": []
+    },
+    {
+      "title": "运算电路",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 266,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/representation/circuit/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-representation-circuit.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-representation-circuit",
+      "failures": []
+    },
+    {
+      "title": "类型转换",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 267,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/representation/conversion/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-representation-conversion.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-representation-conversion",
+      "failures": []
+    },
+    {
+      "title": "浮点数表示",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 265,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/representation/floats/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-representation-floats.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-representation-floats",
+      "failures": []
+    },
+    {
+      "title": "整数的表示",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 264,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/representation/integer/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-representation-integer.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-representation-integer",
+      "failures": []
+    },
+    {
+      "title": "Cache",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 272,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/storage/cache/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-storage-cache.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-storage-cache",
+      "failures": []
+    },
+    {
+      "title": "存储系统",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 269,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/storage/defs/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-storage-defs.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-storage-defs",
+      "failures": []
+    },
+    {
+      "title": "内存",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 270,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/storage/memory/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-storage-memory.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-storage-memory",
+      "failures": []
+    },
+    {
+      "title": "外存",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 271,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/storage/storage/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-storage-storage.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-storage-storage",
+      "failures": []
+    },
+    {
+      "title": "虚拟存储器",
+      "subjectId": 2,
+      "subjectName": "计算机组成原理",
+      "knowledgePointId": 344,
+      "sourceUrl": "https://www.csgraduates.com/constitution_principle/storage/virtual/",
+      "htmlRef": "knowledge-html/csgraduates/constitution-principle/constitution_principle-storage-virtual.html",
+      "assetDir": "knowledge-assets/csgraduates/constitution-principle/constitution_principle-storage-virtual",
+      "failures": []
+    },
+    {
+      "title": "操作系统",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 287,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system",
+      "failures": []
+    },
+    {
+      "title": "计算机系统概述",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 288,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/concepts/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-concepts.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-concepts",
+      "failures": []
+    },
+    {
+      "title": "文件管理",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 301,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/files/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-files.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-files",
+      "failures": []
+    },
+    {
+      "title": "I/O 管理",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 305,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/io_device/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-io_device.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-io_device",
+      "failures": []
+    },
+    {
+      "title": "内存管理",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 298,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/memory/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-memory.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-memory",
+      "failures": []
+    },
+    {
+      "title": "进程管理",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 292,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/process/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-process.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-process",
+      "failures": []
+    },
+    {
+      "title": "操作系统概念",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 289,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/concepts/concept/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-concepts-concept.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-concepts-concept",
+      "failures": []
+    },
+    {
+      "title": "程序运行环境",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 290,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/concepts/environment/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-concepts-environment.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-concepts-environment",
+      "failures": []
+    },
+    {
+      "title": "操作系统结构",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 291,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/concepts/structure/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-concepts-structure.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-concepts-structure",
+      "failures": []
+    },
+    {
+      "title": "目录",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 303,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/files/dir/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-files-dir.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-files-dir",
+      "failures": []
+    },
+    {
+      "title": "文件",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 302,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/files/file/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-files-file.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-files-file",
+      "failures": []
+    },
+    {
+      "title": "文件系统",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 304,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/files/file_system/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-files-file_system.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-files-file_system",
+      "failures": []
+    },
+    {
+      "title": "I/O 设备",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 306,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/io_device/devices/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-io_device-devices.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-io_device-devices",
+      "failures": []
+    },
+    {
+      "title": "磁盘",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 308,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/io_device/disks/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-io_device-disks.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-io_device-disks",
+      "failures": []
+    },
+    {
+      "title": "设备管理",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 307,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/io_device/management/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-io_device-management.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-io_device-management",
+      "failures": []
+    },
+    {
+      "title": "内存管理概念",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 299,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/memory/concepts/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-memory-concepts.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-memory-concepts",
+      "failures": []
+    },
+    {
+      "title": "虚拟内存管理",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 300,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/memory/management/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-memory-management.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-memory-management",
+      "failures": []
+    },
+    {
+      "title": "死锁",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 297,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/process/deadlock/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-process-deadlock.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-process-deadlock",
+      "failures": []
+    },
+    {
+      "title": "经典同步问题",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 296,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/process/problem/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-process-problem.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-process-problem",
+      "failures": []
+    },
+    {
+      "title": "进程和线程",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 293,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/process/process_thread/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-process-process_thread.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-process-process_thread",
+      "failures": []
+    },
+    {
+      "title": "处理机调度",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 294,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/process/scheduling/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-process-scheduling.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-process-scheduling",
+      "failures": []
+    },
+    {
+      "title": "同步和互斥",
+      "subjectId": 3,
+      "subjectName": "操作系统",
+      "knowledgePointId": 295,
+      "sourceUrl": "https://www.csgraduates.com/operating_system/process/sync/",
+      "htmlRef": "knowledge-html/csgraduates/operating-system/operating_system-process-sync.html",
+      "assetDir": "knowledge-assets/csgraduates/operating-system/operating_system-process-sync",
+      "failures": []
+    },
+    {
+      "title": "计算机网络",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 309,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network",
+      "failures": []
+    },
+    {
+      "title": "应用层",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 337,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/application/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-application.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-application",
+      "failures": []
+    },
+    {
+      "title": "数据链路层",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 319,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink",
+      "failures": []
+    },
+    {
+      "title": "网络层",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 326,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network",
+      "failures": []
+    },
+    {
+      "title": "计算机网络体系结构",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 310,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/overall/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-overall.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-overall",
+      "failures": []
+    },
+    {
+      "title": "物理层",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 314,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/physical/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-physical.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-physical",
+      "failures": []
+    },
+    {
+      "title": "传输层",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 334,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/transport/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-transport.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-transport",
+      "failures": []
+    },
+    {
+      "title": "DNS",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 339,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/application/dns/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-application-dns.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-application-dns",
+      "failures": []
+    },
+    {
+      "title": "FTP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 340,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/application/ftp/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-application-ftp.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-application-ftp",
+      "failures": []
+    },
+    {
+      "title": "电子邮件",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 341,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/application/mail/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-application-mail.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-application-mail",
+      "failures": []
+    },
+    {
+      "title": "网络应用模型",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 338,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/application/model/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-application-model.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-application-model",
+      "failures": []
+    },
+    {
+      "title": "万维网",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 342,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/application/www/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-application-www.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-application-www",
+      "failures": []
+    },
+    {
+      "title": "数据链路层设备",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 325,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/dev/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink-dev.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink-dev",
+      "failures": []
+    },
+    {
+      "title": "差错控制",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 321,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/error/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink-error.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink-error",
+      "failures": []
+    },
+    {
+      "title": "流量控制",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 322,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/flow_control/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink-flow_control.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink-flow_control",
+      "failures": []
+    },
+    {
+      "title": "组帧",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 320,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/framing/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink-framing.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink-framing",
+      "failures": []
+    },
+    {
+      "title": "局域网和广域网",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 324,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/lan/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink-lan.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink-lan",
+      "failures": []
+    },
+    {
+      "title": "介质访问控制",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 323,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/datalink/mac/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-datalink-mac.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-datalink-mac",
+      "failures": []
+    },
+    {
+      "title": "ARP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 330,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/arp/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-arp.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-arp",
+      "failures": []
+    },
+    {
+      "title": "网络层设备",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 333,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/dev/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-dev.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-dev",
+      "failures": []
+    },
+    {
+      "title": "DHCP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 329,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/dhcp/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-dhcp.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-dhcp",
+      "failures": []
+    },
+    {
+      "title": "ICMP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 328,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/icmp/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-icmp.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-icmp",
+      "failures": []
+    },
+    {
+      "title": "IP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 327,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/ip/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-ip.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-ip",
+      "failures": []
+    },
+    {
+      "title": "路由算法",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 331,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/route/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-route.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-route",
+      "failures": []
+    },
+    {
+      "title": "SDN",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 332,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/network/sdn/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-network-sdn.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-network-sdn",
+      "failures": []
+    },
+    {
+      "title": "网络设备总结",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 312,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/overall/dev/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-overall-dev.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-overall-dev",
+      "failures": []
+    },
+    {
+      "title": "分层结构",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 311,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/overall/iso/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-overall-iso.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-overall-iso",
+      "failures": []
+    },
+    {
+      "title": "各层协议总结",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 313,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/overall/protocol/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-overall-protocol.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-overall-protocol",
+      "failures": []
+    },
+    {
+      "title": "通信概念",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 315,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/physical/concept/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-physical-concept.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-physical-concept",
+      "failures": []
+    },
+    {
+      "title": "物理层设备",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 318,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/physical/dev/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-physical-dev.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-physical-dev",
+      "failures": []
+    },
+    {
+      "title": "编码和调制",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 316,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/physical/encoding/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-physical-encoding.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-physical-encoding",
+      "failures": []
+    },
+    {
+      "title": "交换方式",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 317,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/physical/switching/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-physical-switching.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-physical-switching",
+      "failures": []
+    },
+    {
+      "title": "TCP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 335,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/transport/tcp/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-transport-tcp.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-transport-tcp",
+      "failures": []
+    },
+    {
+      "title": "UDP",
+      "subjectId": 4,
+      "subjectName": "计算机网络",
+      "knowledgePointId": 336,
+      "sourceUrl": "https://www.csgraduates.com/computer_network/transport/udp/",
+      "htmlRef": "knowledge-html/csgraduates/computer-network/computer_network-transport-udp.html",
+      "assetDir": "knowledge-assets/csgraduates/computer-network/computer_network-transport-udp",
+      "failures": []
+    }
+  ]
+}

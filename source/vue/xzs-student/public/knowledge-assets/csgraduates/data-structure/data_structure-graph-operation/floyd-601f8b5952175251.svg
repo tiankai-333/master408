@@ -1,0 +1,99 @@
+<svg width="800" height="550" xmlns="http://www.w3.org/2000/svg">
+  <text x="400" y="30" text-anchor="middle" font-size="24" font-weight="bold" fill="#2c3e50">
+    Floyd-Warshall 算法核心思想
+  </text>
+
+  <!-- 标题 -->
+  <text x="400" y="30" text-anchor="middle" font-size="24" font-weight="bold" fill="#2c3e50">
+    Floyd-Warshall 算法核心思想
+  </text>
+  
+  <!-- 标题 -->
+  <text x="400" y="30" text-anchor="middle" font-size="24" font-weight="bold" fill="#2c3e50">
+    Floyd-Warshall 算法核心思想
+  </text>
+  
+  <!-- 主要图形区域 -->
+  <g transform="translate(50, 80)">
+    <!-- 节点 i -->
+    <circle cx="100" cy="150" r="30" fill="#3498db" stroke="#2980b9" stroke-width="3"/>
+    <text x="100" y="155" text-anchor="middle" font-size="20" font-weight="bold" fill="white">i</text>
+    
+    <!-- 节点 j -->
+    <circle cx="500" cy="150" r="30" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/>
+    <text x="500" y="155" text-anchor="middle" font-size="20" font-weight="bold" fill="white">j</text>
+    
+    <!-- 节点 k (中转点) -->
+    <circle cx="300" cy="80" r="30" fill="#f39c12" stroke="#e67e22" stroke-width="3"/>
+    <text x="300" y="85" text-anchor="middle" font-size="20" font-weight="bold" fill="white">k</text>
+    
+    <!-- 原路径 i → j -->
+    <line x1="130" y1="150" x2="470" y2="150" stroke="#95a5a6" stroke-width="4" stroke-dasharray="10,5"/>
+    <text x="300" y="140" text-anchor="middle" font-size="16" fill="#7f8c8d">原路径: dist[i][j]</text>
+    
+    <!-- 新路径 i → k → j -->
+    <!-- i → k -->
+    <line x1="115" y1="130" x2="285" y2="95" stroke="#27ae60" stroke-width="4" marker-end="url(#arrowhead)"/>
+    <text x="180" y="105" text-anchor="middle" font-size="14" fill="#27ae60">dist[i][k]</text>
+    
+    <!-- k → j -->
+    <line x1="315" y1="95" x2="485" y2="130" stroke="#27ae60" stroke-width="4" marker-end="url(#arrowhead)"/>
+    <text x="420" y="105" text-anchor="middle" font-size="14" fill="#27ae60">dist[k][j]</text>
+    
+    <!-- 箭头标记定义 -->
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+       refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#27ae60"/>
+      </marker>
+      <marker id="arrowhead-gray" markerWidth="10" markerHeight="7" 
+       refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#95a5a6"/>
+      </marker>
+    </defs>
+    
+    <!-- 比较符号 -->
+    <text x="300" y="200" text-anchor="middle" font-size="18" font-weight="bold" fill="#8e44ad">VS</text>
+    
+    <!-- 公式展示 -->
+    <rect x="50" y="230" width="500" height="80" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2" rx="10"/>
+    <text x="300" y="255" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">
+      核心公式
+    </text>
+    <text x="300" y="285" text-anchor="middle" font-size="16" fill="#34495e">
+      dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+    </text>
+    
+    <!-- 算法步骤说明 -->
+    <text x="600" y="60" font-size="16" font-weight="bold" fill="#2c3e50">算法步骤：</text>
+    <text x="600" y="85" font-size="14" fill="#34495e">1. 初始化距离矩阵</text>
+    <text x="600" y="105" font-size="14" fill="#34495e">2. 对每个中转点 k：</text>
+    <text x="620" y="125" font-size="14" fill="#34495e">• 检查所有点对 (i,j)</text>
+    <text x="620" y="145" font-size="14" fill="#34495e">• 比较直达vs中转路径</text>
+    <text x="620" y="165" font-size="14" fill="#34495e">• 更新最短距离</text>
+    <text x="600" y="185" font-size="14" fill="#34495e">3. 重复直到所有k遍历完</text>
+    
+    <!-- 关键思想强调 -->
+    <rect x="600" y="210" width="150" height="100" fill="#fff3cd" stroke="#ffeaa7" stroke-width="2" rx="8"/>
+    <text x="675" y="235" text-anchor="middle" font-size="14" font-weight="bold" fill="#856404">关键思想</text>
+    <text x="675" y="255" text-anchor="middle" font-size="12" fill="#856404">每次选择一个</text>
+    <text x="675" y="270" text-anchor="middle" font-size="12" fill="#856404">中转点k，</text>
+    <text x="675" y="285" text-anchor="middle" font-size="12" fill="#856404">尝试优化所有</text>
+    <text x="675" y="300" text-anchor="middle" font-size="12" fill="#856404">点对间距离</text>
+  </g>
+  
+  <!-- 示例数字 -->
+  <g transform="translate(50, 420)">
+    <text x="0" y="0" font-size="16" font-weight="bold" fill="#2c3e50">示例：假设当前距离</text>
+    <text x="50" y="25" font-size="14" fill="#34495e">• dist[i][j] = 10 (直达距离)</text>
+    <text x="50" y="45" font-size="14" fill="#34495e">• dist[i][k] = 3, dist[k][j] = 4</text>
+    <text x="50" y="65" font-size="14" fill="#27ae60">• 通过k中转: 3 + 4 = 7 &lt; 10</text>
+    <text x="50" y="85" font-size="14" font-weight="bold" fill="#e74c3c">• 更新: dist[i][j] = 7</text>
+  </g>
+  
+  <!-- 时间复杂度说明 -->
+  <rect x="500" y="450" width="250" height="60" fill="#e8f4fd" stroke="#3498db" stroke-width="2" rx="8"/>
+  <text x="625" y="470" text-anchor="middle" font-size="14" font-weight="bold" fill="#2980b9">时间复杂度</text>
+  <text x="625" y="490" text-anchor="middle" font-size="16" font-weight="bold" fill="#2980b9">O(V³)</text>
+  <text x="625" y="505" text-anchor="middle" font-size="12" fill="#2980b9">三层嵌套循环：k, i, j</text>
+</svg>

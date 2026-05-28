@@ -4,7 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mindskip.xzs.ai.AnalysisService;
 import com.mindskip.xzs.ai.PromptTemplate;
 import com.mindskip.xzs.ai.RagService;
+import com.mindskip.xzs.base.BaseApiController;
 import com.mindskip.xzs.base.RestResponse;
+import com.mindskip.xzs.service.AiAgentPlannerService;
+import com.mindskip.xzs.service.AiPaperComposeService;
+import com.mindskip.xzs.viewmodel.student.ai.AiAgentConfirmRequestVM;
+import com.mindskip.xzs.viewmodel.student.ai.AiAgentPlanRequestVM;
+import com.mindskip.xzs.viewmodel.student.ai.AiAgentPlanResponseVM;
+import com.mindskip.xzs.viewmodel.student.ai.AiPaperComposeRequestVM;
+import com.mindskip.xzs.viewmodel.student.ai.AiPaperComposeResponseVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +29,24 @@ import java.util.stream.Collectors;
 
 @RestController("StudentAIAnalysisController")
 @RequestMapping("/api/student/ai")
-public class AIAnalysisController {
+public class AIAnalysisController extends BaseApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(AIAnalysisController.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final AnalysisService analysisService;
     private final RagService ragService;
+    private final AiPaperComposeService aiPaperComposeService;
+    private final AiAgentPlannerService aiAgentPlannerService;
 
     @Autowired
-    public AIAnalysisController(AnalysisService analysisService, RagService ragService) {
+    public AIAnalysisController(AnalysisService analysisService, RagService ragService,
+                                AiPaperComposeService aiPaperComposeService,
+                                AiAgentPlannerService aiAgentPlannerService) {
         this.analysisService = analysisService;
         this.ragService = ragService;
+        this.aiPaperComposeService = aiPaperComposeService;
+        this.aiAgentPlannerService = aiAgentPlannerService;
     }
 
     @GetMapping("/styles")
@@ -79,6 +93,17 @@ public class AIAnalysisController {
             if (question == null || question.trim().isEmpty()) {
                 logger.warn("题目内容为空");
                 return RestResponse.fail(2, "题目内容不能为空");
+            }
+
+            if (shouldComposePaper(taskType, question, request)) {
+                AiPaperComposeResponseVM paper = composePaperFromRequest(request, question);
+                Map<String, Object> result = new HashMap<>();
+                result.put("analysis", composePaperMarkdown(paper));
+                result.put("paper", paper);
+                result.put("style", style);
+                result.put("taskType", taskType);
+                result.put("tool", "composePaper");
+                return RestResponse.ok(result);
             }
 
             String referenceDocs = null;
@@ -140,6 +165,36 @@ public class AIAnalysisController {
         }
     }
 
+    @PostMapping("/compose-paper")
+    public RestResponse<AiPaperComposeResponseVM> composePaper(@RequestBody AiPaperComposeRequestVM request) {
+        try {
+            return RestResponse.ok(aiPaperComposeService.compose(request, getCurrentUser()));
+        } catch (Exception e) {
+            logger.error("AI组卷失败", e);
+            return RestResponse.fail(2, e.getMessage());
+        }
+    }
+
+    @PostMapping("/agent/plan")
+    public RestResponse<AiAgentPlanResponseVM> agentPlan(@RequestBody AiAgentPlanRequestVM request) {
+        try {
+            return RestResponse.ok(aiAgentPlannerService.plan(request, getCurrentUser()));
+        } catch (Exception e) {
+            logger.error("Agent草案生成失败", e);
+            return RestResponse.fail(2, e.getMessage());
+        }
+    }
+
+    @PostMapping("/agent/confirm")
+    public RestResponse<AiPaperComposeResponseVM> agentConfirm(@RequestBody AiAgentConfirmRequestVM request) {
+        try {
+            return RestResponse.ok(aiAgentPlannerService.confirm(request, getCurrentUser()));
+        } catch (Exception e) {
+            logger.error("Agent草案确认失败", e);
+            return RestResponse.fail(2, e.getMessage());
+        }
+    }
+
     @PostMapping(value = "/analyze-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter analyzeWithAIStream(@RequestBody Map<String, Object> request) {
         SseEmitter emitter = new SseEmitter(600000L);
@@ -152,6 +207,14 @@ public class AIAnalysisController {
 
                 if (question == null || question.trim().isEmpty()) {
                     sendEvent(emitter, "error", "题目内容不能为空");
+                    emitter.complete();
+                    return;
+                }
+
+                if (shouldComposePaper(taskType, question, request)) {
+                    AiPaperComposeResponseVM paper = composePaperFromRequest(request, question);
+                    sendEvent(emitter, "chunk", composePaperMarkdown(paper));
+                    sendEvent(emitter, "done", "ok");
                     emitter.complete();
                     return;
                 }
@@ -207,5 +270,39 @@ public class AIAnalysisController {
 
     private void sendEvent(SseEmitter emitter, String name, String data) throws IOException {
         emitter.send(SseEmitter.event().name(name).data(data == null ? "" : data));
+    }
+
+    private boolean shouldComposePaper(String taskType, String question, Map<String, Object> request) {
+        if (Boolean.TRUE.equals(request.get("composePaper"))) {
+            return true;
+        }
+        if (!"practice".equals(taskType) || question == null) {
+            return false;
+        }
+        return question.contains("/compose paper");
+    }
+
+    private AiPaperComposeResponseVM composePaperFromRequest(Map<String, Object> request, String question) {
+        AiPaperComposeRequestVM composeRequest = objectMapper.convertValue(request, AiPaperComposeRequestVM.class);
+        composeRequest.setInstruction(question);
+        if (composeRequest.getKnowledgePoint() == null || composeRequest.getKnowledgePoint().trim().isEmpty()) {
+            Object knowledgePoints = request.get("knowledgePoints");
+            if (knowledgePoints instanceof String) {
+                composeRequest.setKnowledgePoint((String) knowledgePoints);
+            }
+        }
+        return aiPaperComposeService.compose(composeRequest, getCurrentUser());
+    }
+
+    private String composePaperMarkdown(AiPaperComposeResponseVM paper) {
+        StringBuilder markdown = new StringBuilder();
+        markdown.append("## 已生成限时练习\n\n")
+                .append("- 试卷：").append(paper.getPaperName()).append("\n")
+                .append("- 题量：").append(paper.getQuestionCount()).append(" 道\n")
+                .append("- 限时：").append(paper.getMinutes()).append(" 分钟\n")
+                .append("- 选题策略：").append(paper.getStrategy()).append("\n")
+                .append("- 题目 ID：").append(paper.getQuestionIds()).append("\n\n");
+        markdown.append("[开始答题](").append(paper.getUrl()).append(")");
+        return markdown.toString();
     }
 }

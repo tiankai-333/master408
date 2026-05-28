@@ -1,0 +1,97 @@
+<svg width="800" height="550" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="pageGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F8F9FA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E9ECEF;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <dropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="none"/>
+  
+  <!-- 核心概念框 -->
+  <rect x="50" y="30" width="700" height="80" rx="10" fill="#E8F4FD" stroke="#4A90E2" stroke-width="2" filter="url(#shadow)"/>
+  <text x="400" y="55" text-anchor="middle" fill="#2C3E50" font-size="16" font-weight="bold">核心思想：选择在未来最长时间内不会被访问的页面进行置换</text>
+  <text x="400" y="80" text-anchor="middle" fill="#34495E" font-size="14">（需要预知未来的页面访问序列）</text>
+  <text x="400" y="100" text-anchor="middle" fill="#E74C3C" font-size="12">⚠️ 实际不可实现，仅用于理论研究和性能基准</text>
+
+  <!-- 示例演示区域 -->
+  <text x="400" y="150" text-anchor="middle" fill="#2C3E50" font-size="18" font-weight="bold">算法演示示例</text>
+  
+  <!-- 页面访问序列 -->
+  <text x="70" y="185" fill="#34495E" font-size="14" font-weight="bold">页面访问序列：</text>
+  <g id="sequence">
+    <rect x="200" y="170" width="30" height="25" fill="#FFE4E1" stroke="#FF6B6B" rx="3"/>
+    <text x="215" y="187" text-anchor="middle" fill="#C0392B" font-size="12" font-weight="bold">A</text>
+    <rect x="240" y="170" width="30" height="25" fill="#E1F5FE" stroke="#2196F3" rx="3"/>
+    <text x="255" y="187" text-anchor="middle" fill="#1565C0" font-size="12" font-weight="bold">B</text>
+    <rect x="280" y="170" width="30" height="25" fill="#F3E5F5" stroke="#9C27B0" rx="3"/>
+    <text x="295" y="187" text-anchor="middle" fill="#7B1FA2" font-size="12" font-weight="bold">C</text>
+    <rect x="320" y="170" width="30" height="25" fill="#FFE4E1" stroke="#FF6B6B" rx="3"/>
+    <text x="335" y="187" text-anchor="middle" fill="#C0392B" font-size="12" font-weight="bold">A</text>
+    <rect x="360" y="170" width="30" height="25" fill="#E8F5E8" stroke="#4CAF50" rx="3"/>
+    <text x="375" y="187" text-anchor="middle" fill="#2E7D32" font-size="12" font-weight="bold">D</text>
+    <rect x="400" y="170" width="30" height="25" fill="#E1F5FE" stroke="#2196F3" rx="3"/>
+    <text x="415" y="187" text-anchor="middle" fill="#1565C0" font-size="12" font-weight="bold">B</text>
+    <rect x="440" y="170" width="30" height="25" fill="#FFF3E0" stroke="#FF9800" rx="3"/>
+    <text x="455" y="187" text-anchor="middle" fill="#F57C00" font-size="12" font-weight="bold">E</text>
+    <rect x="480" y="170" width="30" height="25" fill="#FFE4E1" stroke="#FF6B6B" rx="3"/>
+    <text x="495" y="187" text-anchor="middle" fill="#C0392B" font-size="12" font-weight="bold">A</text>
+  </g>
+  
+  <!-- 当前时刻指示 -->
+  <polygon points="375,205 380,215 370,215" fill="#E74C3C"/>
+  <text x="375" y="230" text-anchor="middle" fill="#E74C3C" font-size="12" font-weight="bold">当前时刻</text>
+
+  <!-- 内存状态 -->
+  <text x="70" y="270" fill="#34495E" font-size="14" font-weight="bold">当前内存状态 (容量: 3页)：</text>
+  
+  <!-- 内存页面框 -->
+  <g id="memory">
+    <rect x="280" y="280" width="60" height="40" fill="url(#pageGrad)" stroke="#34495E" stroke-width="2" rx="5"/>
+    <text x="310" y="295" text-anchor="middle" fill="#34495E" font-size="10">页面 A</text>
+    <text x="310" y="310" text-anchor="middle" fill="#E74C3C" font-size="9">下次访问: +3</text>
+    
+    <rect x="350" y="280" width="60" height="40" fill="url(#pageGrad)" stroke="#34495E" stroke-width="2" rx="5"/>
+    <text x="380" y="295" text-anchor="middle" fill="#34495E" font-size="10">页面 B</text>
+    <text x="380" y="310" text-anchor="middle" fill="#27AE60" font-size="9">下次访问: +2</text>
+    
+    <rect x="420" y="280" width="60" height="40" fill="#FFE5E5" stroke="#E74C3C" stroke-width="3" rx="5"/>
+    <text x="450" y="295" text-anchor="middle" fill="#34495E" font-size="10">页面 C</text>
+    <text x="450" y="310" text-anchor="middle" fill="#E74C3C" font-size="9">不再访问</text>
+  </g>
+
+  <!-- 决策说明 -->
+  <text x="400" y="350" text-anchor="middle" fill="#E74C3C" font-size="14" font-weight="bold">OPT 算法选择：置换页面 C （未来不再访问）</text>
+
+  <!-- 算法特点 -->
+  <rect x="50" y="380" width="340" height="140" rx="10" fill="#E8F5E8" stroke="#27AE60" stroke-width="2"/>
+  <text x="220" y="400" text-anchor="middle" fill="#27AE60" font-size="16" font-weight="bold">✓ 算法优势</text>
+  <text x="70" y="425" fill="#2C3E50" font-size="13">• 理论上最优解</text>
+  <text x="70" y="445" fill="#2C3E50" font-size="13">• 缺页中断次数最少</text>
+  <text x="70" y="465" fill="#2C3E50" font-size="13">• 性能评估基准</text>
+  <text x="70" y="485" fill="#2C3E50" font-size="13">• 算法正确性证明标准</text>
+  <text x="70" y="505" fill="#2C3E50" font-size="13">• 其他算法效果对比</text>
+
+  <rect x="410" y="380" width="340" height="140" rx="10" fill="#FFE5E5" stroke="#E74C3C" stroke-width="2"/>
+  <text x="580" y="400" text-anchor="middle" fill="#E74C3C" font-size="16" font-weight="bold">✗ 实际限制</text>
+  <text x="430" y="425" fill="#2C3E50" font-size="13">• 无法预知未来访问</text>
+  <text x="430" y="445" fill="#2C3E50" font-size="13">• 实际系统不可实现</text>
+  <text x="430" y="465" fill="#2C3E50" font-size="13">• 仅用于理论研究</text>
+  <text x="430" y="485" fill="#2C3E50" font-size="13">• 需要完整访问序列</text>
+  <text x="430" y="505" fill="#2C3E50" font-size="13">• 计算复杂度较高</text>
+
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#E74C3C"/>
+    </marker>
+  </defs>
+
+</svg>

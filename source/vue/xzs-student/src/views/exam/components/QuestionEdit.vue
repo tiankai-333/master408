@@ -1,5 +1,5 @@
 <template>
-  <div style="line-height:1.8">
+  <div class="question-edit">
     <div v-if="qType === 1" v-loading="qLoading">
       <QuestionHtml class="q-title" :content="question.title" />
       <div class="q-content">
@@ -73,3 +73,88 @@ const props = defineProps({
   }
 })
 </script>
+
+<style lang="scss" scoped>
+.question-edit {
+  color: #1f2937;
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+.q-title {
+  display: block;
+  margin-bottom: 14px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.85;
+}
+
+.q-content {
+  margin-top: 8px;
+}
+
+.question-prefix {
+  margin-right: 6px;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.q-item-span-content {
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+:deep(.question-html-ref),
+:deep(p),
+:deep(li),
+:deep(td),
+:deep(th) {
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+:deep(table) {
+  width: 100%;
+  margin: 12px 0;
+  border-collapse: collapse;
+}
+
+:deep(td),
+:deep(th) {
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+}
+
+:deep(img) {
+  max-width: 100%;
+  height: auto;
+}
+
+:deep(code),
+:deep(pre) {
+  font-size: 16px;
+}
+
+:deep(pre) {
+  max-width: 100%;
+  margin: 14px 0;
+  padding: 14px 16px;
+  overflow-x: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f8fafc !important;
+  color: #111827 !important;
+  line-height: 1.7;
+}
+
+:deep(pre code),
+:deep(pre span) {
+  background: transparent !important;
+}
+
+:deep(.highlight) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+</style>

@@ -42,7 +42,7 @@
           </el-row>
           <el-row class="do-align-center">
             <el-button type="primary" @click="submitForm">提交</el-button>
-            <el-button>取消</el-button>
+            <el-button @click="cancelExam">取消</el-button>
           </el-row>
         </el-form>
       </el-main>
@@ -131,6 +131,11 @@ const submitForm = () => {
   })
 }
 
+const cancelExam = () => {
+  clearInterval(timer.value)
+  router.push('/paper/index')
+}
+
 onMounted(() => {
   const id = route.query.id
   if (id && parseInt(id) !== 0) {
@@ -151,11 +156,54 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-.align-center { text-align: center; }
-.exam-question-item { padding: 10px;
-  :deep(.el-form-item__label) { font-size: 15px !important; }
+.align-center {
+  text-align: center;
+
+  h1 {
+    font-size: 28px;
+    line-height: 1.35;
+  }
 }
-.question-title-padding { padding-left: 25px; padding-right: 25px; }
+
+.exam-question-item {
+  padding: 16px 10px;
+
+  :deep(.el-form-item__label) {
+    font-size: 18px !important;
+    line-height: 1.7;
+  }
+}
+
+.question-title-padding {
+  padding-left: 25px;
+  padding-right: 25px;
+  font-size: 16px;
+}
+
+:deep(.el-card__body) {
+  padding: 22px 24px;
+}
+
+:deep(.el-radio),
+:deep(.el-checkbox) {
+  min-height: 34px;
+  margin-right: 24px;
+  white-space: normal;
+  align-items: flex-start;
+}
+
+:deep(.el-radio__label),
+:deep(.el-checkbox__label) {
+  font-size: 17px;
+  line-height: 1.75;
+  color: #1f2937;
+}
+
+:deep(.el-textarea__inner),
+:deep(.el-input__inner) {
+  font-size: 17px;
+  line-height: 1.7;
+}
 
 @media screen and (max-width: 768px) {
   .align-center {

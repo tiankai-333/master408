@@ -235,6 +235,15 @@
     <where>
       and do_right=FALSE
       and create_user=#{createUser}
+      <if test="subjectId != null">
+        and subject_id = #{subjectId}
+      </if>
+      <if test="subjectIds != null and subjectIds.size() > 0">
+        and subject_id in
+        <foreach collection="subjectIds" item="subjectId" open="(" separator="," close=")">
+          #{subjectId}
+        </foreach>
+      </if>
     </where>
   </select>
 

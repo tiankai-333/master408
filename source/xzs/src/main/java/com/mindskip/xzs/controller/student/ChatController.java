@@ -179,13 +179,14 @@ public class ChatController extends BaseApiController {
             Map<String, Object> totalRow = jdbcTemplate.queryForMap(
                     "SELECT COUNT(*) AS total_questions, " +
                             "COALESCE(SUM(CASE WHEN do_right = TRUE THEN 1 ELSE 0 END), 0) AS correct_questions " +
-                            "FROM t_exam_paper_question_customer_answer WHERE create_user = ?",
+                            "FROM t_exam_paper_question_customer_answer WHERE create_user = ? AND subject_id IN (1,2,3,4)",
                     userId);
             int totalQuestions = toInt(totalRow.get("total_questions"));
             int correctQuestions = toInt(totalRow.get("correct_questions"));
             stats.put("totalQuestions", totalQuestions);
             stats.put("accuracy", totalQuestions == 0 ? 0 : Math.round(correctQuestions * 100.0 / totalQuestions));
             stats.put("weakPoints", Math.max(0, totalQuestions - correctQuestions));
+            stats.put("scope", "408");
 
             List<Map<String, Object>> subjects = new ArrayList<>();
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(

@@ -1,0 +1,51 @@
+<h1>网络层</h1><div class="lead">本章是计算机网络中的重点，会在选择题中考察，其中知识点也会与其他知识结合，放在大题中考察，需要熟练掌握 IP 协议以及 IP 数据包从一台主机发送到另一台主机的逻辑过程。</div><header class="article-meta"></header><p>学习思维导图：</p><pre tabindex="0"><code class="language-markmap" data-lang="markmap"># 网络层
+
+## 网络层功能
+
+- 异构网络互联
+- 路由和转发
+- SDN基本概念
+- 拥塞控制
+
+## 路由算法
+
+- 静态路由和动态路由
+- 距离-向量路由算法
+- 链路状态路由算法
+- 层次路由
+
+## IPV4
+
+- IPv4分组
+- IPv4地址和NAT
+- 子网划分、路由聚集、子网掩码和CIDR
+- ARP, DHCP, ICMP协议
+
+## IPv6
+
+- IPv6主要特点
+- IPv6地址
+
+## 路由协议
+
+- 自治系统
+- 域内路由和域间路由
+- RIP路由协议
+- OSPF路由协议
+- BGP路由协议
+
+## IP组播
+
+- 组播的概念
+- IP组播地址
+
+## 移动IP
+
+- 移动IP的概念
+- 移动IP通信过程
+
+## 网络层设备
+
+- 路由器的组成和功能
+- 路由表与分组转发
+</code></pre><p><strong>网络层功能</strong></p><ol><li>路由选择：网络层负责确定数据包从源到目的地的最佳路径，以确保数据包能够跨越多个网络或子网。路由选择算法用于决定数据包应该通过哪些中间路由器传输，以达到目的地。</li><li>数据包转发：一旦确定了数据包的路径，网络层将数据包从一个路由器或交换机传递到下一个路由器或交换机，直到到达目的地。这个过程称为数据包转发。</li><li>寻址和标识：网络层使用 IP 地址来唯一标识主机和路由器。IP 地址是网络层的核心标识机制，它帮助路由器和交换机将数据包正确地传送到目的地。</li><li>分段和重组：网络层可以将数据流分成更小的数据包（分段），以便在网络上传输。在目的地，这些分段将被重新组装成原始数据流。</li><li>数据包的传输和传递：网络层通过控制数据包的传输和传递来确保数据的可靠性和完整性。这包括错误检测、丢包处理和数据包的重新发送。</li></ol><div class="section-index"><hr class="panel-line"/><div class="entry"><h5><a href="/computer_network/network/ip/">IP</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/network/icmp/">ICMP</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/network/dhcp/">DHCP</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/network/arp/">ARP</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/network/route/">路由算法</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/network/sdn/">SDN</a></h5><p></p></div><div class="entry"><h5><a href="/computer_network/network/dev/">网络层设备</a></h5><p></p></div></div>

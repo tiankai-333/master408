@@ -1,9 +1,11 @@
 package com.mindskip.xzs.service.impl;
 
+import com.mindskip.xzs.domain.KnowledgeContent;
 import com.mindskip.xzs.domain.KnowledgePoint;
 import com.mindskip.xzs.domain.Question;
 import com.mindskip.xzs.domain.QuestionKnowledgePoint;
 import com.mindskip.xzs.domain.Subject;
+import com.mindskip.xzs.repository.KnowledgeContentMapper;
 import com.mindskip.xzs.repository.KnowledgePointMapper;
 import com.mindskip.xzs.repository.QuestionKnowledgePointMapper;
 import com.mindskip.xzs.repository.QuestionMapper;
@@ -19,6 +21,7 @@ import java.util.*;
 public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
 
     private final KnowledgePointMapper knowledgePointMapper;
+    private final KnowledgeContentMapper knowledgeContentMapper;
     private final QuestionKnowledgePointMapper questionKnowledgePointMapper;
     private final QuestionMapper questionMapper;
     private final SubjectMapper subjectMapper;
@@ -26,11 +29,13 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
 
     @Autowired
     public KnowledgeGraphServiceImpl(KnowledgePointMapper knowledgePointMapper,
+                                     KnowledgeContentMapper knowledgeContentMapper,
                                      QuestionKnowledgePointMapper questionKnowledgePointMapper,
                                      QuestionMapper questionMapper,
                                      SubjectMapper subjectMapper,
                                      JdbcTemplate jdbcTemplate) {
         this.knowledgePointMapper = knowledgePointMapper;
+        this.knowledgeContentMapper = knowledgeContentMapper;
         this.questionKnowledgePointMapper = questionKnowledgePointMapper;
         this.questionMapper = questionMapper;
         this.subjectMapper = subjectMapper;
@@ -168,6 +173,21 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         result.put("name", kp.getName());
         result.put("description", kp.getDescription());
         result.put("level", kp.getLevel());
+        try {
+            KnowledgeContent content = knowledgeContentMapper.findCurrentByKnowledgePointId(knowledgePointId);
+            if (content != null) {
+                result.put("htmlRef", content.getHtmlRef());
+                result.put("summaryText", content.getSummaryText());
+                result.put("sourceUrl", content.getSourceUrl());
+                result.put("assetDir", content.getAssetDir());
+                result.put("contentFormat", "html");
+                if (content.getSummaryText() != null && !content.getSummaryText().isEmpty()) {
+                    result.put("description", content.getSummaryText());
+                }
+            }
+        } catch (Exception e) {
+            result.put("contentFormat", "text");
+        }
 
         if (kp.getSubjectId() != null) {
             Subject subject = subjectMapper.selectByPrimaryKey(kp.getSubjectId());
@@ -270,8 +290,11 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         try {
             Map<String, Object> row = jdbcTemplate.queryForMap(
                     "SELECT q.title_text, JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')) AS content_title, " +
-                            "q.source, q.source_year, q.source_question_no " +
-                            "FROM t_question q LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id WHERE q.id = ?",
+                            "q.source, q.source_year, q.source_question_no, s.name AS subject_name " +
+                            "FROM t_question q " +
+                            "LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id " +
+                            "LEFT JOIN t_subject s ON q.subject_id = s.id " +
+                            "WHERE q.id = ?",
                     questionId);
             String title = trimToLength(firstText(row.get("title_text"), row.get("content_title")), 72);
             if (title == null || title.isEmpty()) {
@@ -285,6 +308,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                 source += " 第" + no + "题";
             }
             result.put("source", source);
+            result.put("subjectName", firstText(row.get("subject_name")));
         } catch (Exception e) {
             result.put("title", "真题 #" + questionId);
             result.put("source", "408真题");
@@ -315,8 +339,9 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
             List<Map<String, Object>> rows = matchSql.length() == 0 ? Collections.emptyList() : jdbcTemplate.queryForList(
                     "SELECT q.id, q.question_type, q.difficult, q.subject_id, q.title_text, " +
                             "JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')) AS content_title, " +
-                            "q.source, q.source_year, q.source_question_no, q.tags " +
+                            "q.source, q.source_year, q.source_question_no, q.tags, s.name AS subject_name " +
                             "FROM t_question q LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id " +
+                            "LEFT JOIN t_subject s ON q.subject_id = s.id " +
                             "WHERE q.deleted = FALSE AND q.subject_id = ? AND (" + matchSql + ") " +
                             "ORDER BY CASE WHEN q.tags LIKE ? THEN 0 ELSE 1 END, q.source_year DESC, q.source_question_no ASC, q.id ASC LIMIT 8",
                     appendExactTagParam(params, kp.getName()).toArray());
@@ -324,8 +349,9 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                 rows = jdbcTemplate.queryForList(
                         "SELECT q.id, q.question_type, q.difficult, q.subject_id, q.title_text, " +
                                 "JSON_UNQUOTE(JSON_EXTRACT(tc.content, '$.titleContent')) AS content_title, " +
-                                "q.source, q.source_year, q.source_question_no " +
+                                "q.source, q.source_year, q.source_question_no, s.name AS subject_name " +
                                 "FROM t_question q LEFT JOIN t_text_content tc ON q.info_text_content_id = tc.id " +
+                                "LEFT JOIN t_subject s ON q.subject_id = s.id " +
                                 "WHERE q.deleted = FALSE AND q.subject_id = ? " +
                                 "ORDER BY source_year DESC, source_question_no ASC, id ASC LIMIT 5",
                         kp.getSubjectId());
@@ -345,6 +371,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                     source += " 第" + no + "题";
                 }
                 item.put("source", source);
+                item.put("subjectName", firstText(row.get("subject_name")));
                 result.add(item);
             }
         } catch (Exception e) {

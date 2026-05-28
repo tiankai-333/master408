@@ -10,11 +10,6 @@
 
     <div class="paper-content">
       <el-tabs tab-position="left" v-model="tabId" @tab-click="tabChange" class="subject-tabs">
-        <el-tab-pane label="408综合" :name="'0'" key="0">
-          <div class="tab-content">
-            <paper-table :data="tableData" :loading="listLoading" :total="total" :query-param="queryParam" @search="search" />
-          </div>
-        </el-tab-pane>
         <el-tab-pane v-for="item in subjectList" :label="item.name" :key="item.id" :name="String(item.id)">
           <div class="tab-content">
             <paper-table :data="tableData" :loading="listLoading" :total="total" :query-param="queryParam" @search="search" />
@@ -31,7 +26,7 @@ import examPaperApi from '@/api/examPaper'
 import subjectApi from '@/api/subject'
 import PaperTable from './components/PaperTable.vue'
 
-const tabId = ref('0')
+const tabId = ref('')
 const listLoading = ref(true)
 const subjectList = ref([])
 const tableData = ref([])
@@ -64,9 +59,11 @@ const search = () => {
   })
 }
 
-const tabChange = () => {
-  const id = Number(tabId.value)
-  queryParam.subjectId = id === 0 ? null : id
+const tabChange = (tabPane) => {
+  const nextTabId = tabPane?.props?.name || tabPane?.paneName || tabPane?.index || tabId.value
+  tabId.value = String(nextTabId)
+  const id = Number(nextTabId)
+  queryParam.subjectId = Number.isFinite(id) ? id : null
   queryParam.pageIndex = 1
   search()
 }
@@ -74,7 +71,14 @@ const tabChange = () => {
 onMounted(() => {
   subjectApi.list().then(re => {
     subjectList.value = re.response || []
-    search()
+    const firstSubject = subjectList.value[0]
+    if (firstSubject) {
+      tabId.value = String(firstSubject.id)
+      queryParam.subjectId = Number(firstSubject.id)
+      search()
+    } else {
+      listLoading.value = false
+    }
   })
 })
 </script>

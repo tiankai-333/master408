@@ -1,0 +1,157 @@
+<svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3f4f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#00000020"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="1000" height="800" fill="none"/>
+  
+  <!-- 标题 -->
+  <rect x="50" y="20" width="900" height="60" rx="10" fill="url(#headerGrad)" filter="url(#shadow)"/>
+  <text x="500" y="55" font-family="SimHei, Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="white">线性表基本操作</text>
+  
+  <!-- 线性表示例 -->
+  <text x="450" y="120" font-family="SimHei, Arial, sans-serif" font-size="18" text-anchor="middle" fill="#374151">示例线性表: [A, B, C, D, E]</text>
+  
+  <!-- 绘制线性表 -->
+  <g transform="translate(300, 140)">
+    <!-- 数组框 -->
+    <rect x="0" y="0" width="60" height="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="60" y="0" width="60" height="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="120" y="0" width="60" height="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="180" y="0" width="60" height="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="240" y="0" width="60" height="40" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <!-- 元素 -->
+    <text x="30" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#92400e">A</text>
+    <text x="90" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#92400e">B</text>
+    <text x="150" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#92400e">C</text>
+    <text x="210" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#92400e">D</text>
+    <text x="270" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#92400e">E</text>
+    <!-- 索引 -->
+    <text x="30" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#6b7280">0</text>
+    <text x="90" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#6b7280">1</text>
+    <text x="150" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#6b7280">2</text>
+    <text x="210" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#6b7280">3</text>
+    <text x="270" y="60" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#6b7280">4</text>
+  </g>
+
+  <!-- 操作分类 -->
+  <!-- 第一行：创建和基本信息操作 -->
+  <g transform="translate(50, 220)">
+    <!-- 初始化 -->
+    <rect x="0" y="0" width="140" height="80" rx="8" fill="url(#boxGrad)" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+    <text x="70" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e40af">InitList</text>
+    <text x="70" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">初始化</text>
+    <text x="70" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">创建空线性表</text>
+    
+    <!-- 长度 -->
+    <rect x="160" y="0" width="140" height="80" rx="8" fill="url(#boxGrad)" stroke="#10b981" stroke-width="2" filter="url(#shadow)"/>
+    <text x="230" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#047857">Length</text>
+    <text x="230" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">获取长度</text>
+    <text x="230" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">返回元素数量</text>
+    
+    <!-- 判空 -->
+    <rect x="320" y="0" width="140" height="80" rx="8" fill="url(#boxGrad)" stroke="#10b981" stroke-width="2" filter="url(#shadow)"/>
+    <text x="390" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#047857">IsEmpty</text>
+    <text x="390" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">判断为空</text>
+    <text x="390" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">检查是否为空</text>
+    
+    <!-- 清空 -->
+    <rect x="480" y="0" width="140" height="80" rx="8" fill="url(#boxGrad)" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+    <text x="550" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#dc2626">ClearList</text>
+    <text x="550" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">清空表</text>
+    <text x="550" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">删除所有元素</text>
+    
+    <!-- 遍历 -->
+    <rect x="640" y="0" width="140" height="80" rx="8" fill="url(#boxGrad)" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+    <text x="710" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#7c3aed">Traverse</text>
+    <text x="710" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">遍历</text>
+    <text x="710" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">访问每个元素</text>
+  </g>
+
+  <!-- 第二行：修改操作 -->
+  <g transform="translate(50, 330)">
+    <!-- 插入 -->
+    <rect x="0" y="0" width="180" height="100" rx="8" fill="url(#boxGrad)" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
+    <text x="90" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#d97706">Insert</text>
+    <text x="90" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">插入元素</text>
+    <text x="90" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">在指定位置插入</text>
+    <text x="90" y="74" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">新的元素</text>
+    
+    <!-- 删除 -->
+    <rect x="200" y="0" width="180" height="100" rx="8" fill="url(#boxGrad)" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+    <text x="290" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#dc2626">Delete</text>
+    <text x="290" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">删除元素</text>
+    <text x="290" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">删除指定位置</text>
+    <text x="290" y="74" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">的元素</text>
+    
+    <!-- 设置元素 -->
+    <rect x="400" y="0" width="180" height="100" rx="8" fill="url(#boxGrad)" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+    <text x="490" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#7c3aed">SetElem</text>
+    <text x="490" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">设置元素</text>
+    <text x="490" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">修改指定位置</text>
+    <text x="490" y="74" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">元素的值</text>
+  </g>
+
+  <!-- 第三行：查询操作 -->
+  <g transform="translate(50, 460)">
+    <!-- 获取元素 -->
+    <rect x="0" y="0" width="180" height="100" rx="8" fill="url(#boxGrad)" stroke="#06b6d4" stroke-width="2" filter="url(#shadow)"/>
+    <text x="90" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#0891b2">GetElem</text>
+    <text x="90" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">获取元素</text>
+    <text x="90" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">获取指定位置</text>
+    <text x="90" y="74" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">的元素值</text>
+    
+    <!-- 查找 -->
+    <rect x="200" y="0" width="180" height="100" rx="8" fill="url(#boxGrad)" stroke="#06b6d4" stroke-width="2" filter="url(#shadow)"/>
+    <text x="290" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#0891b2">LocateElem</text>
+    <text x="290" y="42" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#374151">查找元素</text>
+    <text x="290" y="58" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">根据给定条件</text>
+    <text x="290" y="74" font-family="SimHei, Arial, sans-serif" font-size="12" text-anchor="middle" fill="#6b7280">查找元素位置</text>
+  </g>
+
+  <!-- 操作类型说明 -->
+  <g transform="translate(50, 590)">
+    <text x="0" y="20" font-family="SimHei, Arial, sans-serif" font-size="16" font-weight="bold" fill="#374151">操作分类：</text>
+    
+    <!-- 颜色图例 -->
+    <g transform="translate(0, 35)">
+      <rect x="0" y="0" width="20" height="15" fill="#3b82f6"/>
+      <text x="30" y="12" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">初始化操作</text>
+      
+      <rect x="120" y="0" width="20" height="15" fill="#10b981"/>
+      <text x="150" y="12" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">状态查询</text>
+      
+      <rect x="220" y="0" width="20" height="15" fill="#f59e0b"/>
+      <text x="250" y="12" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">插入操作</text>
+      
+      <rect x="320" y="0" width="20" height="15" fill="#ef4444"/>
+      <text x="350" y="12" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">删除操作</text>
+      
+      <rect x="420" y="0" width="20" height="15" fill="#8b5cf6"/>
+      <text x="450" y="12" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">修改操作</text>
+      
+      <rect x="520" y="0" width="20" height="15" fill="#06b6d4"/>
+      <text x="550" y="12" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">查询操作</text>
+    </g>
+  </g>
+
+  <!-- 重要提示 -->
+  <g transform="translate(50, 680)">
+    <rect x="0" y="0" width="700" height="80" rx="8" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+    <text x="20" y="25" font-family="SimHei, Arial, sans-serif" font-size="14" font-weight="bold" fill="#dc2626">💡 重要提示：</text>
+    <text x="20" y="45" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">• 线性表的位置索引通常从 0 开始</text>
+    <text x="20" y="62" font-family="SimHei, Arial, sans-serif" font-size="12" fill="#374151">• 插入和删除操作会改变表的长度，需要注意边界条件处理</text>
+  </g>
+
+</svg>
