@@ -2,7 +2,9 @@ const app = getApp()
 Page({
   data: {
     spinShow: false,
-    info: {}
+    info: {},
+    displayName: '408Master',
+    avatarPath: '/assets/tabBar/my-select.png'
   },
 
   onLoad: function(options) {
@@ -16,7 +18,9 @@ Page({
     app.formPost('/api/wx/student/user/current', null).then(res => {
       if (res.code == 1) {
         _this.setData({
-          info: res.response
+          info: res.response,
+          displayName: res.response && res.response.userName ? res.response.userName : '408Master',
+          avatarPath: res.response && res.response.imagePath ? res.response.imagePath : '/assets/tabBar/my-select.png'
         });
       }
       _this.setData({
@@ -28,6 +32,16 @@ Page({
       });
       app.message(e, 'error')
     })
+  },
+  openPage(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    wx.navigateTo({ url })
+  },
+  openTab(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    wx.switchTab({ url })
   },
   logOut() {
     let _this = this

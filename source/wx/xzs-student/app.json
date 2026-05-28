@@ -49,7 +49,7 @@
       },
       {
         "pagePath": "pages/my/index/index",
-        "text": "我的",
+        "text": "大师",
         "iconPath": "/assets/tabBar/my.png",
         "selectedIconPath": "/assets/tabBar/my-select.png"
       }

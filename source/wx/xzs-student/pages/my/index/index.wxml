@@ -1,59 +1,70 @@
-<view class="userinfo">
-  <block>
-    <image class="userinfo-avatar" src="{{info.imagePath}}"></image>
-    <view class="userinfo-text">
-      <text class="userinfo-nickname">{{info.userName}}</text>
-      <text class="userinfo-subtitle">408Master 学习档案</text>
+<view class="master-page">
+  <view class="hero">
+    <view class="hero-kicker">408MASTER AI TUTOR</view>
+    <view class="hero-title">大师</view>
+    <view class="hero-desc">拍题识别、错题复盘、真题练习和学习档案都放在这里。</view>
+  </view>
+
+  <view class="profile-card">
+    <image class="avatar" src="{{avatarPath}}"></image>
+    <view class="profile-main">
+      <view class="profile-name">{{displayName}}</view>
+      <view class="profile-subtitle">你的移动学习工作台</view>
     </view>
-  </block>
+    <view class="profile-link" bind:tap="openPage" data-url="/pages/my/info/index">档案</view>
+  </view>
+
+  <view class="section-title">核心功能</view>
+  <view class="feature-grid">
+    <view class="feature-card primary" bind:tap="openPage" data-url="/pages/ai-analyze/index/index">
+      <view class="feature-icon">AI</view>
+      <view class="feature-title">AI题目识别</view>
+      <view class="feature-desc">拍照上传题目，提取题干、选项、答案和解析。</view>
+    </view>
+    <view class="feature-card" bind:tap="openPage" data-url="/pages/error-book/index/index">
+      <view class="feature-icon warn">错</view>
+      <view class="feature-title">错题本</view>
+      <view class="feature-desc">回看错题，配合 AI 分析薄弱点。</view>
+    </view>
+    <view class="feature-card" bind:tap="openTab" data-url="/pages/exam/index/index">
+      <view class="feature-icon exam">练</view>
+      <view class="feature-title">试卷中心</view>
+      <view class="feature-desc">进入真题、专项卷和限时训练。</view>
+    </view>
+    <view class="feature-card" bind:tap="openTab" data-url="/pages/record/index">
+      <view class="feature-icon record">记</view>
+      <view class="feature-title">考试记录</view>
+      <view class="feature-desc">复查答题历史和得分变化。</view>
+    </view>
+  </view>
+
+  <view class="section-title">学习档案</view>
+  <view class="quick-list">
+    <view class="quick-item" bind:tap="openPage" data-url="/pages/my/log/index">
+      <view>
+        <view class="quick-title">学习动态</view>
+        <view class="quick-desc">查看最近练习和系统消息。</view>
+      </view>
+      <view class="quick-arrow">›</view>
+    </view>
+    <view class="quick-item" bind:tap="openPage" data-url="/pages/my/message/list/index">
+      <view>
+        <view class="quick-title">消息</view>
+        <view class="quick-desc">接收学习提醒和通知。</view>
+      </view>
+      <view class="quick-arrow">›</view>
+    </view>
+    <view class="quick-item danger" bind:tap="logOut">
+      <view>
+        <view class="quick-title">退出账号</view>
+        <view class="quick-desc">解绑当前微信登录。</view>
+      </view>
+      <view class="quick-arrow">›</view>
+    </view>
+  </view>
+
+  <view class="copyright">408Master | 计算机考研学习助手</view>
+
+  <i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
+  <i-message id="message" />
 </view>
-<view>
-  <i-cell-group i-class="my-group-margin">
-    <i-cell title="个人资料" is-link url="/pages/my/info/index">
-      <i-icon type="mine_fill" slot="icon" size="20" />
-    </i-cell>
-    <i-cell title="学习动态" is-link url="/pages/my/log/index">
-      <i-icon type="collection_fill" slot="icon" size="20" />
-    </i-cell>
-    <i-cell title="消息" is-link url="/pages/my/message/list/index">
-      <i-icon type="message_fill" slot="icon" size="20" />
-    </i-cell>
-  </i-cell-group>
-</view>
-
-<view>
-  <i-cell-group i-class="my-group-margin">
-    <i-cell title="错题本" is-link url="/pages/error-book/index/index">
-      <i-icon type="browse_fill" slot="icon" size="20" />
-    </i-cell>
-    <i-cell title="AI题目识别" is-link url="/pages/ai-analyze/index/index">
-      <i-icon type="camera_fill" slot="icon" size="20" />
-    </i-cell>
-  </i-cell-group>
-
-  <view>
-  <i-cell-group i-class="my-group-margin">
-    <i-cell title="学习设置" is-link url="/pages/dashboard/index">
-      <i-icon type="setup_fill" slot="icon" size="20" />
-    </i-cell>
-    <i-cell title="反馈" is-link url="/pages/dashboard/index">
-      <i-icon type="praise_fill" slot="icon" size="20" />
-    </i-cell>
-    <i-cell title="关于" is-link url="/pages/dashboard/index">
-      <i-icon type="prompt_fill" slot="icon" size="20" />
-    </i-cell>
-  </i-cell-group>
-</view>
-
-<view>
-  <i-cell-group i-class="my-group-margin">
-    <i-cell title="退出账号" bind:click="logOut">
-      <i-icon type="flashlight_fill" slot="icon" size="20" />
-    </i-cell>
-  </i-cell-group>
-</view>
-
-<view class="copyright">408Master | 计算机考研学习助手</view>
-
-<i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
-<i-message id="message" />
