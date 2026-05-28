@@ -12,6 +12,7 @@
         <a href="/student/index" class="action primary">学生端</a>
         <a href="/admin/" class="action">管理端</a>
         <a href="/admin/ai/config" class="action">AI 密钥与用量</a>
+        <a :href="`${basePath}developer/poster`" class="action">80×180 易拉宝</a>
       </div>
     </header>
 
@@ -100,6 +101,26 @@
       <section class="panel">
         <div class="section-title">
           <span>03</span>
+          <h2>AI 工作台 Orchestrator</h2>
+        </div>
+        <p class="lead">
+          最新 AI 改造把“按钮文案、关键词、Prompt 拼接”从前端拆出来，变成后端统一调度：前端只提交 intent、context、style 和用户消息，后端再决定走画像、讲解、Agent 草案、组卷工具或自由对话。
+        </p>
+        <div class="flow-grid">
+          <article v-for="item in orchestratorFlow" :key="item.title" class="flow-card">
+            <b>{{ item.title }}</b>
+            <p>{{ item.desc }}</p>
+            <code>{{ item.detail }}</code>
+          </article>
+        </div>
+        <p class="note">
+          这套设计和 <code>docs/06-uml-standard</code> 中的用例图、组件图、时序图、领域类图、AI Runtime 和部署图可以互相印证：UML 负责讲清系统结构，Orchestrator 负责把学生一次 AI 请求落到确定的后端流程。
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <span>04</span>
           <h2>UML 分析与读图指南</h2>
         </div>
         <p class="lead">
@@ -128,7 +149,7 @@
       <section class="two-column">
         <article class="panel">
           <div class="section-title">
-            <span>04</span>
+            <span>05</span>
             <h2>当前数据状态</h2>
           </div>
           <div class="data-table">
@@ -143,7 +164,7 @@
 
         <article class="panel">
           <div class="section-title">
-            <span>05</span>
+            <span>06</span>
             <h2>核心能力</h2>
           </div>
           <ul class="plain-list">
@@ -151,6 +172,7 @@
             <li>四种 AI 解析 Skill：常规、费曼、第一性原理、柏拉图式对话。</li>
             <li>AI 题目图片识别：拍照上传 → OCR → AI 解析，支持拍照刷题场景。</li>
             <li>知识图谱与 RAG 知识库，用于减少 AI 解析幻觉。</li>
+            <li>AI 工作台 Orchestrator：显式区分 intent、context、style、tool，统一返回流式文本、引用、Agent 草案和组卷结果。</li>
             <li>学生学习事件、答题记录、错题本，为学生图谱打基础。</li>
             <li>微信小程序学生端：4 个 Tab（首页/刷题/错题/我的）、13 个页面、独立 /api/wx 接口和微信绑定登录。</li>
           </ul>
@@ -159,7 +181,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>06</span>
+          <span>07</span>
           <h2>数据库主线</h2>
         </div>
         <div class="table-grid">
@@ -206,7 +228,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>07</span>
+          <span>10</span>
           <h2>数据质量与关联真题策略</h2>
         </div>
         <div class="table-grid">
@@ -223,7 +245,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>10</span>
+          <span>11</span>
           <h2>模型切换与调用链路</h2>
         </div>
         <div class="flow-grid">
@@ -241,7 +263,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>11</span>
+          <span>12</span>
           <h2>Agent、任务、卷子与 Memory</h2>
         </div>
         <div class="agent-grid">
@@ -261,7 +283,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>12</span>
+          <span>13</span>
           <h2>显式 AI 工具调用</h2>
         </div>
         <p class="lead">
@@ -281,7 +303,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>13</span>
+          <span>14</span>
           <h2>接口文档摘要</h2>
         </div>
         <div class="api-grid">
@@ -295,7 +317,7 @@
 
       <section class="panel">
         <div class="section-title">
-          <span>14</span>
+          <span>15</span>
           <h2>部署说明</h2>
         </div>
         <div class="deploy-steps">
@@ -352,6 +374,7 @@
 
 <script setup>
 const assetBase = import.meta.env.BASE_URL || '/'
+const basePath = assetBase
 
 const summaryCards = [
   { label: 'Product', value: '408Master', desc: '408 刷题 + AI 学习辅助' },
@@ -561,6 +584,39 @@ const toolCallFlow = [
   }
 ]
 
+const orchestratorFlow = [
+  {
+    title: '1. 前端只提交上下文',
+    desc: 'AI 工作台不再用按钮文案和关键词承担主路由，只把当前题目、错题、知识点或粘贴内容整理成统一 context。',
+    detail: 'AiWorkbenchRequestVM: intent + context + style + userMessage'
+  },
+  {
+    title: '2. Intent Router 定任务',
+    desc: '显式 intent 优先，缺失时再根据上下文和用户消息兜底推断，关键词只用于自由输入的兜底识别。',
+    detail: 'explain_question / explain_knowledge / learning_profile / practice_plan'
+  },
+  {
+    title: '3. Context Builder 补材料',
+    desc: '真题携带 question，错题携带 question + answerRecord，知识点携带 knowledgePoint，粘贴携带 pastedText。',
+    detail: 'question / answerRecord / knowledgePoint / pastedText'
+  },
+  {
+    title: '4. Tool Router 选工具',
+    desc: '画像、讲解、Agent 草案、直接组卷和自由对话分别进入不同服务，style 只影响表达，不影响工具选择。',
+    detail: 'AnalysisService / AiAgentPlannerService / AiPaperComposeService'
+  },
+  {
+    title: '5. SSE 统一返回',
+    desc: '一个流式入口返回状态、引用、正文 token、Agent 草案、试卷结果和错误，前端按事件类型渲染。',
+    detail: 'status / references / chunk / agentDraft / paper / done / error'
+  },
+  {
+    title: '6. 旧接口兼容',
+    desc: 'analyze、analyze-stream、agent/plan、agent/confirm 保留，新的工作台先迁移到 /workbench/stream。',
+    detail: '/api/student/ai/workbench/stream'
+  }
+]
+
 const agentRoadmap = [
   {
     title: '草案确认型 Agent',
@@ -617,6 +673,7 @@ const apis = [
   { method: 'POST', path: '/api/student/user/register', desc: '学生注册' },
   { method: 'POST', path: '/api/student/ai/analyze', desc: '学生端 AI 解析（非流式）' },
   { method: 'POST', path: '/api/student/ai/analyze-stream', desc: '学生端 AI 解析 SSE 流式：status/references/chunk/done/error' },
+  { method: 'POST', path: '/api/student/ai/workbench/stream', desc: 'AI 工作台统一 Orchestrator 入口：intent + context + style + tool routing' },
   { method: 'POST', path: '/api/student/ai/agent/plan', desc: 'Agent 草案：查错题、题库和知识图谱，返回组卷建议但不落库' },
   { method: 'POST', path: '/api/student/ai/agent/confirm', desc: '确认 Agent 草案：用已有题目 ID 创建限时卷' },
   { method: 'POST', path: '/api/student/ai/compose-paper', desc: '显式 AI 工具调用：从题库已有题中生成 1-5 题限时卷' },
@@ -679,6 +736,10 @@ const docs = [
 ]
 
 const recentWork = [
+  '新增 AI 工作台 Orchestrator：/api/student/ai/workbench/stream 统一接收 intent、context、style、userMessage，后端按任务路由到画像、讲解、Agent 草案或组卷工具。',
+  '新增 AiWorkbenchContextVM：真题、错题、知识点和粘贴内容统一进入上下文容器，错题建模为 question + answerRecord，避免把错题格式写死。',
+  '更新 Developer Brief 与 UML 说明：用 docs/06-uml-standard 的 PlantUML 标准图解释用例、组件、时序、领域类、RAG、AI Runtime 和部署关系。',
+  '新增 80×180 易拉宝展示页入口：/admin/developer/poster，面向答辩现场快速说明项目定位、技术路线、AI 架构、数据治理和小程序入口。',
   '稳定版阶段收束：学生端试卷中心、错题本、AI 学习工作台、知识点 HTML 渲染和本地初始化脚本完成一轮可演示修复。',
   '重建 CSGraduates HTML 真题与模拟卷导入链路：数据库仅保存 HTML 轻引用、来源、纯文本摘要和元数据，题干/解析片段与图片资源放入学生端 public 静态目录。',
   '扩展题库范围：补齐 408 真题/模拟卷、数学一/二/三、英语一/二、思想政治理论的可见 HTML 题库导入脚本。',

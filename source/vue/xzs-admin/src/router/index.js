@@ -28,6 +28,13 @@ const constantRoutes = [
     meta: { title: '开发者说明' }
   },
   {
+    path: '/developer/poster',
+    name: 'DeveloperPoster',
+    hidden: true,
+    component: () => import('@/views/developer/poster.vue'),
+    meta: { title: '项目易拉宝' }
+  },
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
