@@ -192,7 +192,13 @@ public class AnalysisService {
     }
 
     private boolean isWorkbenchTask(String taskType) {
-        return "explain".equals(taskType) || "exam".equals(taskType) || "practice".equals(taskType);
+        return "explain".equals(taskType)
+                || "exam".equals(taskType)
+                || "practice".equals(taskType)
+                || "explain_question".equals(taskType)
+                || "explain_knowledge".equals(taskType)
+                || "learning_profile".equals(taskType)
+                || "free_chat".equals(taskType);
     }
 
     private String buildWorkbenchPrompt(String taskType, String style, String question, String knowledgePoints, String referenceDocs) {
@@ -202,10 +208,11 @@ public class AnalysisService {
             .append("   标题必须写成“## 标题”，不要输出单独一行的 #。\n")
             .append("2. 面向学生表达，不要暴露 RAG、向量检索、prompt、上下文注入等技术实现词。\n")
             .append("3. 如果参考资料不足，要明确说明“不确定”，不要编造真题年份、题号或答案。\n")
-            .append("4. 讲解要围绕 408 的四科：数据结构、组成原理、操作系统、计算机网络。\n")
-            .append("5. 只输出最终教学答案，不输出自我规划、草稿、元说明或“我需要/我将/现在我”的过程描述。\n")
-            .append("6. 不要重复整段结构；每个标题只出现一次。\n")
-            .append("7. 当前讲法：").append(styleName(style)).append("。\n\n");
+            .append("4. 数据库正确答案优先于数据库解析；数据库解析优先于知识点和参考资料；参考资料优先于模型常识。\n")
+            .append("5. 讲解要围绕 408 的四科：数据结构、组成原理、操作系统、计算机网络。\n")
+            .append("6. 只输出最终教学答案，不输出自我规划、草稿、元说明或“我需要/我将/现在我”的过程描述。\n")
+            .append("7. 不要重复整段结构；每个标题只出现一次。\n")
+            .append("8. 当前讲法：").append(styleName(style)).append("。\n\n");
 
         if (knowledgePoints != null && !knowledgePoints.trim().isEmpty()) {
             prompt.append("## 当前知识点\n").append(knowledgePoints.trim()).append("\n\n");
@@ -218,7 +225,13 @@ public class AnalysisService {
         prompt.append("## 学生请求\n").append(question != null ? question.trim() : "").append("\n\n");
         prompt.append(buildStyleOutputRules(style, taskType)).append("\n");
 
-        if ("practice".equals(taskType)) {
+        if ("learning_profile".equals(taskType)) {
+            prompt.append("## 输出要求\n")
+                .append("- 这是学习画像，不是题目解析；不要输出“题型与考点”“选项分析”“最终答案”。\n")
+                .append("- 推荐格式：## 学习画像 / ## 当前优势 / ## 薄弱风险 / ## 下一步练习建议。\n")
+                .append("- 结论必须来自学习统计和当前上下文；数据不足时明确说明数据不足。\n")
+                .append("- 建议要能执行，优先给出科目、知识点和练习方向。\n");
+        } else if ("practice".equals(taskType)) {
             prompt.append("## 输出要求\n")
                 .append("- 这是“AI 辅助组卷/练习推荐”，不是自由出题。\n")
                 .append("- 只能从题库已经存在的题目中挑选 1-5 道，不能编造新题、题号、年份、来源或选项。\n")
@@ -229,7 +242,11 @@ public class AnalysisService {
             prompt.append("## 输出要求\n")
                 .append("- 根据学生问题选择最合适的结构，不要机械套固定模板。\n")
                 .append("- 普通刷题优先短答案；概念讲解可以稍展开，但不要写长篇背景。\n");
-            if (wantsExamStyle(question)) {
+            if ("explain_question".equals(taskType)) {
+                prompt.append("- 这是题目讲解：优先说明考点、关键推理、正确答案依据和易错原因。\n");
+            } else if ("explain_knowledge".equals(taskType)) {
+                prompt.append("- 这是知识点讲解：优先说明定义、核心机制、常见考法和与当前题目的联系。\n");
+            } else if (wantsExamStyle(question)) {
                 prompt.append("- 学生明确要求结合真题时，可以补充“## 常见考法”。\n");
             } else {
                 prompt.append("- 不要默认输出“真题考法”“解题抓手”“典型题型示例”“复习建议”。\n");

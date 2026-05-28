@@ -684,6 +684,7 @@ const setRelatedQuestionContext = async (question, quickAction = '') => {
   questionContext.value = body
   selectedQuestion.value = {
     ...question,
+    ...(detail || {}),
     source,
     title: source,
     body,
@@ -909,11 +910,16 @@ const pickRandomWrongQuestion = async () => {
     const answer = detail.response.questionAnswerVM
     const context = formatQuestionContext(question, answer) || stripHtml(wrong.shortTitle) || `错题 #${wrong.id}`
     setQuestionContext(context, {
+      ...(question || {}),
       id: wrong.questionId || question.id || wrong.id,
       title: `错题 #${wrong.id}`,
       source: `错题 #${wrong.id}`,
       body: context,
-      subjectName: wrong.subjectName || question.subjectName || '错题'
+      subjectName: wrong.subjectName || question.subjectName || '错题',
+      userAnswer: stripHtml(answer?.content || (Array.isArray(answer?.contentArray) ? answer.contentArray.join('、') : '')),
+      correctStatus: false,
+      doTime: wrong.createTime || wrong.doTime,
+      answerId: wrong.id
     }, 'wrong')
     draftTaskType.value = 'exam'
     ElMessage.success('已选择一道随机错题')
@@ -946,30 +952,7 @@ const focusPasteInput = async () => {
 }
 
 const draftLearningProfile = () => {
-  const subjectLines = normalizedSubjectStats.value
-    .filter(subject => subject.name !== '全部')
-    .map(subject => `${subject.name}：已做 ${subject.done || 0} 题，正确率 ${subject.accuracy || 0}%`)
-    .join('\n')
-  const context = hasActiveContext.value
-    ? `当前上下文：${activeContextTitle.value}\n${activeContextDescription.value}`
-    : '当前上下文：未选择具体知识点或题目'
-
-  draftPrompt(`请根据下面的学习数据，生成我的 408 学习画像，并给出下一步复习建议。
-
-总体数据：
-已做题：${userStats.totalQuestions || 0}
-综合正确率：${safePercent(userStats.accuracy)}%
-
-分科表现：
-${subjectLines || '暂无分科做题数据'}
-
-${context}
-
-请输出：
-1. 当前学习画像
-2. 可能薄弱点
-3. 建议优先复习的知识点
-4. 下一组针对练习应该怎么选题`, 'profile')
+  sendWorkbenchMessage('learning_profile', '请根据我的学习数据、当前上下文和错题情况，生成 408 学习画像，并给出下一步复习建议。')
 }
 
 const explainKnowledge = () => {
@@ -1010,11 +993,11 @@ const generatePractice = () => {
 
 const draftGeneratePaper = () => {
   const knowledgeName = currentKnowledgeName()
-  draftPrompt(`请帮我生成一份 408 针对练习草案。
+  sendWorkbenchMessage('practice_plan', `请帮我生成一份 408 针对练习草案。
 题量：3 题。
 限时：10 分钟。
 选题：${knowledgeName ? `围绕「${knowledgeName}」` : '优先结合我的错题和薄弱点'}。
-约束：先给出草案，确认后再生成试卷；只能使用题库中已经存在的题目，不要编造新题。`, 'practice')
+约束：先给出草案，确认后再生成试卷；只能使用题库中已经存在的题目，不要编造新题。`)
 }
 
 const draftComposePaperCommand = () => {
@@ -1039,15 +1022,98 @@ const goAiAnalyze = () => {
 const sendMessage = () => {
   const question = inputMessage.value.trim()
   if (!question) return
-  const taskType = draftTaskType.value || 'chat'
+  const intent = resolveDefaultIntent(question)
   const hasStableContext = (contextMode.value === 'knowledge' && selectedPoint.value) ||
     (contextMode.value === 'question' && questionContext.value)
   const isCurrentQuestionContext = contextMode.value === 'question' && questionContext.value === question
-  if (!isCurrentQuestionContext && !(taskType !== 'chat' && hasStableContext)) {
+  if (!isCurrentQuestionContext && !(intent !== 'free_chat' && hasStableContext)) {
     setQuestionContext(question)
   }
   draftTaskType.value = 'chat'
-  sendAnalyzeMessage(question, taskType)
+  sendWorkbenchMessage(intent, question)
+}
+
+const resolveDefaultIntent = (question) => {
+  if (/\/compose paper|直接建卷|确认生成试卷/.test(question)) return 'compose_paper'
+  if (/练习|组卷|出题|挑选|生成.*卷|针对.*题|同类题/.test(question)) return 'practice_plan'
+  if (/学习画像|薄弱点|学习状态|掌握情况|复习建议|正确率/.test(question)) return 'learning_profile'
+  if (contextMode.value === 'question' && questionContext.value) return 'explain_question'
+  if (contextMode.value === 'knowledge' && selectedPoint.value) return 'explain_knowledge'
+  return 'free_chat'
+}
+
+const buildOptionList = (question) => {
+  const items = question?.items || question?.options || []
+  if (!Array.isArray(items)) return []
+  return items.map(item => ({
+    key: item.prefix || item.key || item.label,
+    text: stripHtml(item.content || item.text || item.value)
+  })).filter(item => item.key || item.text)
+}
+
+const buildWorkbenchContext = () => {
+  const scopeIds = currentSubjectScopeIds.value
+  const subjectId = scopeIds.length === 1 ? scopeIds[0] : null
+  const subjectName = activeContextTag.value || currentSubjectScopeName.value || null
+  const context = {
+    contextType: contextMode.value,
+    subjectId,
+    subjectName,
+    userStats: {
+      totalQuestions: userStats.totalQuestions || 0,
+      accuracy: userStats.accuracy || 0,
+      weakPoints: userStats.weakPoints || 0,
+      subjects: normalizedSubjectStats.value
+        .filter(subject => subject.name !== '全部')
+        .map(subject => ({
+          id: subject.id,
+          name: subject.name,
+          done: subject.done || 0,
+          accuracy: subject.accuracy || 0
+        }))
+    }
+  }
+
+  if (contextMode.value === 'knowledge' && selectedPoint.value) {
+    context.knowledgePoint = {
+      id: selectedPoint.value.rawId || selectedPointDetail.id,
+      name: selectedPointDetail.name || selectedPoint.value.name,
+      summary: selectedPointDetail.summaryText || selectedPointDetail.description || selectedPoint.value.description,
+      description: selectedPointDetail.description || selectedPoint.value.description,
+      htmlRef: selectedPointDetail.htmlRef,
+      sourceUrl: selectedPointDetail.sourceUrl,
+      relatedQuestionIds: relatedQuestions.value.map(item => Number(item.id || item.questionId)).filter(Number.isFinite)
+    }
+  }
+
+  if (contextMode.value === 'question' && questionContext.value) {
+    const question = selectedQuestion.value || {}
+    context.contextType = question.userAnswer || question.answerId ? 'wrong_question' : (question.source ? 'exam_question' : 'pasted_question')
+    context.question = {
+      id: Number(question.id || question.questionId) || null,
+      source: question.source || question.title || activeContextTitle.value,
+      title: question.title || question.source || activeContextTitle.value,
+      body: question.body || questionContext.value,
+      options: buildOptionList(question),
+      correctAnswer: stripHtml(question.correct || question.correctAnswer || (Array.isArray(question.correctArray) ? question.correctArray.join('、') : '')),
+      analysis: stripHtml(question.analyze || question.analysis),
+      questionType: question.questionType,
+      sourceYear: question.sourceYear
+    }
+    if (question.userAnswer || question.answerRecord) {
+      context.answerRecord = {
+        answerId: question.answerId || question.id,
+        userAnswer: question.userAnswer,
+        correct: question.correctStatus,
+        doTime: question.doTime
+      }
+    }
+    if (context.contextType === 'pasted_question') {
+      context.pastedText = questionContext.value
+    }
+  }
+
+  return context
 }
 
 const buildFunctionPayload = (question) => {
@@ -1072,6 +1138,84 @@ const shouldUseAgentPlan = (question, taskType, functionPayload) => {
     return false
   }
   return taskType === 'practice' && /练习|组卷|出题|挑选|生成|卷子|试卷/.test(question)
+}
+
+const sendWorkbenchMessage = async (intent, question) => {
+  if (!question || !String(question).trim() || isTyping.value) return
+
+  const userQuestion = String(question).trim()
+  messages.value.push({ role: 'user', content: userQuestion })
+  const assistantMessage = { role: 'assistant', content: '' }
+  messages.value.push(assistantMessage)
+  inputMessage.value = ''
+  isTyping.value = true
+
+  await nextTick()
+  scrollToBottom()
+
+  try {
+    let received = ''
+    let references = []
+    await postStream('/api/student/ai/workbench/stream', {
+      intent,
+      style: selectedStyle.value,
+      context: buildWorkbenchContext(),
+      userMessage: userQuestion
+    }, {
+      onStatus: (status) => {
+        if (!received && !assistantMessage.agentDraft) updateAssistantMessage(assistantMessage, status)
+        nextTick().then(scrollToBottom)
+      },
+      onReferences: (raw) => {
+        try {
+          references = JSON.parse(raw) || []
+        } catch (e) {
+          references = []
+        }
+      },
+      onChunk: (chunk) => {
+        if (!received) updateAssistantMessage(assistantMessage, '')
+        received += chunk
+        updateAssistantMessage(assistantMessage, received)
+        nextTick().then(scrollToBottom)
+      },
+      onEvent: (eventName, raw) => {
+        if (eventName === 'agentDraft') {
+          try {
+            assistantMessage.content = ''
+            assistantMessage.agentDraft = JSON.parse(raw)
+            messages.value = messages.value.slice()
+          } catch (e) {
+            updateAssistantMessage(assistantMessage, '练习草案解析失败，请稍后重试。')
+          }
+        }
+        if (eventName === 'paper') {
+          try {
+            updateAssistantMessage(assistantMessage, formatPaperResult(JSON.parse(raw)))
+          } catch (e) {
+            updateAssistantMessage(assistantMessage, '练习卷已生成。')
+          }
+        }
+      },
+      onError: (message) => {
+        throw new Error(message || 'AI工作台处理失败')
+      }
+    })
+
+    if (references.length > 0 && assistantMessage.content) {
+      let contentWithReferences = assistantMessage.content + '\n\n---\n参考来源\n'
+      references.forEach((ref, idx) => {
+        contentWithReferences += `\n${idx + 1}. [${ref.similarity}] ${ref.title}`
+      })
+      updateAssistantMessage(assistantMessage, contentWithReferences)
+    }
+  } catch (error) {
+    updateAssistantMessage(assistantMessage, normalizeAiError(error.message))
+  } finally {
+    isTyping.value = false
+    await nextTick()
+    scrollToBottom()
+  }
 }
 
 const sendAnalyzeMessage = async (question, taskType = 'chat') => {
