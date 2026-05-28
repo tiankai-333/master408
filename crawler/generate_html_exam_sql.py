@@ -302,6 +302,7 @@ def parse_questions(spec: ExamSpec, html: str, session: requests.Session, html_r
     current_subject_id = spec.subject_id
     current_subject_name = spec.subject_name
     context_nodes: list[Tag] = []
+    context_consumed = False
 
     for elem in main.find_all(["h4", "h5"], recursive=True):
         text = elem.get_text(" ", strip=True)
@@ -318,8 +319,10 @@ def parse_questions(spec: ExamSpec, html: str, session: requests.Session, html_r
                         break
                     if isinstance(sib, Tag) and sib.name != "script":
                         context_nodes.append(sib)
+                context_consumed = False
             else:
                 context_nodes = []
+                context_consumed = False
             continue
 
         if not text.isdigit():
@@ -363,12 +366,15 @@ def parse_questions(spec: ExamSpec, html: str, session: requests.Session, html_r
 
         if choice:
             title_nodes = siblings[: siblings.index(choice)]
-            if spec.family.startswith("english") and context_nodes:
+            if spec.family.startswith("english") and context_nodes and not context_consumed:
                 title_nodes = context_nodes + title_nodes
+                context_consumed = True
             title_html = "\n".join(outer_html(n) for n in title_nodes).strip()
+            if spec.family.startswith("english") and not title_html:
+                title_html = f'<p class="cloze-question-prompt">完型填空 第 {q_no} 空</p>'
             correct = (choice.get("data-answer") or "").strip()
             items = []
-            for label in choice.select("label.choice-option"):
+            for label in choice.select("label.choice-option, label.choice-option-inline"):
                 prefix = label.select_one(".choice-label")
                 content = label.select_one(".choice-text")
                 prefix_text = prefix.get_text("", strip=True).replace(".", "") if prefix else ""
@@ -393,8 +399,9 @@ def parse_questions(spec: ExamSpec, html: str, session: requests.Session, html_r
                 if marker in siblings:
                     end_index = min(end_index, siblings.index(marker))
             title_nodes = siblings[:end_index]
-            if spec.family.startswith("english") and context_nodes:
+            if spec.family.startswith("english") and context_nodes and not context_consumed:
                 title_nodes = context_nodes + title_nodes
+                context_consumed = True
             title_html = "\n".join(outer_html(n) for n in title_nodes).strip()
             analysis_html = inner_html(solution) if solution else ""
             correct = ""
