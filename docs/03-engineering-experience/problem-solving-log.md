@@ -58,6 +58,24 @@
   - `../01-requirements-plan/AI智能学习辅助功能-整体规划.md`
   - `AI_AGENT_TEST_GUIDE.md`
 
+## 6. AI 工作台卡死（429 限流）
+
+- **现象**：AI 学习工作台发消息后一直显示"正在检索…"，永远不出结果。
+- **根因**：每次对话都调智谱 embedding API 做向量检索，触发 429 限流；同一 API Key 的 chat 流式调用也被连带限流，SSE 连接挂住。
+- **处理**：
+  - RagService 增加候选向量和已解析 `float[]` 的 5 分钟 TTL 缓存，避免每次全表扫描和重复 JSON 反序列化。
+  - Orchestrator 在闲聊（`free_chat`）且无知识点/题目上下文时直接跳过 RAG 检索。
+- **资料**：
+  - `2026-05-29-ai-workbench-stall-fix.md`
+
+## 7. Admin 后台登录失败（跨域 Cookie 丢失）
+
+- **现象**：用 `http://127.0.0.1:8002` 访问管理后台，登录成功但页面仍显示"用户未登录"；改用 `http://localhost:8002` 则正常。
+- **根因**：`.env` 中 `VITE_APP_URL=http://localhost:8000` 让 axios 直连后端，绕过 Vite 代理。`127.0.0.1` 和 `localhost` 被浏览器视为不同域，session cookie 域名为 `localhost`，在 `127.0.0.1` 页面发请求时 cookie 不会携带。
+- **处理**：清空 `VITE_APP_URL`，让请求走 Vite dev server 代理，避免跨域。
+- **资料**：
+  - `2026-05-29-ai-workbench-stall-fix.md`（附 2）
+
 ## 6. 微信小程序本地跑通
 
 - 现象：小程序正式微信登录依赖 AppID/AppSecret，本地开发阶段难以完整跑通。

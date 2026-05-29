@@ -13,5 +13,6 @@
 | `db_tables_structure.txt` | 数据库表结构文本快照。 |
 | `problem-solving-log.md` | 典型问题排查与解决记录索引。 |
 | `manual-test-log-2026-05-17.md` | 学生端和 408Master 工作台手工测试记录，包含 UI、数据、AI 交互问题与复测清单。 |
+| `2026-05-29-qdrant-vector-index.md` | Qdrant 向量索引接入：题目+知识库全量向量化，替换内存余弦方案。 |
 
 这些材料适合在汇报里包装成“工程化能力”：迁移、治理、排错、测试、可维护性。
