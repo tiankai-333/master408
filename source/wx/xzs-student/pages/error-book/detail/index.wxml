@@ -98,7 +98,11 @@
     </i-panel>
   </view>
 
+    <view class="delete-section" wx:if="{{questionVM}}">
+      <button class="delete-btn" bindtap="deleteAnswer" disabled="{{deleting}}">{{deleting ? '删除中...' : '移出错题本'}}</button>
+    </view>
+  </view>
+
   <i-spin size="large" fix wx:if="{{spinShow}}"></i-spin>
   <i-spin size="large" fix wx:if="{{aiAnalyzing}}"></i-spin>
   <i-message id="message" />
-</view>

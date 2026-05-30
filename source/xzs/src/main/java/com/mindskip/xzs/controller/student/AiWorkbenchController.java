@@ -1,6 +1,9 @@
 package com.mindskip.xzs.controller.student;
 
+import com.mindskip.xzs.ai.AnalysisService;
+import com.mindskip.xzs.ai.RagService;
 import com.mindskip.xzs.base.BaseApiController;
+import com.mindskip.xzs.domain.User;
 import com.mindskip.xzs.service.AiOrchestratorService;
 import com.mindskip.xzs.viewmodel.student.ai.AiWorkbenchRequestVM;
 import org.slf4j.Logger;
@@ -27,9 +30,12 @@ public class AiWorkbenchController extends BaseApiController {
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter stream(@RequestBody AiWorkbenchRequestVM request) {
         SseEmitter emitter = new SseEmitter(600000L);
+        final User currentUser = getCurrentUser();
         CompletableFuture.runAsync(() -> {
+            AnalysisService.setCurrentUserId(currentUser.getId());
+            RagService.setCurrentUserId(currentUser.getId());
             try {
-                aiOrchestratorService.handleStream(request, getCurrentUser(),
+                aiOrchestratorService.handleStream(request, currentUser,
                         (eventName, data) -> sendEvent(emitter, eventName, data));
                 sendEvent(emitter, "done", "ok");
                 emitter.complete();
@@ -40,6 +46,9 @@ public class AiWorkbenchController extends BaseApiController {
                 } catch (Exception ignored) {
                 }
                 emitter.completeWithError(e);
+            } finally {
+                RagService.clearCurrentUserId();
+                AnalysisService.clearCurrentUserId();
             }
         });
         return emitter;

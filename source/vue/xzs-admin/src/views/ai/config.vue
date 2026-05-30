@@ -14,6 +14,11 @@
             <el-table-column prop="providerCode" label="代码" width="110"/>
             <el-table-column prop="apiBaseUrl" label="Base URL" min-width="220"/>
             <el-table-column prop="chatModel" label="对话模型" width="150"/>
+            <el-table-column prop="visionModel" label="视觉模型" width="150">
+              <template #default="{ row }">
+                <span>{{ row.visionModel || visionFallback(row.providerCode) || '-' }}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="embeddingModel" label="Embedding 模型" width="170">
               <template #default="{ row }">
                 <span>{{ row.embeddingModel || embeddingFallback(row.providerCode) || '-' }}</span>
@@ -34,17 +39,25 @@
                 />
               </template>
             </el-table-column>
-            <el-table-column label="测试" width="160">
+            <el-table-column label="测试" width="180">
               <template #default="{ row }">
-                <el-tag v-if="row.lastTestSuccess === true" type="success">成功</el-tag>
-                <el-tag v-else-if="row.lastTestSuccess === false" type="danger">失败</el-tag>
-                <el-tag v-else type="info">未测试</el-tag>
+                <el-tooltip v-if="row.lastTestMessage" :content="row.lastTestMessage" placement="top" :show-after="300">
+                  <el-tag v-if="row.lastTestSuccess === true" type="success">成功</el-tag>
+                  <el-tag v-else-if="row.lastTestSuccess === false" type="danger">失败</el-tag>
+                  <el-tag v-else type="info">未测试</el-tag>
+                </el-tooltip>
+                <template v-else>
+                  <el-tag v-if="row.lastTestSuccess === true" type="success">成功</el-tag>
+                  <el-tag v-else-if="row.lastTestSuccess === false" type="danger">失败</el-tag>
+                  <el-tag v-else type="info">未测试</el-tag>
+                </template>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="170" fixed="right">
+            <el-table-column label="操作" width="230" fixed="right">
               <template #default="{ row }">
                 <el-button size="small" @click="openEdit(row)">编辑</el-button>
                 <el-button size="small" type="primary" @click="test(row)">测试</el-button>
+                <el-button size="small" type="danger" @click="deleteProvider(row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -93,8 +106,42 @@
               </div>
             </el-col>
           </el-row>
+          <el-table :data="usage.recentLogs || []" border fit max-height="400">
+            <el-table-column prop="createTime" label="时间" width="170"/>
+            <el-table-column prop="provider" label="供应商" width="100">
+              <template #default="{ row }">{{ providerName(row.provider) }}</template>
+            </el-table-column>
+            <el-table-column prop="model" label="模型" width="150"/>
+            <el-table-column prop="taskType" label="类型" width="100">
+              <template #default="{ row }">
+                <el-tag size="small" :type="row.taskType === 'embedding' ? 'warning' : row.taskType === 'vision' ? 'success' : 'primary'">
+                  {{ row.taskType === 'embedding' ? 'Embedding' : row.taskType === 'vision' ? '视觉' : '对话' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="Token (命中/输入/输出)" width="200">
+              <template #default="{ row }">
+                {{ row.tokensUsed || 0 }}
+                <span style="color:#909399;font-size:12px">
+                  ({{ row.cacheHitTokens || 0 }}/{{ Math.max(0, (row.inputTokens || 0) - (row.cacheHitTokens || 0)) }}/{{ row.outputTokens || 0 }})
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="cost" label="费用" width="100">
+              <template #default="{ row }">{{ formatCost(row.cost) }}</template>
+            </el-table-column>
+            <el-table-column prop="durationMs" label="耗时(ms)" width="100"/>
+            <el-table-column label="状态" width="80">
+              <template #default="{ row }">
+                <el-tag size="small" :type="row.success ? 'success' : 'danger'">{{ row.success ? '成功' : '失败' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="question" label="问题" min-width="120" show-overflow-tooltip/>
+          </el-table>
           <el-table :data="usage.byProvider || []" border fit>
-            <el-table-column prop="provider" label="供应商" width="140"/>
+            <el-table-column prop="provider" label="供应商" width="140">
+              <template #default="{ row }">{{ providerName(row.provider) }}</template>
+            </el-table-column>
             <el-table-column prop="model" label="模型"/>
             <el-table-column prop="requestCount" label="请求数" width="110"/>
             <el-table-column prop="tokensUsed" label="Token" width="120"/>
@@ -110,7 +157,7 @@
     <el-dialog v-model="dialog.visible" title="AI 供应商配置" width="680px">
       <el-form :model="form" label-width="130px">
         <el-form-item label="供应商代码">
-          <el-input v-model="form.providerCode" placeholder="deepseek / zhipu / openai / custom"/>
+          <el-input v-model="form.providerCode" placeholder="deepseek / zhipu / openai / custom" :disabled="isEditing"/>
         </el-form-item>
         <el-form-item label="供应商名称">
           <el-input v-model="form.providerName"/>
@@ -123,6 +170,9 @@
         </el-form-item>
         <el-form-item label="Embedding 模型">
           <el-input v-model="form.embeddingModel" placeholder="智谱默认 embedding-2，OpenAI 默认 text-embedding-3-small"/>
+        </el-form-item>
+        <el-form-item label="视觉模型">
+          <el-input v-model="form.visionModel" placeholder="智谱默认 glm-4.6v-flash，OpenAI 默认 gpt-4o"/>
         </el-form-item>
         <el-form-item label="API Key">
           <el-input v-model="form.apiKey" type="password" show-password autocomplete="new-password" placeholder="对话和 Embedding 共用；留空表示不修改已有密钥"/>
@@ -159,12 +209,14 @@ const form = reactive({
   apiBaseUrl: '',
   chatModel: '',
   embeddingModel: '',
+  visionModel: '',
   apiKey: '',
   enabled: false,
   priority: 100
 })
 
 const summary = computed(() => usage.value.summary || {})
+const isEditing = computed(() => form.id != null)
 const successRate = computed(() => {
   const total = Number(summary.value.requestCount || 0)
   if (!total) return '0%'
@@ -195,6 +247,7 @@ const resetForm = () => {
     apiBaseUrl: '',
     chatModel: '',
     embeddingModel: '',
+    visionModel: '',
     apiKey: '',
     enabled: false,
     priority: 100
@@ -214,6 +267,7 @@ const openEdit = row => {
     apiBaseUrl: row.apiBaseUrl,
     chatModel: row.chatModel,
     embeddingModel: row.embeddingModel,
+    visionModel: row.visionModel,
     apiKey: '',
     enabled: row.enabled,
     priority: row.priority || 100
@@ -237,6 +291,7 @@ const toggleEnabled = row => {
     apiBaseUrl: row.apiBaseUrl,
     chatModel: row.chatModel,
     embeddingModel: row.embeddingModel || embeddingFallback(row.providerCode),
+    visionModel: row.visionModel || visionFallback(row.providerCode),
     enabled: row.enabled,
     priority: row.priority || 100,
     apiKey: ''
@@ -260,9 +315,29 @@ const test = row => {
   })
 }
 
+const deleteProvider = row => {
+  aiConfigApi.deleteProvider(row.id).then(re => {
+    if (re.code === 1) {
+      loadProviders()
+      ElMessage.success(re.message)
+    }
+  })
+}
+
+const providerName = code => {
+  const p = providers.value.find(p => p.providerCode === code)
+  return p ? `${p.providerName}（${code}）` : code
+}
+
 const embeddingFallback = providerCode => {
   if (providerCode === 'zhipu') return 'embedding-2'
   if (providerCode === 'openai') return 'text-embedding-3-small'
+  return ''
+}
+
+const visionFallback = providerCode => {
+  if (providerCode === 'zhipu') return 'glm-4.6v-flash'
+  if (providerCode === 'openai') return 'gpt-4o'
   return ''
 }
 

@@ -71,10 +71,10 @@ spring:
   profiles:
     active:  dev
 
-# AI API配置
+# AI API配置（密钥已迁移至数据库 ai_provider_config，通过管理后台 /ai/config 管理）
 ai:
   api:
-    key: e4a645c3ea464385acdafec1f41b2e9b.vJnGYzcGzAESUSBu
+    key: ${AI_API_KEY:}
     url: https://open.bigmodel.cn/api/paas/v4/chat/completions
     type: glm  # 可选值: openai, glm
   rag:

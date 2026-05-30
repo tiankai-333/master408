@@ -25,4 +25,12 @@ public interface AiUsageLogMapper {
     double countSuccessRate();
 
     List<Map<String, Object>> getTopStyles(@Param("limit") int limit);
+
+    Map<String, Object> selectUserUsageSummary(@Param("userId") Integer userId, @Param("days") int days);
+
+    List<Map<String, Object>> selectUserUsageSummaryByKeySource(@Param("userId") Integer userId, @Param("days") int days);
+
+    List<Map<String, Object>> selectUserUsageByProvider(@Param("userId") Integer userId, @Param("days") int days);
+
+    List<Map<String, Object>> selectUserRecentLogs(@Param("userId") Integer userId, @Param("days") int days, @Param("limit") int limit);
 }

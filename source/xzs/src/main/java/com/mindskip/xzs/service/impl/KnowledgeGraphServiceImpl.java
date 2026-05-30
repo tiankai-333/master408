@@ -199,6 +199,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         if (kp.getParentId() != null) {
             KnowledgePoint parent = knowledgePointMapper.findById(kp.getParentId());
             if (parent != null) {
+                result.put("parentId", parent.getId());
                 result.put("parentName", parent.getName());
             }
         }

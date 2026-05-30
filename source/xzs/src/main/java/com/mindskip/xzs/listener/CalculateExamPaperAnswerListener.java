@@ -1,7 +1,6 @@
 package com.mindskip.xzs.listener;
 
 import com.mindskip.xzs.domain.*;
-import com.mindskip.xzs.domain.enums.ExamPaperTypeEnum;
 import com.mindskip.xzs.domain.enums.QuestionTypeEnum;
 import com.mindskip.xzs.event.CalculateExamPaperAnswerCompleteEvent;
 import com.mindskip.xzs.service.ExamPaperAnswerService;
@@ -69,13 +68,8 @@ public class CalculateExamPaperAnswerListener implements ApplicationListener<Cal
         });
         examPaperQuestionCustomerAnswerService.insertList(examPaperQuestionCustomerAnswers);
 
-        switch (ExamPaperTypeEnum.fromCode(examPaper.getPaperType())) {
-            case Task: {
-                examCustomerAnswerService.insertOrUpdate(examPaper, examPaperAnswer, now);
-                break;
-            }
-            default:
-                break;
+        if (examPaper.getTaskExamId() != null) {
+            examCustomerAnswerService.insertOrUpdate(examPaper, examPaperAnswer, now);
         }
     }
 }

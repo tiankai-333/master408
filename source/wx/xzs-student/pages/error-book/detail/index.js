@@ -21,6 +21,8 @@ Page({
     spinShow: false,
     questionVM: null,
     answerVM: null,
+    answerId: null,
+    deleting: false,
     aiAnalyzing: false,
     aiResult: '',
     aiResultHtml: '',
@@ -30,7 +32,7 @@ Page({
 
   onLoad: function (options) {
     if (options.id) {
-      this.setData({ spinShow: true })
+      this.setData({ spinShow: true, answerId: parseInt(options.id) })
       this.loadDetail(options.id)
     }
   },
@@ -100,5 +102,36 @@ Page({
         _this.setData({ aiAnalyzing: false })
         app.message(e, 'error')
       })
+  },
+
+  deleteAnswer: function () {
+    var _this = this
+    var answerId = this.data.answerId
+    if (!answerId) return
+
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要将此题移出错题本吗？',
+      confirmColor: '#f56c6c',
+      success: function (res) {
+        if (!res.confirm) return
+        _this.setData({ deleting: true })
+        app.formPost('/api/wx/student/question/answer/delete/' + answerId, {})
+          .then(function (res) {
+            _this.setData({ deleting: false })
+            if (res.code === 1) {
+              wx.showToast({ title: '已移出错题本', icon: 'success' })
+              setTimeout(function () {
+                wx.navigateBack()
+              }, 1200)
+            } else {
+              app.message(res.message, 'error')
+            }
+          }).catch(function (e) {
+            _this.setData({ deleting: false })
+            app.message(e, 'error')
+          })
+      }
+    })
   }
 })

@@ -1,0 +1,44 @@
+@startuml
+title 一次 AI 回答的完整链路
+
+actor 用户 as User
+participant "前端页面" as Front
+participant "AIAnalysisController" as Controller
+participant "RagService" as Rag
+participant "AnalysisService" as Analysis
+participant "PromptTemplate" as Template
+database "text_content" as DB
+participant "Embedding API" as EmbedAPI
+participant "Chat Model API" as ChatAPI
+
+User -> Front : 输入问题
+Front -> Controller : POST /api/student/ai/analyze-stream
+
+Controller -> Rag : retrieve(question, 5)
+Rag -> DB : selectAllWithEmbedding()
+DB --> Rag : 候选文本 + embedding
+Rag -> EmbedAPI : embed(question)
+EmbedAPI --> Rag : queryEmbedding
+Rag -> Rag : 计算相似度 + topK
+Rag --> Controller : referenceDocs
+
+Controller -> Analysis : analyzeWithAIStream(style, question,\nknowledgePoints, referenceDocs, taskType)
+
+Analysis -> Analysis : generatePrompt()
+
+alt 非工作台任务
+    Analysis -> Template : formatUserPrompt()
+    Template --> Analysis : userPrompt
+else 工作台任务
+    Analysis -> Analysis : buildWorkbenchPrompt()\n或 buildDirectPrompt()
+end
+
+Analysis -> ChatAPI : stream=true 请求
+ChatAPI --> Analysis : SSE token
+Analysis --> Controller : tokenConsumer.accept(token)
+Controller --> Front : SSE 推送 token
+Front --> User : 页面逐字显示
+
+Analysis -> Analysis : 保存 usage log
+
+@enduml

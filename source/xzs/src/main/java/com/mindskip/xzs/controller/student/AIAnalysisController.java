@@ -81,11 +81,15 @@ public class AIAnalysisController extends BaseApiController {
 
     @PostMapping("/analyze")
     public RestResponse<Map<String, Object>> analyzeWithAI(@RequestBody Map<String, Object> request) {
+        AnalysisService.setCurrentUserId(getCurrentUser().getId());
+        RagService.setCurrentUserId(getCurrentUser().getId());
         try {
             String style = (String) request.getOrDefault("style", "default");
             String taskType = (String) request.getOrDefault("taskType", "chat");
             String question = (String) request.get("question");
             String knowledgePoints = (String) request.get("knowledgePoints");
+            String conversationContext = conversationContextValue(request.get("conversationContext"));
+            question = withConversationContext(question, style, conversationContext);
 
             logger.info("开始AI分析 - 风格: {}, 任务: {}, 内容长度: {}", 
                 style, taskType, question != null ? question.length() : 0);
@@ -162,6 +166,9 @@ public class AIAnalysisController extends BaseApiController {
         } catch (Exception e) {
             logger.error("AI分析失败", e);
             return RestResponse.fail(2, "AI分析失败: " + e.getMessage());
+        } finally {
+            RagService.clearCurrentUserId();
+            AnalysisService.clearCurrentUserId();
         }
     }
 
@@ -198,12 +205,17 @@ public class AIAnalysisController extends BaseApiController {
     @PostMapping(value = "/analyze-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter analyzeWithAIStream(@RequestBody Map<String, Object> request) {
         SseEmitter emitter = new SseEmitter(600000L);
+        final Integer userId = getCurrentUser().getId();
         CompletableFuture.runAsync(() -> {
+            AnalysisService.setCurrentUserId(userId);
+            RagService.setCurrentUserId(userId);
             try {
                 String style = (String) request.getOrDefault("style", "default");
                 String taskType = (String) request.getOrDefault("taskType", "chat");
                 String question = (String) request.get("question");
                 String knowledgePoints = (String) request.get("knowledgePoints");
+                String conversationContext = conversationContextValue(request.get("conversationContext"));
+                question = withConversationContext(question, style, conversationContext);
 
                 if (question == null || question.trim().isEmpty()) {
                     sendEvent(emitter, "error", "题目内容不能为空");
@@ -263,6 +275,9 @@ public class AIAnalysisController extends BaseApiController {
                 } catch (Exception ignored) {
                 }
                 emitter.completeWithError(e);
+            } finally {
+                RagService.clearCurrentUserId();
+                AnalysisService.clearCurrentUserId();
             }
         });
         return emitter;
@@ -270,6 +285,34 @@ public class AIAnalysisController extends BaseApiController {
 
     private void sendEvent(SseEmitter emitter, String name, String data) throws IOException {
         emitter.send(SseEmitter.event().name(name).data(data == null ? "" : data));
+    }
+
+    private String conversationContextValue(Object value) {
+        if (value instanceof Map) {
+            Object previous = ((Map<?, ?>) value).get("previousAssistant");
+            return previous == null ? null : String.valueOf(previous);
+        }
+        return value == null ? null : String.valueOf(value);
+    }
+
+    private String withConversationContext(String question, String style, String conversationContext) {
+        if (!"plato".equals(style) || conversationContext == null || conversationContext.trim().isEmpty()) {
+            return question;
+        }
+        StringBuilder builder = new StringBuilder(question == null ? "" : question);
+        builder.append("\n\n【上一轮AI引导内容】\n")
+            .append(limitText(conversationContext, 1800))
+            .append("\n\n【本轮要求】\n")
+            .append("延续上一轮已经提出的问题、学生可能卡住的位置和已有结论，不要重新从零开始。先用一句话承接上一轮，再继续用柏拉图式追问推进。\n");
+        return builder.toString();
+    }
+
+    private String limitText(String value, int maxLength) {
+        String text = value == null ? "" : value.trim();
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "\n...(已截断)";
     }
 
     private boolean shouldComposePaper(String taskType, String question, Map<String, Object> request) {

@@ -152,6 +152,7 @@ const constantRoutes = [
   {
     path: '/task',
     component: Layout,
+    hidden: true,
     name: 'TaskPage',
     meta: {
       title: '任务管理',
@@ -176,6 +177,7 @@ const constantRoutes = [
   {
     path: '/education',
     component: Layout,
+    hidden: true,
     name: 'EducationPage',
     meta: {
       title: '教育管理',
@@ -201,6 +203,7 @@ const constantRoutes = [
   {
     path: '/answer',
     component: Layout,
+    hidden: true,
     name: 'AnswerPage',
     meta: {
       title: '成绩管理',
@@ -226,6 +229,7 @@ const constantRoutes = [
   {
     path: '/message',
     component: Layout,
+    hidden: true,
     name: 'MessagePage',
     meta: {
       title: '消息中心',
@@ -250,6 +254,7 @@ const constantRoutes = [
   {
     path: '/log',
     component: Layout,
+    hidden: true,
     name: 'LogPage',
     meta: {
       title: '日志中心',
@@ -268,18 +273,12 @@ const constantRoutes = [
   {
     path: '/ai',
     component: Layout,
-    name: 'AiPage',
-    meta: {
-      title: 'AI 管理',
-      icon: 'skill'
-    },
-    alwaysShow: true,
     children: [
       {
         path: 'config',
         component: () => import('@/views/ai/config.vue'),
         name: 'AiConfigPage',
-        meta: { title: '密钥与用量', noCache: true }
+        meta: { title: '密钥与用量', icon: 'skill', noCache: true }
       }
     ]
   },

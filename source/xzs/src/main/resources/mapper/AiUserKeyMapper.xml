@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mindskip.xzs.repository.AiUserKeyMapper">
+
+    <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.ai.AiUserKey">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="provider_code" property="providerCode"/>
+        <result column="provider_name" property="providerName"/>
+        <result column="api_base_url" property="apiBaseUrl"/>
+        <result column="chat_model" property="chatModel"/>
+        <result column="embedding_model" property="embeddingModel"/>
+        <result column="vision_model" property="visionModel"/>
+        <result column="api_key_cipher" property="apiKeyCipher"/>
+        <result column="api_key_mask" property="apiKeyMask"/>
+        <result column="enabled" property="enabled"/>
+        <result column="priority" property="priority"/>
+        <result column="last_test_success" property="lastTestSuccess"/>
+        <result column="last_test_message" property="lastTestMessage"/>
+        <result column="last_test_time" property="lastTestTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM ai_user_key WHERE user_id = #{userId} ORDER BY priority ASC, id ASC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM ai_user_key WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiUserKey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_user_key (
+            user_id, provider_code, provider_name, api_base_url, chat_model, embedding_model, vision_model,
+            api_key_cipher, api_key_mask, enabled, priority
+        ) VALUES (
+            #{userId}, #{providerCode}, #{providerName}, #{apiBaseUrl}, #{chatModel}, #{embeddingModel}, #{visionModel},
+            #{apiKeyCipher}, #{apiKeyMask}, #{enabled}, #{priority}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.mindskip.xzs.domain.ai.AiUserKey">
+        UPDATE ai_user_key SET
+            provider_name = #{providerName},
+            api_base_url = #{apiBaseUrl},
+            chat_model = #{chatModel},
+            embedding_model = #{embeddingModel},
+            vision_model = #{visionModel},
+            <if test="apiKeyCipher != null and apiKeyCipher != ''">
+                api_key_cipher = #{apiKeyCipher},
+                api_key_mask = #{apiKeyMask},
+            </if>
+            enabled = #{enabled},
+            priority = #{priority},
+            update_time = NOW()
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM ai_user_key WHERE id = #{id}
+    </delete>
+
+    <update id="updateTestResult">
+        UPDATE ai_user_key SET
+            last_test_success = #{success},
+            last_test_message = #{message},
+            last_test_time = NOW(),
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -69,7 +69,8 @@ public class QuestionController extends BaseWXApiController {
     }
 
     @RequestMapping(value = "/analyze-image", method = RequestMethod.POST)
-    public RestResponse analyzeImageQuestion(@RequestParam("file") MultipartFile file) {
+    public RestResponse analyzeImageQuestion(@RequestParam(value = "file", required = false) MultipartFile file) {
+        AnalysisService.setCurrentUserId(getCurrentUser().getId());
         try {
             if (file == null || file.isEmpty()) {
                 return RestResponse.fail(2, "请选择要识别的图片");
@@ -78,6 +79,8 @@ public class QuestionController extends BaseWXApiController {
             return RestResponse.ok(result);
         } catch (Exception e) {
             return RestResponse.fail(2, "图片识别失败：" + e.getMessage());
+        } finally {
+            AnalysisService.clearCurrentUserId();
         }
     }
 }

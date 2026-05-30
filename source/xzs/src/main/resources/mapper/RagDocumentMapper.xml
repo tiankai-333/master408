@@ -100,6 +100,63 @@
         LIMIT #{limit}
     </select>
 
+    <insert id="backfillDocumentsFromQuestions">
+        INSERT INTO rag_document (
+            document_type, title, summary, subject_id, knowledge_point_id,
+            source_type, source_name, source_ref, permission_scope, version,
+            content_hash, status, create_user
+        )
+        SELECT
+            'question',
+            CONCAT('题目 #', q.id),
+            NULL,
+            q.subject_id,
+            NULL,
+            'exam',
+            CONCAT('subject_', q.subject_id),
+            CONCAT('t_question:', q.id),
+            'public',
+            1,
+            SHA2(CONCAT_WS('|', q.id, tc.content), 256),
+            'ready',
+            q.create_user
+        FROM t_question q
+        JOIN t_text_content tc ON q.info_text_content_id = tc.id
+        WHERE q.deleted = 0
+          AND tc.content IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM rag_document rd WHERE rd.source_ref = CONCAT('t_question:', q.id)
+          )
+    </insert>
+
+    <insert id="backfillChunksFromQuestions">
+        INSERT INTO rag_chunk (
+            document_id, chunk_index, content, content_text, token_count,
+            subject_id, knowledge_point_id, citation_label, source_position,
+            content_hash, enabled
+        )
+        SELECT
+            rd.id,
+            0,
+            tc.content,
+            tc.content,
+            CHAR_LENGTH(tc.content),
+            q.subject_id,
+            NULL,
+            CONCAT('题目 #', q.id),
+            CONCAT('t_question:', q.id),
+            SHA2(CONCAT_WS('|', q.id, tc.content), 256),
+            b'1'
+        FROM rag_document rd
+        JOIN t_question q ON rd.source_ref = CONCAT('t_question:', q.id)
+        JOIN t_text_content tc ON q.info_text_content_id = tc.id
+        WHERE rd.document_type = 'question'
+          AND tc.content IS NOT NULL
+          AND NOT EXISTS (
+              SELECT 1 FROM rag_chunk rc WHERE rc.document_id = rd.id AND rc.chunk_index = 0
+          )
+    </insert>
+
     <insert id="upsertEmbeddingMetadata">
         INSERT INTO rag_embedding (
             chunk_id, embedding_model, embedding_dimension, vector_store,

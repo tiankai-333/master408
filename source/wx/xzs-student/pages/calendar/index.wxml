@@ -1,0 +1,53 @@
+<view class="calendar-page">
+  <view class="month-header">
+    <view class="month-arrow" bind:tap="prevMonth">&#8249;</view>
+    <view class="month-title">{{year}}年{{month}}月</view>
+    <view class="month-arrow" bind:tap="nextMonth">&#8250;</view>
+  </view>
+
+  <view class="weekday-row">
+    <text class="weekday" wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
+  </view>
+
+  <view class="calendar-grid">
+    <view class="calendar-week" wx:for="{{weeks}}" wx:for-item="week" wx:key="index">
+      <view class="calendar-day {{item.isToday ? 'is-today' : ''}} {{item.date === selectedDate ? 'is-selected' : ''}}"
+            wx:for="{{week}}" wx:key="index"
+            bind:tap="selectDay" data-date="{{item.date}}">
+        <text class="day-text">{{item.day}}</text>
+        <view class="study-dot" wx:if="{{item.hasStudy}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="day-detail">
+    <view class="detail-title">{{selectedDate}} 学习详情</view>
+
+    <view class="detail-stats" wx:if="{{dayDetail}}">
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.questionCount || 0}}</text>
+        <text class="detail-label">做题数</text>
+      </view>
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.accuracy || 0}}%</text>
+        <text class="detail-label">正确率</text>
+      </view>
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.wrongCount || 0}}</text>
+        <text class="detail-label">错题数</text>
+      </view>
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.aiCount || 0}}</text>
+        <text class="detail-label">AI 解析</text>
+      </view>
+    </view>
+
+    <view class="detail-empty" wx:if="{{!dayDetail}}">
+      <text>当天暂无学习记录</text>
+    </view>
+
+    <view class="detail-action" bind:tap="goPractice">
+      <text>去练习</text>
+    </view>
+  </view>
+</view>

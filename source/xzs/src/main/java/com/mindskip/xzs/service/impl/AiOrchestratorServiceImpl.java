@@ -59,18 +59,23 @@ public class AiOrchestratorServiceImpl implements AiOrchestratorService {
 
         String contextText = buildContextText(request.getContext(), intent);
         String question = buildStudentRequest(intent, userMessage, request.getContext());
-        String retrievalQuery = buildRetrievalQuery(question, contextText);
         String referenceDocs = null;
-        List<RagService.RagDocument> ragDocs = null;
-        try {
-            consumer.send("status", "正在检索知识库资料...");
-            ragDocs = ragService.retrieve(retrievalQuery, 5);
-            if (ragDocs != null && !ragDocs.isEmpty()) {
-                referenceDocs = ragService.formatReferenceDocs(ragDocs);
-                consumer.send("references", objectMapper.writeValueAsString(toReferenceList(ragDocs)));
+        boolean isPastedQuestion = request.getContext() != null
+                && "pasted_question".equals(request.getContext().getContextType());
+        boolean needsRag = isPastedQuestion;
+        if (needsRag) {
+            List<RagService.RagDocument> ragDocs = null;
+            String retrievalQuery = buildRetrievalQuery(question, contextText);
+            try {
+                consumer.send("status", "正在检索知识库资料...");
+                ragDocs = ragService.retrieve(retrievalQuery, 5);
+                if (ragDocs != null && !ragDocs.isEmpty()) {
+                    referenceDocs = ragService.formatReferenceDocs(ragDocs);
+                    consumer.send("references", objectMapper.writeValueAsString(toReferenceList(ragDocs)));
+                }
+            } catch (Exception e) {
+                consumer.send("status", "知识库检索暂不可用，正在直接回答...");
             }
-        } catch (Exception e) {
-            consumer.send("status", "知识库检索暂不可用，正在直接回答...");
         }
 
         consumer.send("status", statusFor(intent));

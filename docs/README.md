@@ -33,10 +33,12 @@
 5. `03-engineering-experience/Vue2ToVue3Migration.md`
 6. `03-engineering-experience/数据库结构分析报告.md`
 7. `03-engineering-experience/problem-solving-log.md`
-8. `04-deployment/deployment-experience.md`
-9. `04-deployment/朋友远程部署操作手册.md`
-10. `00-deliverables/408Master_AI_RAG_项目报告.docx`
-11. `00-deliverables/408Master_AI_RAG_答辩展示.pptx`
+8. `03-engineering-experience/2026-05-30-local-dev-maven-docker-ports.md`
+9. `02-work-records/2026-05-30-local-dev-runtime-clarification.md`
+10. `04-deployment/deployment-experience.md`
+11. `04-deployment/朋友远程部署操作手册.md`
+12. `00-deliverables/408Master_AI_RAG_项目报告.docx`
+13. `00-deliverables/408Master_AI_RAG_答辩展示.pptx`
 
 ## 维护原则
 

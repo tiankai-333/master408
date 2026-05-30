@@ -3,7 +3,7 @@ Page({
   data: {
     spinShow: false,
     loadMoreLoad: false,
-    loadMoreTip: '暂无数据',
+    loadMoreTip: '',
     queryParam: {
       pageIndex: 1,
       pageSize: app.globalData.pageSize
@@ -43,12 +43,16 @@ Page({
             total: re.pages
           })
           if (re.pageNum >= re.pages) {
-            _this.setData({ loadMoreLoad: false, loadMoreTip: '暂无数据' })
+            _this.setData({ loadMoreLoad: false, loadMoreTip: re.list.length > 0 ? '没有更多了' : '' })
           }
         }
       }).catch(e => {
         _this.setData({ spinShow: false })
         app.message(e, 'error')
       })
+  },
+  goDetail: function(e) {
+    var id = e.currentTarget.dataset.id
+    if (id) wx.navigateTo({ url: '/pages/error-book/detail/index?id=' + id })
   }
 })

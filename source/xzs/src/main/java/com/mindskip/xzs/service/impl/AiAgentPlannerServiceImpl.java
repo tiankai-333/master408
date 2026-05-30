@@ -17,6 +17,8 @@ import com.mindskip.xzs.viewmodel.student.ai.AiPaperComposeResponseVM;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class AiAgentPlannerServiceImpl implements AiAgentPlannerService {
     private static final int DEFAULT_QUESTION_COUNT = 3;
     private static final int DEFAULT_MINUTES = 10;
     private static final int MAX_QUESTION_COUNT = 5;
+    private static final List<Integer> CORE_408_SUBJECT_IDS = Arrays.asList(1, 2, 3, 4);
     private static final String INTENT_COMPOSE_PAPER = "compose_paper";
 
     private final QuestionMapper questionMapper;
@@ -139,31 +142,44 @@ public class AiAgentPlannerServiceImpl implements AiAgentPlannerService {
 
     private List<Question> selectCandidates(AiAgentPlanRequestVM request, Integer userId, String knowledgePoint,
                                             boolean preferMistakes, int count) {
+        List<Integer> subjectIds = resolveSubjectIds(request.getSubjectId());
         List<Question> selected = new ArrayList<>();
-        if (preferMistakes && userId != null) {
-            selected.addAll(questionMapper.selectMistakesForAiPaper(
-                    userId,
-                    request.getSubjectId(),
-                    knowledgePoint,
-                    null,
-                    request.getQuestionTypes(),
-                    request.getExcludeQuestionIds(),
-                    request.getExcludeSourceYears(),
-                    count
-            ));
-        }
-        if (selected.size() < count) {
-            selected.addAll(questionMapper.selectForAiPaper(
-                    request.getSubjectId(),
-                    knowledgePoint,
-                    null,
-                    request.getQuestionTypes(),
-                    mergeIds(request.getExcludeQuestionIds(), ids(selected)),
-                    request.getExcludeSourceYears(),
-                    count - selected.size()
-            ));
+        for (Integer subjectId : subjectIds) {
+            if (selected.size() >= count) break;
+            int remain = count - selected.size();
+            if (preferMistakes && userId != null) {
+                selected.addAll(questionMapper.selectMistakesForAiPaper(
+                        userId,
+                        subjectId,
+                        knowledgePoint,
+                        null,
+                        request.getQuestionTypes(),
+                        mergeIds(request.getExcludeQuestionIds(), ids(selected)),
+                        request.getExcludeSourceYears(),
+                        remain
+                ));
+            }
+            if (selected.size() < count) {
+                remain = count - selected.size();
+                selected.addAll(questionMapper.selectForAiPaper(
+                        subjectId,
+                        knowledgePoint,
+                        null,
+                        request.getQuestionTypes(),
+                        mergeIds(request.getExcludeQuestionIds(), ids(selected)),
+                        request.getExcludeSourceYears(),
+                        remain
+                ));
+            }
         }
         return distinctById(selected);
+    }
+
+    private List<Integer> resolveSubjectIds(Integer subjectId) {
+        if (subjectId != null) {
+            return Collections.singletonList(subjectId);
+        }
+        return CORE_408_SUBJECT_IDS;
     }
 
     private String resolveKnowledgePoint(AiAgentPlanRequestVM request, String message) {

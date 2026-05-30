@@ -98,6 +98,86 @@
   - `../04-deployment/朋友远程部署操作手册.md`
   - `../04-deployment/deployment-experience.md`
 
+## 8. 图片识别 400/1210 排查与修复
+
+- **现象**：重构图片识别链路后，调用智谱 GLM-4V API 报 `400 BAD_REQUEST code=1210`（参数格式错误）。
+- **根因**：三个叠加问题：
+  1. GLM-4V 系列不支持 `system` role，只接受 `user`/`assistant`
+  2. 模型名从旧的 `glm-4.6v` 改成了 `glm-4v-flash`，但实际可用的是 `glm-4.6v-flash`
+  3. 智谱 API 的 Base64 图片要传裸 base64，不带 `data:image/png;base64,` 前缀
+- **处理**：
+  - 去掉 system message，prompt 拼入 user content
+  - 默认视觉模型改为 `glm-4.6v-flash`
+  - 按 provider 类型剥离 base64 前缀
+  - 增加脱敏日志、图片格式校验、URL 防重复追加、用量日志区分 vision/runtime
+- **资料**：
+  - `2026-05-30-vision-api-1210-fix.md`
+
+## 9. 部署脚本改进：从全量发布到可诊断、可分层部署
+
+### 问题背景
+
+项目使用 `deploy/cloud-update.sh` 进行云端 Docker 部署。脚本已经能完成构建、上传、远端部署、数据库备份和 SQL 快照导入，但随着项目复杂度上升，暴露出多个实际工程问题：前端页面、后端接口、数据库数据经常一起变化，小功能改动也会触发完整部署流程（构建 JAR + 构建前端 dist + 上传静态资源 + 备份数据库 + 导入 SQL + 重启 Docker + 健康检查），导致部署成本高、排错困难。
+
+### 具体问题
+
+**密码硬编码**：数据库密码 `doushijiaxiang0.` 和服务器 IP `118.31.34.132` 直接写在脚本里，存在提交到 Git 的风险。
+
+**构建跳过导致旧包部署**：脚本发现 JAR 或 dist 已存在时跳过构建。用 `-y` 自动确认时，`confirm` 函数返回 true，相当于每次都回答"是，重新构建"，但构建环境（WSL 下 JAVA_HOME 未配置）可能失败，脚本继续使用旧产物，部署的仍然是旧代码。
+
+**首次部署失败**：远端服务器第一次部署时没有 `xzs-mysql` 容器，脚本的备份步骤 `docker exec xzs-mysql mysqldump ...` 直接报错退出。
+
+**WSL / Windows SSH key 不一致**：PowerShell 中 `ssh root@118.31.34.132` 免密成功，但 PowerShell 里 `bash` 调用的是 WSL，WSL 的 `$HOME/.ssh/` 路径与 Windows 不同，找不到 `id_ed25519`，导致脚本的 `ssh -o BatchMode=yes` 连接失败。排查这个问题的过程很费时间，因为错误信息只显示"Permission denied"，没有指出 key 路径差异。
+
+**Maven 构建失败误判**：WSL 环境下 `JAVA_HOME` 未配置，`mvn` 执行失败，但旧 JAR 仍然存在，脚本继续执行并输出"JAR: 39M OK"，实际上传了旧包。
+
+**缺少诊断手段**：部署失败时不知道是本地环境问题、SSH 问题、远端 Docker 问题还是数据库问题，只能手动逐个排查。
+
+### 改进措施
+
+**密钥外置到 `.env`**：新建 `deploy/.env.example`（模板，提交 Git）和 `deploy/.env`（真实密码，gitignore 排除）。脚本加载顺序调整为"默认值 < .env < 命令行参数"，密码不再出现在代码中。
+
+**`full` 默认强制构建**：`full` 命令设置 `FORCE_BUILD=true`，构建前先删除旧 JAR，Maven/npm 失败时直接 `fail` 退出，不再使用旧产物伪装成功。新增 `--skip-build` 选项允许跳过构建（用于只改了 SQL 或配置的场景）。
+
+**新增 `doctor` 命令**：检查本地环境（WSL/Git Bash/Linux）、命令是否存在（ssh/scp/rsync/java/mvn/npm）、SSH key 路径和文件存在性、SSH 连接测试（打印实际命令）、远端 Docker 版本和磁盘空间。`full` 流程前自动调用 `doctor`。
+
+**首次部署检测**：部署前检查远端是否存在 `xzs-mysql` 容器，不存在则标记为首次部署，跳过数据库备份，先 `docker compose up -d mysql`，然后用 `wait_mysql_ready()` 轮询 `mysqladmin ping` 最多 90 秒，再导入 SQL。
+
+**`setup-key` 环境提示**：显示当前运行环境（WSL/Git Bash）、HOME 路径、选择的 SSH key 路径，明确提示 PowerShell 和 WSL 使用不同 `~/.ssh` 目录。
+
+**备份清理**：备份成功后保留最近 3 个，删除更早的，避免磁盘被历史备份占满。
+
+**SQL 归档整合**：将 21 个增量补丁 SQL 文件归档到 `database/archive/`，用 `mysqldump` 导出一个干净的 `00_full_snapshot.sql`（6.6MB），新部署只需一步导入。
+
+### 经验总结
+
+1. **部署失败不一定是 Docker 的问题**：实际遇到的问题中，本地环境（JAVA_HOME）、SSH key 路径（WSL vs Windows）、远端容器状态（MySQL 是否存在）都可能导致部署失败，需要有诊断命令快速定位。
+
+2. **Windows + WSL 环境下要明确脚本运行在哪个 shell 中**：PowerShell 里 `bash` 调用的是 WSL，不是 Git Bash。WSL 的 `$HOME` 是 `/home/<user>/`，不是 `/c/Users/<user>/`。SSH key、Java、Maven 的路径都不同。
+
+3. **小改动不应该总是触发全量部署**：只改前端时不应该重新构建 JAR，只改后端时不应该重新上传 295MB 的前端 dist。后续应支持 `frontend`、`backend`、`db` 等分层部署命令。
+
+4. **演示环境可以使用 SQL 快照覆盖，但必须在文档中说明边界**：当前 `deploy/README.md` 已明确标注为"开发/演示环境 SQL 快照覆盖策略"，不适合有真实用户数据的生产环境。如果进入生产，应改为增量迁移（Flyway/Liquibase）。
+
+5. **部署脚本也需要工程化维护**：配置外置（.env）、诊断能力（doctor）、构建失败中止（fail 而非继续）、首次部署处理（检测容器是否存在）和备份清理（保留最近 N 个）都是必要的。
+
+### 后续计划
+
+- 将题目 HTML 和图片等大体积静态资源从前端 dist 中拆出，独立上传
+- 增加 `database/migrations`（结构迁移）和 `database/data-patches`（数据补丁），支持增量升级
+- 后端和前端打成 Docker 镜像，使用镜像 tag 管理版本
+- 增加域名和 HTTPS（Let's Encrypt）
+- 增加定时数据库备份和日志轮转
+- 暂不引入 Kubernetes 和 CI/CD
+
+- 资料：
+  - `../../deploy/cloud-update.sh`
+  - `../../deploy/README.md`
+  - `../../deploy/.env.example`
+  - `../02-work-records/2026-05-29-cloud-deploy-and-sql-consolidation.md`
+
+---
+
 ## 汇报表达
 
 可以把这些问题统一总结为：

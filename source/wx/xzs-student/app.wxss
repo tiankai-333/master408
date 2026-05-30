@@ -4,7 +4,9 @@
 @import '/component/iView/input/index.wxss';
 
 page {
-  background: #f7f7f7;
+  background: #FAFAFE;
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .container {

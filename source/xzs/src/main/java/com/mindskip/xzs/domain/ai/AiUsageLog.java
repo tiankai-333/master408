@@ -4,6 +4,8 @@ import java.util.Date;
 
 public class AiUsageLog {
     private Integer id;
+    private Integer userId;
+    private String keySource;
     private Integer templateId;
     private String style;
     private String aiType;
@@ -15,6 +17,9 @@ public class AiUsageLog {
     private String response;
     private Integer responseLength;
     private Integer tokensUsed;
+    private Integer inputTokens;
+    private Integer outputTokens;
+    private Integer cacheHitTokens;
     private Double cost;
     private Integer durationMs;
     private Boolean success;
@@ -29,6 +34,22 @@ public class AiUsageLog {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getKeySource() {
+        return keySource;
+    }
+
+    public void setKeySource(String keySource) {
+        this.keySource = keySource;
     }
 
     public Integer getTemplateId() {
@@ -117,6 +138,30 @@ public class AiUsageLog {
 
     public void setTokensUsed(Integer tokensUsed) {
         this.tokensUsed = tokensUsed;
+    }
+
+    public Integer getInputTokens() {
+        return inputTokens;
+    }
+
+    public void setInputTokens(Integer inputTokens) {
+        this.inputTokens = inputTokens;
+    }
+
+    public Integer getOutputTokens() {
+        return outputTokens;
+    }
+
+    public void setOutputTokens(Integer outputTokens) {
+        this.outputTokens = outputTokens;
+    }
+
+    public Integer getCacheHitTokens() {
+        return cacheHitTokens;
+    }
+
+    public void setCacheHitTokens(Integer cacheHitTokens) {
+        this.cacheHitTokens = cacheHitTokens;
     }
 
     public Double getCost() {

@@ -1,0 +1,30 @@
+<view class="practice-page">
+  <view class="section-title">练习中心</view>
+  <view class="entry-list">
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/exam/index/index">
+      <view class="entry-accent accent-indigo"></view>
+      <view class="entry-name">真题练习</view>
+      <view class="entry-desc">历年真题分类训练</view>
+    </view>
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/exam/index/index?type=special">
+      <view class="entry-accent accent-teal"></view>
+      <view class="entry-name">专项练习</view>
+      <view class="entry-desc">按科目和知识点精练</view>
+    </view>
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/error-book/index/index">
+      <view class="entry-accent accent-rose"></view>
+      <view class="entry-name">错题复习</view>
+      <view class="entry-desc">回顾做错的题目</view>
+    </view>
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/record/index">
+      <view class="entry-accent accent-violet"></view>
+      <view class="entry-name">做题记录</view>
+      <view class="entry-desc">查看历史答题</view>
+    </view>
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/exam/index/index?type=timed">
+      <view class="entry-accent accent-amber"></view>
+      <view class="entry-name">限时训练</view>
+      <view class="entry-desc">限时模拟考试</view>
+    </view>
+  </view>
+</view>

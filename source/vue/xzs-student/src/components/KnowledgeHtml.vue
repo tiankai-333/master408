@@ -1,5 +1,5 @@
 <template>
-  <div v-html="rendered" />
+  <div v-html="rendered" @click="handleClick" />
 </template>
 
 <script setup>
@@ -33,6 +33,13 @@ const resolveAssetUrl = (src) => {
   return `${base.replace(/\/$/, '')}/${src.replace(/^\//, '')}`
 }
 
+const handleClick = (e) => {
+  const anchor = e.target.closest('a')
+  if (anchor && anchor.getAttribute('href')) {
+    e.preventDefault()
+  }
+}
+
 const renderContent = async () => {
   const current = ++requestId
   if (!props.src) {
@@ -56,3 +63,20 @@ const renderContent = async () => {
 
 watch(() => [props.src, props.fallback], renderContent, { immediate: true })
 </script>
+
+<style scoped>
+div :deep(a) {
+  pointer-events: none;
+  color: inherit;
+  text-decoration: none;
+}
+div :deep(.section-index) {
+  display: none;
+}
+div :deep(pre code.language-markmap) {
+  display: none;
+}
+div :deep(pre:has(code.language-markmap)) {
+  display: none;
+}
+</style>

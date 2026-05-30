@@ -1,62 +1,50 @@
 # database/current
 
-当前分支部署必需 SQL，只保留可进入正常初始化流程的脚本。
+当前分支部署必需的 SQL 文件。
 
-## 导入顺序
-
-一键本地初始化可以直接执行：
+## 快速初始化
 
 ```bash
-mysql -u root -p xzs < database/current/00_init_database_with_seed.sql
+# 依次执行：建表 → 种子数据 → 业务数据
+mysql -u root -p xzs < database/current/01_schema.sql
+mysql -u root -p xzs < database/current/02_seed.sql
+mysql -u root -p xzs < database/current/03_questions_and_exams.sql
+mysql -u root -p xzs < database/current/04_knowledge_and_rag.sql
+mysql -u root -p xzs < database/current/05_student_data.sql
 ```
 
-脚本会创建完整表结构、导入种子题库/知识库，并创建测试账号 `test / 123456` 及默认做题记录。
-
-手动分步导入顺序如下：
+或一键全量导入（合并文件）：
 
 ```bash
-mysql -u root -p xzs < database/current/01_init_structure.sql
-mysql -u root -p xzs < database/current/02_extend_fields.sql
-mysql -u root -p xzs < database/current/04_exam_data.sql
-mysql -u root -p xzs < database/current/05_rag_embeddings.sql
-mysql -u root -p xzs < database/current/06_ai_knowledge_rag.sql
-mysql -u root -p xzs < database/current/10_knowledge_points_data.sql
-mysql -u root -p xzs < database/current/08_clean_knowledge_display_noise.sql
-mysql -u root -p xzs < database/current/11_default_user_level.sql
-mysql -u root -p xzs < database/current/12_canonical_ai_architecture.sql
-mysql -u root -p xzs < database/current/13_backfill_canonical_ai_data.sql
-mysql -u root -p xzs < database/current/14_ai_provider_config.sql
-mysql -u root -p xzs < database/current/15_embed_question_images.sql
-mysql -u root -p xzs < database/current/16_import_2026_html_mock_exam.sql
-mysql -u root -p xzs < database/current/17_import_csgraduates_html_exams.sql
-mysql -u root -p xzs < database/current/18_generate_408_subject_papers.sql
-mysql -u root -p xzs < database/current/19_import_408_knowledge_html.sql
-mysql -u root -p xzs < database/current/07_demo_student_learning_data.sql
+cat database/current/0{1,2,3,4,5}_*.sql | mysql -u root -p xzs
 ```
 
 ## 文件说明
 
-| 文件 | 说明 |
-|---|---|
-| `01_init_structure.sql` | 核心表结构。 |
-| `02_extend_fields.sql` | 408 真题扩展字段、综合题表。 |
-| `04_exam_data.sql` | 题目、试卷、用户、科目等数据。 |
-| `05_rag_embeddings.sql` | 题目内容 embedding 字段。 |
-| `06_ai_knowledge_rag.sql` | AI 知识库、RAG 字段、学生画像、学习事件、Skill 反馈。 |
-| `10_knowledge_points_data.sql` | 408 知识点目录与 AI 知识库内容，包含爬虫导入后本地已验证的数据。 |
-| `00_init_database_with_seed.sql` | 一键初始化入口，串联当前目录的结构、种子题库、HTML 真题、知识点和测试账号记录。 |
-| `07_demo_student_learning_data.sql` | `test / 123456` 测试账号默认做题记录，用于学习状态、做题记录和错题本演示；同时清理旧 `231310423` 测试账号。 |
-| `08_clean_knowledge_display_noise.sql` | 清理知识目录根节点中的爬虫图例残留，避免页面展示 A/B/C/D/E 等噪声。 |
-| `11_default_user_level.sql` | 学生注册默认年级兜底，兼容取消年级后的旧字段约束。 |
-| `12_canonical_ai_architecture.sql` | 新增规范题目内容、RAG 元数据、学生图谱、Agent/Skill/Tool 表。 |
-| `13_backfill_canonical_ai_data.sql` | 从旧题库和 AI 知识库幂等回填规范层。 |
-| `14_ai_provider_config.sql` | 管理端 AI 供应商密钥配置表和默认供应商种子。 |
-| `15_embed_question_images.sql` | 将题目 images 列路径转为 `<img>` 标签追加到 title，同步 question_content。 |
-| `16_import_2026_html_mock_exam.sql` | 导入 2026 HTML 模拟卷。数据库仅保存 HTML 引用、纯文本和内容标签，完整 HTML 片段由学生端静态资源 `question-html/2026/` 提供。 |
-| `17_import_csgraduates_html_exams.sql` | 导入 CSGraduates 真题、模拟卷、数学、英语、政治 HTML 题库。 |
-| `18_generate_408_subject_papers.sql` | 生成 408 四科近年专项卷。 |
-| `19_import_408_knowledge_html.sql` | 导入 408 四科知识点 HTML 轻引用和本地资产索引。 |
+| 文件 | 说明 | 大小 |
+|---|---|---|
+| `01_schema.sql` | 所有 41 张表的 CREATE TABLE（纯结构，无数据） | ~49 KB |
+| `02_seed.sql` | 种子/配置数据：科目、AI配置、用户、Agent、Prompt模板 | ~7 KB |
+| `03_questions_and_exams.sql` | 题目与试卷（核心业务数据） | ~2.8 MB |
+| `04_knowledge_and_rag.sql` | 知识点、RAG 向量、AI知识库 | ~3.7 MB |
+| `05_student_data.sql` | 学生学习状态、事件、错题本（大部分表为空） | ~9 KB |
 
-`10_knowledge_points_data.sql` 让云端部署不依赖额外运行爬虫。需要重新抓取或刷新数据时，再使用 `crawler/knowledge_crawler.py --skip-crawl --import-db --clear-existing` 从 `crawler/data/knowledge_pages.json` 导入本地库，并重新导出该 SQL。
+## 数据概览
 
-新增 AI 架构采用渐进兼容方式：旧 `t_question`、`t_text_content`、`t_ai_knowledge_base` 继续保留；新代码应优先读 `question_content`、`rag_document`、`rag_chunk`、`student_*`、`ai_agent/ai_skill` 等规范表。
+| 表 | 行数 | 说明 |
+|---|---|---|
+| t_question | 650 | 题目 |
+| t_text_content | 669 | 题目文本内容 |
+| t_exam_paper | 18 | 试卷 |
+| t_subject | 5 | 科目 |
+| knowledge_point | 116 | 知识点 |
+| t_ai_knowledge_base | 98 | AI 知识库 |
+| question_content | 640 | 规范化题目内容 |
+| rag_document / rag_chunk | 119 / 81 | RAG 向量检索 |
+| ai_provider_config | 3 | AI 供应商配置 |
+| t_user | 4 | 用户（含 test/123456 测试账号） |
+
+## 历史文件
+
+- `00_full_snapshot.sql` — 拆分前的全量快照，验证后可删除
+- `database/archive/` — 旧的增量迁移文件（00-23 编号），仅增量升级时使用

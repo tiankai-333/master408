@@ -3,8 +3,12 @@ package com.mindskip.xzs.service.impl;
 import com.mindskip.xzs.domain.ai.AiProviderConfig;
 import com.mindskip.xzs.repository.AiProviderConfigMapper;
 import com.mindskip.xzs.service.AiProviderConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,8 @@ import java.util.*;
 @Service
 public class AiProviderConfigServiceImpl implements AiProviderConfigService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AiProviderConfigServiceImpl.class);
+
     private static final int GCM_TAG_LENGTH = 128;
     private static final int GCM_IV_LENGTH = 12;
 
@@ -32,6 +38,34 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
 
     @Value("${ai.secret.master-key:${system.pwdKey.privateKey:408MasterLocalSecret}}")
     private String masterKey;
+
+    @Value("${ai.api.key:}")
+    private String legacyApiKey;
+
+    @Value("${ai.api.type:glm}")
+    private String legacyApiType;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void syncLegacyConfig() {
+        if (legacyApiKey == null || legacyApiKey.trim().isEmpty()) {
+            return;
+        }
+        String providerCode = "glm".equals(legacyApiType) ? "zhipu" : legacyApiType;
+        AiProviderConfig config;
+        try {
+            config = mapper.selectByProviderCode(providerCode);
+        } catch (Exception e) {
+            return;
+        }
+        if (config == null || config.getApiKeyCipher() != null && !config.getApiKeyCipher().trim().isEmpty()) {
+            return;
+        }
+        config.setApiKeyCipher(encrypt(legacyApiKey.trim()));
+        config.setApiKeyMask(mask(legacyApiKey.trim()));
+        config.setEnabled(true);
+        mapper.update(config);
+        logger.info("Synced legacy AI key from application.yml to database for provider: {}", providerCode);
+    }
 
     @Override
     public List<AiProviderConfig> listSafe() {
@@ -72,6 +106,11 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
         return saved;
     }
 
+    @Override
+    public void deleteById(Integer id) {
+        mapper.deleteById(id);
+    }
+
     private void normalizeDefaults(AiProviderConfig config) {
         if (config == null || config.getProviderCode() == null) {
             return;
@@ -88,12 +127,18 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
             if (isBlank(config.getEmbeddingModel())) {
                 config.setEmbeddingModel("embedding-2");
             }
+            if (isBlank(config.getVisionModel())) {
+                config.setVisionModel("glm-4.6v-flash");
+            }
         } else if ("openai".equals(providerCode)) {
             if (isBlank(config.getApiBaseUrl())) {
                 config.setApiBaseUrl("https://api.openai.com/v1");
             }
             if (isBlank(config.getEmbeddingModel())) {
                 config.setEmbeddingModel("text-embedding-3-small");
+            }
+            if (isBlank(config.getVisionModel())) {
+                config.setVisionModel("gpt-4o");
             }
         } else if ("deepseek".equals(providerCode)) {
             if (isBlank(config.getApiBaseUrl())) {
@@ -144,6 +189,7 @@ public class AiProviderConfigServiceImpl implements AiProviderConfigService {
         result.put("summary", mapper.selectUsageSummary(safeDays));
         result.put("byProvider", mapper.selectUsageByProvider(safeDays));
         result.put("byDay", mapper.selectUsageByDay(safeDays));
+        result.put("recentLogs", mapper.selectRecentLogs(safeDays, 100));
         return result;
     }
 

@@ -14,5 +14,7 @@
 | `problem-solving-log.md` | 典型问题排查与解决记录索引。 |
 | `manual-test-log-2026-05-17.md` | 学生端和 408Master 工作台手工测试记录，包含 UI、数据、AI 交互问题与复测清单。 |
 | `2026-05-29-qdrant-vector-index.md` | Qdrant 向量索引接入：题目+知识库全量向量化，替换内存余弦方案。 |
+| `2026-05-30-local-dev-maven-docker-ports.md` | 本地开发中 Maven、Docker、前端代理、MySQL/Qdrant 端口关系与误判复盘。 |
+| `2026-05-30-vision-api-1210-fix.md` | 图片识别 400/1210 排查：消息结构、模型名、base64 前缀三个叠加问题。 |
 
 这些材料适合在汇报里包装成“工程化能力”：迁移、治理、排错、测试、可维护性。

@@ -1,0 +1,61 @@
+.gen-page {
+  min-height: 100vh;
+  padding: 24rpx;
+  box-sizing: border-box;
+  background: #FAFAFE;
+}
+
+.form-section {
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #E0E7FF;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+  margin-bottom: 20rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 16rpx;
+}
+
+.subject-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.subject-chip {
+  padding: 12rpx 24rpx;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  color: #374151;
+  background: #F5F3FF;
+  border: 1rpx solid #E0E7FF;
+}
+
+.subject-chip.active {
+  background: #EEF2FF;
+  color: #4F46E5;
+  border-color: #6366F1;
+  font-weight: 600;
+}
+
+.gen-btn {
+  margin-top: 32rpx;
+  padding: 24rpx 0;
+  text-align: center;
+  background: #6366F1;
+  color: #fff;
+  border-radius: 14rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  box-shadow: 0 6rpx 20rpx rgba(99, 102, 241, 0.3);
+}
+
+.gen-btn.disabled {
+  background: #A5B4FC;
+  box-shadow: none;
+}

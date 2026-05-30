@@ -238,6 +238,23 @@ const choiceKey = (item, index) => `${item.prefix || 'item'}-${index}`
 .q-item-span-content {
   font-size: 17px;
   line-height: 1.75;
+  white-space: normal;
+  word-break: break-word;
+}
+
+:deep(.el-radio),
+:deep(.el-checkbox) {
+  height: auto;
+  white-space: normal;
+  word-break: break-word;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+:deep(.el-radio__label),
+:deep(.el-checkbox__label) {
+  white-space: normal;
+  word-break: break-word;
 }
 
 :deep(.el-radio__label),

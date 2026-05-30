@@ -1,0 +1,88 @@
+@startuml
+title AI Provider API Key 使用流程
+
+actor Admin as 管理员
+participant "前端页面\nconfig.vue" as Frontend
+participant "前端 API\naiConfig.js" as ApiJs
+participant "AiConfigController\n/api/admin/ai-config" as Controller
+participant "AiProviderConfigServiceImpl" as Service
+database "MySQL\nai_provider_config" as DB
+participant "AI Provider\n智谱 / OpenAI / DeepSeek" as Provider
+
+== 一、后台配置密钥 ==
+
+Admin -> Frontend: 打开“密钥与用量”页面
+Frontend -> ApiJs: providers()
+ApiJs -> Controller: POST /api/admin/ai-config/providers
+Controller -> Service: listSafe()
+Service -> DB: SELECT * FROM ai_provider_config
+DB --> Service: 返回 provider 配置\n含 api_key_cipher / api_key_mask
+Service -> Service: hideSecret()\n清空 apiKeyCipher
+Service --> Controller: 返回安全配置\n只包含 apiKeyMask
+Controller --> ApiJs: RestResponse<List<AiProviderConfig>>
+ApiJs --> Frontend: providers
+Frontend --> Admin: 显示脱敏密钥\n例如 e4a6****USBu
+
+Admin -> Frontend: 编辑 provider\n输入新的 API Key
+Frontend -> ApiJs: saveProvider(form)
+ApiJs -> Controller: POST /api/admin/ai-config/provider/save\nbody.apiKey = 明文密钥
+
+Controller -> Controller: 从 request 中读取字段\nproviderCode / model / enabled / apiKey
+Controller -> Service: save(config, plainApiKey)
+
+Service -> Service: normalizeDefaults(config)
+alt plainApiKey 非空
+    Service -> Service: encrypt(plainApiKey)\nAES-GCM 加密
+    Service -> Service: mask(plainApiKey)\n生成脱敏值
+    Service -> DB: UPDATE/INSERT\napi_key_cipher = 密文\napi_key_mask = 脱敏值
+else plainApiKey 为空
+    Service -> DB: 保留原有密钥字段\n只更新模型、URL、启用状态等
+end
+
+DB --> Service: 保存成功
+Service -> DB: SELECT saved config
+DB --> Service: 返回保存后配置
+Service -> Service: hideSecret()\n不返回 apiKeyCipher
+Service --> Controller: 返回安全配置
+Controller --> ApiJs: RestResponse<AiProviderConfig>
+ApiJs --> Frontend: 保存成功
+Frontend --> Admin: 刷新列表，显示脱敏密钥
+
+== 二、测试密钥 ==
+
+Admin -> Frontend: 点击“测试”
+Frontend -> ApiJs: testProvider(id)
+ApiJs -> Controller: POST /api/admin/ai-config/provider/{id}/test
+Controller -> Service: test(id)
+
+Service -> DB: SELECT * FROM ai_provider_config WHERE id = ?
+DB --> Service: 返回 provider 配置\n含 api_key_cipher
+Service -> Service: decrypt(api_key_cipher)\n得到明文 API Key
+
+alt provider = zhipu
+    Service -> Provider: POST {baseUrl}/embeddings\nAuthorization: Bearer 明文Key
+else provider = openai / deepseek
+    Service -> Provider: GET {baseUrl}/models\nAuthorization: Bearer 明文Key
+end
+
+Provider --> Service: 返回连接结果
+Service -> DB: updateTestResult(id, success, message)
+Service --> Controller: success / message
+Controller --> ApiJs: RestResponse<Map>
+ApiJs --> Frontend: 测试结果
+Frontend --> Admin: 显示“连接成功 / 连接失败”
+
+== 三、AI 实际调用时获取密钥 ==
+
+participant "AI 调用服务\nAnalysisService / Orchestrator" as AiCall
+
+AiCall -> Service: getFirstEnabled()\n或 resolveApiKey(providerCode)
+Service -> DB: 查询启用的 provider
+DB --> Service: 返回 provider 配置
+Service -> Service: decrypt(api_key_cipher)
+Service --> AiCall: 明文 API Key\n仅在后端内存中使用
+
+AiCall -> Provider: 调用 Chat / Embedding API\nAuthorization: Bearer 明文Key
+Provider --> AiCall: AI 响应结果
+
+@enduml

@@ -13,6 +13,10 @@ public interface RagDocumentMapper {
 
     int backfillChunksFromLegacyKnowledgeBase();
 
+    int backfillDocumentsFromQuestions();
+
+    int backfillChunksFromQuestions();
+
     List<RagChunkRecord> selectIndexableChunks(@Param("limit") Integer limit);
 
     int upsertEmbeddingMetadata(@Param("chunkId") Long chunkId,

@@ -159,4 +159,12 @@
     </where>
   </select>
 
+  <select id="getByCreateUser" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from t_task_exam
+    where deleted=0 and create_user = #{createUser,jdbcType=INTEGER}
+    order by id desc
+  </select>
+
 </mapper>

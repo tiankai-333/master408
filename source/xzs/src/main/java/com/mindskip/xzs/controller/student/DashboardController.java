@@ -2,6 +2,7 @@ package com.mindskip.xzs.controller.student;
 
 import com.mindskip.xzs.base.BaseApiController;
 import com.mindskip.xzs.base.RestResponse;
+import com.mindskip.xzs.domain.ExamPaperAnswer;
 import com.mindskip.xzs.domain.TaskExam;
 import com.mindskip.xzs.domain.TaskExamCustomerAnswer;
 import com.mindskip.xzs.domain.TextContent;
@@ -9,6 +10,7 @@ import com.mindskip.xzs.domain.User;
 import com.mindskip.xzs.domain.enums.ExamPaperTypeEnum;
 import com.mindskip.xzs.domain.task.TaskItemAnswerObject;
 import com.mindskip.xzs.domain.task.TaskItemObject;
+import com.mindskip.xzs.repository.ExamPaperAnswerMapper;
 import com.mindskip.xzs.service.*;
 import com.mindskip.xzs.utility.DateTimeUtil;
 import com.mindskip.xzs.utility.JsonUtil;
@@ -33,15 +35,17 @@ public class DashboardController extends BaseApiController {
     private final TaskExamService taskExamService;
     private final TaskExamCustomerAnswerService taskExamCustomerAnswerService;
     private final TextContentService textContentService;
+    private final ExamPaperAnswerMapper examPaperAnswerMapper;
 
     @Autowired
-    public DashboardController(UserService userService, ExamPaperService examPaperService, QuestionService questionService, TaskExamService taskExamService, TaskExamCustomerAnswerService taskExamCustomerAnswerService, TextContentService textContentService) {
+    public DashboardController(UserService userService, ExamPaperService examPaperService, QuestionService questionService, TaskExamService taskExamService, TaskExamCustomerAnswerService taskExamCustomerAnswerService, TextContentService textContentService, ExamPaperAnswerMapper examPaperAnswerMapper) {
         this.userService = userService;
         this.examPaperService = examPaperService;
         this.questionService = questionService;
         this.taskExamService = taskExamService;
         this.taskExamCustomerAnswerService = taskExamCustomerAnswerService;
         this.textContentService = textContentService;
+        this.examPaperAnswerMapper = examPaperAnswerMapper;
     }
 
     @RequestMapping(value = "/index", method = RequestMethod.POST)
@@ -71,7 +75,10 @@ public class DashboardController extends BaseApiController {
     @RequestMapping(value = "/task", method = RequestMethod.POST)
     public RestResponse<List<TaskItemVm>> task() {
         User user = getCurrentUser();
-        List<TaskExam> taskExams = taskExamService.getByGradeLevel(null);
+        Date thirtyDaysAgo = DateTimeUtil.addDuration(new Date(), java.time.Duration.ofDays(-30));
+        List<TaskExam> taskExams = taskExamService.getByCreateUser(user.getId()).stream()
+                .filter(t -> t.getCreateTime() != null && t.getCreateTime().after(thirtyDaysAgo))
+                .collect(Collectors.toList());
         if (taskExams.size() == 0) {
             return RestResponse.ok(new ArrayList<>());
         }
@@ -81,6 +88,7 @@ public class DashboardController extends BaseApiController {
             TaskItemVm itemVm = new TaskItemVm();
             itemVm.setId(t.getId());
             itemVm.setTitle(t.getTitle());
+            itemVm.setCreateTime(t.getCreateTime());
             TaskExamCustomerAnswer taskExamCustomerAnswer = taskExamCustomerAnswers.stream()
                     .filter(tc -> tc.getTaskExamId().equals(t.getId())).findFirst().orElse(null);
             List<TaskItemPaperVm> paperItemVMS = getTaskItemPaperVm(t.getFrameTextContentId(), taskExamCustomerAnswer);
@@ -113,7 +121,14 @@ public class DashboardController extends BaseApiController {
                                 .findFirst()
                                 .ifPresent(a -> {
                                     ivm.setExamPaperAnswerId(a.getExamPaperAnswerId());
-                                    ivm.setStatus(a.getStatus());
+                                    Integer realStatus = a.getStatus();
+                                    if (a.getExamPaperAnswerId() != null) {
+                                        ExamPaperAnswer realAnswer = examPaperAnswerMapper.selectByPrimaryKey(a.getExamPaperAnswerId());
+                                        if (realAnswer != null) {
+                                            realStatus = realAnswer.getStatus();
+                                        }
+                                    }
+                                    ivm.setStatus(realStatus);
                                 });
                     }
                     return ivm;

@@ -1,0 +1,21 @@
+<view class="gen-page">
+  <view class="form-section">
+    <view class="form-label">选择科目</view>
+    <view class="subject-row">
+      <view class="subject-chip {{selectedSubject === item.id ? 'active' : ''}}"
+            wx:for="{{subjects}}" wx:key="id"
+            bind:tap="selectSubject" data-id="{{item.id}}">
+        {{item.name}}
+      </view>
+    </view>
+  </view>
+
+  <view class="form-section">
+    <view class="form-label">题目数量：{{questionCount}} 道</view>
+    <slider min="5" max="50" step="5" value="{{questionCount}}" activeColor="#6366F1" block-size="20" bindchange="setCount" />
+  </view>
+
+  <view class="gen-btn {{generating ? 'disabled' : ''}}" bind:tap="{{generating ? '' : 'generate'}}">
+    {{generating ? '正在生成...' : '生成练习'}}
+  </view>
+</view>

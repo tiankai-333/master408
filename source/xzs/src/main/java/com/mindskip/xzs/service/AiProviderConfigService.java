@@ -20,4 +20,6 @@ public interface AiProviderConfigService {
     AiProviderConfig getEnabled(String providerCode);
 
     AiProviderConfig getFirstEnabled();
+
+    void deleteById(Integer id);
 }

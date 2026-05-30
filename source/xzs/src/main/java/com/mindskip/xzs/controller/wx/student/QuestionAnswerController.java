@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @Controller("WXStudentQuestionAnswerController")
 @RequestMapping(value = "/api/wx/student/question/answer")
 @ResponseBody
@@ -84,5 +86,18 @@ public class QuestionAnswerController extends BaseWXApiController {
         vm.setQuestionVM(questionVM);
         vm.setQuestionAnswerVM(questionAnswerVM);
         return RestResponse.ok(vm);
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
+    public RestResponse<Integer> delete(@PathVariable Integer id) {
+        ExamPaperQuestionCustomerAnswer answer = examPaperQuestionCustomerAnswerService.selectById(id);
+        if (answer == null) {
+            return RestResponse.fail(2, "答题记录不存在");
+        }
+        if (!Objects.equals(answer.getCreateUser(), getCurrentUser().getId())) {
+            return RestResponse.fail(3, "无权删除该记录");
+        }
+        examPaperQuestionCustomerAnswerService.deleteById(id);
+        return RestResponse.ok(id);
     }
 }

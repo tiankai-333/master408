@@ -1,37 +1,72 @@
-<wxs module="enumItem" src="../../wxs/enumItem.wxs"></wxs>
-<view class="page">
-  <view class="hero">
-    <view class="hero-kicker">408Master</view>
-    <view class="hero-title">今天从一道题开始</view>
-    <view class="hero-desc">数据结构、计组、操作系统、网络，按记录推进复习。</view>
-    <view class="hero-row">
-      <view class="hero-chip">刷题</view>
-      <view class="hero-chip">错题</view>
-      <view class="hero-chip">知识点</view>
+<view class="home-page">
+
+  <!-- 问候 -->
+  <view class="greeting">{{greeting}}</view>
+
+  <!-- 周日历 -->
+  <view class="section-title">
+    <view class="week-arrow" bind:tap="prevWeek">◁</view>
+    <text>本周</text>
+    <view class="week-arrow" bind:tap="nextWeek">▷</view>
+  </view>
+  <view class="weekday-row">
+    <text class="weekday" wx:for="{{weekdays}}" wx:key="*this">{{item}}</text>
+  </view>
+  <view class="calendar-week">
+    <view class="calendar-day {{item.isToday ? 'is-today' : ''}} {{item.date === selectedDate ? 'is-selected' : ''}}"
+          wx:for="{{weekDays}}" wx:key="date"
+          bind:tap="selectDay" data-date="{{item.date}}">
+      <text class="day-text">{{item.day}}</text>
+      <text class="study-emoji" wx:if="{{item.hasStudy}}">{{item.emoji}}</text>
     </view>
   </view>
 
-  <i-panel title="今日任务">
-    <i-collapse accordion i-class="index-collapse">
-      <i-collapse-item i-class="index-collapse-item" title="{{item.title}}" name="{{item.id}}" wx:for="{{taskList}}" data-item="item" wx:key="{{item.id}}">
-        <i-cell-group slot="content">
-          <i-cell i-class="index-cell" wx:for="{{item.paperItems}}" data-item="item" wx:key="{{item.examPaperId}}" title="{{item.examPaperName}}" value="{{enumItem.format(enumItem.state.exam.examPaperAnswer.statusEnum,item.status)}}" is-link url="{{item.examPaperAnswerId == null?'/pages/exam/do/index?id='+item.examPaperId:'/pages/exam/read/index?id='+item.examPaperAnswerId}}">
-          </i-cell>
-        </i-cell-group>
-      </i-collapse-item>
-    </i-collapse>
-  </i-panel>
+  <!-- 当日详情 -->
+  <view class="day-detail">
+    <view class="detail-title">{{selectedDate}} 学习详情</view>
+    <view class="detail-stats" wx:if="{{dayDetail}}">
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.questionCount || 0}}</text>
+        <text class="detail-label">做题数</text>
+      </view>
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.accuracy || 0}}%</text>
+        <text class="detail-label">正确率</text>
+      </view>
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.wrongCount || 0}}</text>
+        <text class="detail-label">错题数</text>
+      </view>
+      <view class="detail-stat">
+        <text class="detail-value">{{dayDetail.aiCount || 0}}</text>
+        <text class="detail-label">AI 解析</text>
+      </view>
+    </view>
+    <view class="detail-empty" wx:if="{{!dayDetail}}">
+      <text>当天暂无学习记录</text>
+    </view>
+  </view>
 
-  <i-panel title="专项练习">
-    <i-cell-group>
-      <i-cell wx:for="{{fixedPaper}}" data-item="item" wx:key="{{item.id}}" title="{{item.name}}" is-link url="/pages/exam/do/index?id={{item.id}}"></i-cell>
-    </i-cell-group>
-  </i-panel>
-  <i-panel title="限时训练">
-    <i-cell-group>
-      <i-cell wx:for="{{timeLimitPaper}}" data-item="item" wx:key="{{item.id}}" title="{{item.name}}" is-link url="/pages/exam/do/index?id={{item.id}}" label="{{item.startTime}} 至 {{item.endTime}}"></i-cell>
-    </i-cell-group>
-  </i-panel>
-  <i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
+  <!-- 功能入口 -->
+  <view class="section-title">快捷入口</view>
+  <view class="entry-list">
+    <view class="entry-card" bind:tap="goTab" data-url="/pages/practice/index">
+      <view class="entry-accent accent-indigo"></view>
+      <view class="entry-name">去练习</view>
+      <view class="entry-desc">真题、专项、错题、限时训练</view>
+    </view>
+    <view class="entry-card" bind:tap="goTab" data-url="/pages/ai-workbench/index">
+      <view class="entry-accent accent-violet"></view>
+      <view class="entry-name">AI 助手</view>
+      <view class="entry-desc">对话、拍照识题、智能组卷</view>
+    </view>
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/knowledge/index/index">
+      <view class="entry-accent accent-teal"></view>
+      <view class="entry-name">知识目录</view>
+      <view class="entry-desc">按科目浏览知识点</view>
+    </view>
+  </view>
+
+  <i-spin size="large" fix wx:if="{{spinShow}}"></i-spin>
   <i-message id="message" />
 </view>

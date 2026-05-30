@@ -1,63 +1,48 @@
-<view class="master-page">
+<view class="my-page">
   <view class="hero">
-    <view class="hero-kicker">408MASTER AI TUTOR</view>
-    <view class="hero-title">大师</view>
-    <view class="hero-desc">拍题识别、错题复盘、真题练习和学习档案都放在这里。</view>
+    <view class="hero-kicker">408MASTER</view>
+    <view class="hero-title">我的学习中心</view>
   </view>
 
   <view class="profile-card">
     <image class="avatar" src="{{avatarPath}}"></image>
     <view class="profile-main">
       <view class="profile-name">{{displayName}}</view>
-      <view class="profile-subtitle">你的移动学习工作台</view>
+      <view class="profile-subtitle">计算机考研 · 408 全科</view>
     </view>
     <view class="profile-link" bind:tap="openPage" data-url="/pages/my/info/index">档案</view>
-  </view>
-
-  <view class="section-title">核心功能</view>
-  <view class="feature-grid">
-    <view class="feature-card primary" bind:tap="openPage" data-url="/pages/ai-analyze/index/index">
-      <view class="feature-icon">AI</view>
-      <view class="feature-title">AI题目识别</view>
-      <view class="feature-desc">拍照上传题目，提取题干、选项、答案和解析。</view>
-    </view>
-    <view class="feature-card" bind:tap="openPage" data-url="/pages/error-book/index/index">
-      <view class="feature-icon warn">错</view>
-      <view class="feature-title">错题本</view>
-      <view class="feature-desc">回看错题，配合 AI 分析薄弱点。</view>
-    </view>
-    <view class="feature-card" bind:tap="openTab" data-url="/pages/exam/index/index">
-      <view class="feature-icon exam">练</view>
-      <view class="feature-title">试卷中心</view>
-      <view class="feature-desc">进入真题、专项卷和限时训练。</view>
-    </view>
-    <view class="feature-card" bind:tap="openTab" data-url="/pages/record/index">
-      <view class="feature-icon record">记</view>
-      <view class="feature-title">考试记录</view>
-      <view class="feature-desc">复查答题历史和得分变化。</view>
-    </view>
   </view>
 
   <view class="section-title">学习档案</view>
   <view class="quick-list">
     <view class="quick-item" bind:tap="openPage" data-url="/pages/my/log/index">
-      <view>
+      <view class="quick-content">
         <view class="quick-title">学习动态</view>
-        <view class="quick-desc">查看最近练习和系统消息。</view>
+        <view class="quick-desc">查看最近练习和系统消息</view>
+      </view>
+      <view class="quick-arrow">›</view>
+    </view>
+    <view class="quick-item" bind:tap="openPage" data-url="/pages/record/index">
+      <view class="quick-content">
+        <view class="quick-title">考试记录</view>
+        <view class="quick-desc">复查答题历史和得分变化</view>
       </view>
       <view class="quick-arrow">›</view>
     </view>
     <view class="quick-item" bind:tap="openPage" data-url="/pages/my/message/list/index">
-      <view>
+      <view class="quick-content">
         <view class="quick-title">消息</view>
-        <view class="quick-desc">接收学习提醒和通知。</view>
+        <view class="quick-desc">接收学习提醒和通知</view>
       </view>
       <view class="quick-arrow">›</view>
     </view>
+  </view>
+
+  <view class="section-title">设置</view>
+  <view class="quick-list">
     <view class="quick-item danger" bind:tap="logOut">
-      <view>
+      <view class="quick-content">
         <view class="quick-title">退出账号</view>
-        <view class="quick-desc">解绑当前微信登录。</view>
       </view>
       <view class="quick-arrow">›</view>
     </view>

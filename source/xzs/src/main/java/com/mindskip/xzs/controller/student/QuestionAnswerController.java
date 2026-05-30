@@ -25,6 +25,8 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController("StudentQuestionAnswerController")
 @RequestMapping(value = "/api/student/question/answer")
 public class QuestionAnswerController extends BaseApiController {
@@ -128,6 +130,19 @@ public class QuestionAnswerController extends BaseApiController {
         vm.setQuestionVM(questionVM);
         vm.setQuestionAnswerVM(questionAnswerVM);
         return RestResponse.ok(vm);
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.POST)
+    public RestResponse<Integer> delete(@PathVariable Integer id) {
+        ExamPaperQuestionCustomerAnswer answer = examPaperQuestionCustomerAnswerService.selectById(id);
+        if (answer == null) {
+            return RestResponse.fail(2, "答题记录不存在");
+        }
+        if (!Objects.equals(answer.getCreateUser(), getCurrentUser().getId())) {
+            return RestResponse.fail(3, "无权删除该记录");
+        }
+        examPaperQuestionCustomerAnswerService.deleteById(id);
+        return RestResponse.ok(id);
     }
 
 }

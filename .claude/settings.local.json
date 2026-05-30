@@ -1,7 +1,37 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm -v)"
+      "Bash(npm -v)",
+      "Bash(awk '/INSERT INTO `t_text_content`/' c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql)",
+      "Bash(grep -o \"'\\\\\\\\[\")",
+      "Bash(grep -o \"embedding\\\\|'\\\\\\\\[\")",
+      "Bash(grep -oP \"'2026[^']*',[^\\)]*[^\\\\\\)]*\\\\\\\\\\)\")",
+      "Bash(grep -c \"\\\\\\\\\\\\\\\\'\")",
+      "Bash(awk '/INSERT INTO/{print length, substr\\($0,1,80\\)}' c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql)",
+      "Bash(python -c ' *)",
+      "Bash(grep -o \"INSERT INTO \\\\`[^\\)]*\\\\`\" \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(grep -o \"INSERT INTO \\\\`[^\\)]*\\\\`\" \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(sort -k9)",
+      "Bash(awk '/INSERT INTO/{print NR\": \"substr\\($0,1,200\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(awk '/INSERT INTO/{print NR\": \"substr\\($0,1,200\\)}' \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(awk '/INSERT INTO/{print NR, length\\($0\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(sort -k2 -n)",
+      "Bash(awk '/INSERT INTO/{print NR, length\\($0\\)}' \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`knowledge_point\\\\`\" \"c:/Dev/Workspaces/master408/database/current/02_seed.sql\")",
+      "Bash(awk '/INSERT INTO `knowledge_point`/{print NR\": \"substr\\($0,1,500\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(awk '/INSERT INTO `rag_embedding`/{print NR\": \"length\\($0\\)\" bytes\"}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(awk 'NR==57{print length\\($0\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(awk 'NR==97{print length\\($0\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(awk '/INSERT INTO `t_ai_knowledge_base`/{print NR\": \"substr\\($0,1,300\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(awk 'NR==37{print length\\($0\\)}' \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(awk 'NR==27{print length\\($0\\)}' \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(awk 'NR==68{print substr\\($0,1,500\\)}' \"c:/Dev/Workspaces/master408/database/current/04_knowledge_and_rag.sql\")",
+      "Bash(grep \"INSERT INTO \\\\`t_task_exam\\\\`\" \"c:/Dev/Workspaces/master408/database/current/02_seed.sql\")",
+      "Bash(awk '/INSERT INTO `t_text_content`/{match\\($0, /VALUES \\\\\\(\\([0-9]+\\)/, arr\\); print \"First ID: \" arr[1]}' \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(awk '/INSERT INTO `t_text_content`/{print substr\\($0, length\\($0\\)-200\\)}' \"c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql\")",
+      "Bash(awk '/INSERT INTO/{if\\(length\\($0\\)>max\\) {max=length\\($0\\); line=NR; content=substr\\($0,1,100\\)}} END{print \"Max INSERT: line \" line \", \" max \" bytes: \" content}' \"c:/Dev/Workspaces/master408/deploy/sql/source.sql\")",
+      "Bash(grep -o \"INSERT INTO \\\\`t_question\\\\`\" c:/Dev/Workspaces/master408/database/archive/source.sql)",
+      "Bash(grep \"INSERT INTO \\\\`t_question\\\\`\" c:/Dev/Workspaces/master408/database/current/03_questions_and_exams.sql)"
     ]
   }
 }

@@ -1,15 +1,52 @@
-<!--pages/exam/index/index.wxml-->
-<view>
-	<i-tabs current="{{ paperType }}" bindchange="tabChange" fixed="true">
-		<i-tab key="1" title="专项练习" />
-		<i-tab key="4" title="限时训练" />
-	</i-tabs>
-	<view class="exam-tab-view">
-		<i-cell-group>
-			<i-cell wx:for="{{tableData}}" data-item="item" wx:key="{{item.id}}" title="{{item.name}}" is-link url="/pages/exam/do/index?id={{item.id}}" value="{{item.subjectName}}"></i-cell>
-		</i-cell-group>
-	</view>
-	<i-load-more tip="{{loadMoreTip}}" loading="{{loadMoreLoad}}" i-class="xzs-load-more" />
-	<i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
-	<i-message id="message" />
+<view class="page">
+
+  <!-- 真题练习模式：先选科目 -->
+  <view wx:if="{{mode === 'real' && !selectedSubjectId}}" class="subject-page">
+    <view class="subject-title">选择科目</view>
+    <view class="subject-list">
+      <view class="subject-item" wx:for="{{subjects}}" wx:key="id"
+            bind:tap="selectSubject" data-id="{{item.id}}">
+        <text class="subject-item-name">{{item.name}}</text>
+        <text class="subject-item-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 真题练习模式：选中科目后显示试卷 -->
+  <view wx:if="{{mode === 'real' && selectedSubjectId}}">
+    <view class="back-row">
+      <view class="back-btn" bind:tap="backToSubjects">◁ 返回科目</view>
+      <text class="back-subject">{{currentSubjectName}}</text>
+    </view>
+    <view class="exam-list">
+      <view class="exam-card" wx:for="{{tableData}}" wx:key="{{item.id}}" data-id="{{item.id}}" bind:tap="goExam">
+        <view class="exam-card-body">
+          <view class="exam-card-name">{{item.name}}</view>
+        </view>
+        <view class="exam-card-arrow">›</view>
+      </view>
+    </view>
+    <view class="empty-tip" wx:if="{{!spinShow && tableData.length === 0}}">暂无试卷</view>
+    <i-load-more tip="{{loadMoreTip}}" loading="{{loadMoreLoad}}" i-class="xzs-load-more" wx:if="{{tableData.length > 0}}" />
+  </view>
+
+  <!-- 专项/限时模式：只显示限时试卷 -->
+  <view wx:if="{{mode === 'timed' || mode === 'special'}}">
+    <view class="exam-list" style="margin-top:0">
+      <view class="exam-card" wx:for="{{tableData}}" wx:key="{{item.id}}" data-id="{{item.id}}" bind:tap="goExam">
+        <view class="exam-card-body">
+          <view class="exam-card-name">{{item.name}}</view>
+          <view class="exam-card-meta" wx:if="{{item.startTime}}">
+            <text>{{item.startTime}} 至 {{item.endTime}}</text>
+          </view>
+        </view>
+        <view class="exam-card-arrow">›</view>
+      </view>
+    </view>
+    <view class="empty-tip" wx:if="{{!spinShow && tableData.length === 0}}">暂无限时训练</view>
+    <i-load-more tip="{{loadMoreTip}}" loading="{{loadMoreLoad}}" i-class="xzs-load-more" wx:if="{{tableData.length > 0}}" />
+  </view>
+
+  <i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>
+  <i-message id="message" />
 </view>

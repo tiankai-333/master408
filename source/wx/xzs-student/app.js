@@ -46,6 +46,60 @@ App({
       type: type
     });
   },
+  jsonPost: function(url, data) {
+    let _this = this
+    return new Promise(function(resolve, reject) {
+      wx.showNavigationBarLoading();
+      wx.request({
+        url: _this.globalData.baseAPI + url,
+        header: {
+          'content-type': 'application/json',
+          'token': wx.getStorageSync('token')
+        },
+        method: 'POST',
+        data: data,
+        success(res) {
+          if (res.statusCode !== 200 || typeof res.data !== 'object') {
+            reject('网络出错')
+            return false;
+          }
+          if (res.data.code === 400) {
+            let token = res.data.response
+            wx.setStorageSync('token', token)
+            wx.request({
+              url: _this.globalData.baseAPI + url,
+              header: {
+                'content-type': 'application/json',
+                'token': wx.getStorageSync('token')
+              },
+              method: 'POST',
+              data: data,
+              success(result) {
+                resolve(result.data);
+                return true;
+              }
+            })
+          } else if (res.data.code === 401) {
+            wx.reLaunch({ url: '/pages/user/bind/index' });
+            return false;
+          } else if (res.data.code === 500 || res.data.code === 501) {
+            reject(res.data.message)
+            return false;
+          } else {
+            resolve(res.data);
+            return true;
+          }
+        },
+        fail(res) {
+          reject(res.errMsg)
+          return false;
+        },
+        complete(res) {
+          wx.hideNavigationBarLoading();
+        }
+      })
+    })
+  },
   formPost: function(url, data) {
     let _this = this
     return new Promise(function(resolve, reject) {

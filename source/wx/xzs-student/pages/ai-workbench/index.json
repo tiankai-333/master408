@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "i-message": "/component/iView/message/index",
+    "i-spin": "/component/iView/spin/index"
+  },
+  "navigationBarTitleText": "AI 助手"
+}

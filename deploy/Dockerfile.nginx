@@ -1,0 +1,10 @@
+FROM nginx:1.25-alpine
+
+# 复制前端静态文件
+COPY static/student /usr/share/nginx/html/student
+COPY static/admin /usr/share/nginx/html/admin
+
+# 复制 nginx 配置
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

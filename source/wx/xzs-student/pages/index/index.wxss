@@ -1,66 +1,195 @@
-/**index.wxss**/
-
-.page {
+.home-page {
   min-height: 100vh;
-  background: #f5f7fb;
-  padding-bottom: 24rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+  background: #FAFAFE;
 }
 
-.hero {
-  margin: 24rpx;
-  padding: 34rpx 32rpx;
-  border-radius: 12rpx;
-  background: #17233d;
-  color: #ffffff;
+/* ====== 问候 ====== */
+
+.greeting {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #111827;
+  padding: 12rpx 0 8rpx;
 }
 
-.hero-kicker {
-  color: #7dd3fc;
+/* ====== 标题 ====== */
+
+.section-title {
+  margin: 28rpx 0 16rpx;
+  color: #111827;
+  font-size: 34rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx;
+}
+
+.week-arrow {
+  font-size: 36rpx;
+  color: #6366F1;
+  font-weight: 700;
+  padding: 12rpx 24rpx;
+}
+
+.week-label {
   font-size: 24rpx;
+  color: #6B7280;
+}
+
+/* ====== 周日历 ====== */
+
+.weekday-row {
+  display: flex;
+  background: #fff;
+  border: 1rpx solid #E0E7FF;
+  border-radius: 16rpx 16rpx 0 0;
+  border-bottom: none;
+}
+
+.weekday {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  font-size: 24rpx;
+  color: #6B7280;
   font-weight: 600;
 }
 
-.hero-title {
-  margin-top: 12rpx;
-  font-size: 44rpx;
+.calendar-week {
+  display: flex;
+  background: #fff;
+  border: 1rpx solid #E0E7FF;
+  border-top: none;
+  border-radius: 0 0 16rpx 16rpx;
+  padding-bottom: 12rpx;
+}
+
+.calendar-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14rpx 0;
+}
+
+.day-text {
+  font-size: 28rpx;
+  color: #111827;
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 50%;
+}
+
+.calendar-day.is-today .day-text {
+  background: #EEF2FF;
+  color: #4F46E5;
   font-weight: 700;
 }
 
-.hero-desc {
-  margin-top: 12rpx;
-  color: #dbeafe;
-  font-size: 26rpx;
-  line-height: 1.5;
+.calendar-day.is-selected .day-text {
+  background: #6366F1;
+  color: #fff;
+  font-weight: 700;
 }
 
-.hero-row {
+.study-emoji {
+  font-size: 20rpx;
+  margin-top: 4rpx;
+}
+
+/* ====== 当日详情 ====== */
+
+.day-detail {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #E0E7FF;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+}
+
+.detail-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 20rpx;
+}
+
+.detail-stats {
   display: flex;
-  margin-top: 26rpx;
+  justify-content: space-around;
+  margin-bottom: 20rpx;
 }
 
-.hero-chip {
-  margin-right: 14rpx;
-  padding: 8rpx 18rpx;
-  border-radius: 8rpx;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  font-size: 24rpx;
+.detail-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.index-collapse {
-  font-size: 14px;
-  line-height: 24px;
+.detail-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #6366F1;
 }
 
-.index-collapse-item {
-  padding: 8px 15px !important;
-  border: 0px !important;
+.detail-label {
+  font-size: 22rpx;
+  color: #6B7280;
+  margin-top: 6rpx;
 }
 
-.index-cell {
-  padding: 5px 15px !important;
+.detail-empty {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #6B7280;
+  font-size: 26rpx;
 }
 
-p{
-  display: none;
+/* ====== 快捷入口 ====== */
+
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 }
+
+.entry-card {
+  padding: 32rpx 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #E0E7FF;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.entry-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8rpx;
+}
+
+.entry-desc {
+  font-size: 26rpx;
+  color: #6B7280;
+}
+
+.entry-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+}
+
+.accent-indigo { background: linear-gradient(90deg, #6366F1, #818CF8); }
+.accent-teal   { background: linear-gradient(90deg, #0D9488, #2DD4BF); }
+.accent-violet { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }

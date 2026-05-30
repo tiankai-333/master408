@@ -17,4 +17,6 @@ public interface TaskExamService extends BaseService<TaskExam> {
     TaskRequestVM taskExamToVM(Integer id);
 
     List<TaskExam> getByGradeLevel(Integer gradeLevel);
+
+    List<TaskExam> getByCreateUser(Integer createUser);
 }

@@ -1,8 +1,32 @@
 services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: xzs-qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant-data:/qdrant/storage
+    mem_limit: 512m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - xzs-net
+
   mysql:
     image: registry.cn-hangzhou.aliyuncs.com/mindskip/mysql:8.0.33
     container_name: xzs-mysql
     restart: always
+    command:
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --binlog-row-image=FULL
+      - --binlog-expire-logs-seconds=604800
     environment:
       MYSQL_ROOT_PASSWORD: "doushijiaxiang0."
       MYSQL_DATABASE: "xzs"
@@ -10,7 +34,7 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d:ro
-    mem_limit: 512m
+    mem_limit: 1g
     logging:
       driver: "json-file"
       options:
@@ -31,6 +55,10 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/xzs?useSSL=false&useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowPublicKeyRetrieval=true&allowMultiQueries=true"
       SPRING_DATASOURCE_USERNAME: "root"
       SPRING_DATASOURCE_PASSWORD: "doushijiaxiang0."
+      SPRING_PROFILES_ACTIVE: "prod"
+      AI_RAG_VECTOR_ENABLED: "true"
+      AI_RAG_VECTOR_QDRANT_URL: "http://qdrant:6333"
+      AI_RAG_VECTOR_QDRANT_COLLECTION: "xzs_408_chunks"
       AI_SECRET_MASTER_KEY: "408MasterLocalSecret"
       TZ: "Asia/Shanghai"
     volumes:
@@ -43,6 +71,8 @@ services:
         max-file: "3"
     depends_on:
       mysql:
+        condition: service_started
+      qdrant:
         condition: service_started
     networks:
       - xzs-net
@@ -58,6 +88,7 @@ services:
       - ./static:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
+      - ./certbot/www:/var/www/certbot:ro
     mem_limit: 128m
     logging:
       driver: "json-file"

@@ -1,0 +1,50 @@
+<view class="page" wx:if="{{point}}">
+  <view class="detail-header">
+    <view class="detail-name">{{point.name}}</view>
+  </view>
+
+  <view class="knowledge-html" wx:if="{{htmlContent}}">
+    <rich-text nodes="{{htmlContent}}" />
+  </view>
+  <view class="detail-desc" wx:elif="{{point.description}}">{{point.description}}</view>
+
+  <i-button type="primary" size="small" bind:click="explainKnowledge" custom-class="explain-btn">
+    AI 讲解这个知识点
+  </i-button>
+
+  <view class="related-section" wx:if="{{parentPoint || children.length}}">
+    <view class="related-title">关联知识点</view>
+    <view class="chip-list">
+      <view class="chip-label" wx:if="{{parentPoint}}">上级</view>
+      <view class="chip" wx:if="{{parentPoint}}" bind:click="goParent">{{parentPoint.name}}</view>
+    </view>
+    <view class="chip-list" wx:if="{{children.length}}" style="margin-top: 6px;">
+      <view class="chip-label">下级</view>
+      <view class="chip" wx:for="{{children}}" wx:key="id" data-id="{{item.id}}" bind:click="goChild">
+        {{item.name}}
+      </view>
+    </view>
+  </view>
+
+  <i-panel title="关联真题" wx:if="{{relatedQuestions.length}}">
+    <i-cell-group>
+      <i-cell
+        wx:for="{{relatedQuestions}}"
+        wx:key="id"
+        title="{{item.title || item.name || ('题目 #' + item.id)}}"
+        label="{{item.source || ''}}"
+      />
+    </i-cell-group>
+  </i-panel>
+
+  <view class="empty-tip" wx:if="{{!relatedQuestions.length && !spinShow}}">
+    <text>暂无关联真题</text>
+  </view>
+</view>
+
+<view class="page" wx:else>
+  <view class="empty-tip"><text>加载中...</text></view>
+</view>
+
+<i-spin size="large" fix wx:if="{{spinShow}}"></i-spin>
+<i-message id="message" />

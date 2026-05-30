@@ -1,13 +1,15 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/practice/index",
+    "pages/calendar/index",
+    "pages/my/index/index",
     "pages/user/bind/index",
     "pages/exam/index/index",
     "pages/exam/do/index",
     "pages/exam/edit/index",
     "pages/exam/read/index",
     "pages/record/index",
-    "pages/my/index/index",
     "pages/my/info/index",
     "pages/my/message/info/index",
     "pages/my/message/list/index",
@@ -15,7 +17,11 @@
     "pages/user/register/index",
     "pages/error-book/index/index",
     "pages/error-book/detail/index",
-    "pages/ai-analyze/index/index"
+    "pages/ai-analyze/index/index",
+    "pages/ai-workbench/index",
+    "pages/knowledge/index/index",
+    "pages/knowledge/detail/index",
+    "pages/paper-generate/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
@@ -24,8 +30,8 @@
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#6e6d6b",
-    "selectedColor": "#1677ff",
+    "color": "#6B7280",
+    "selectedColor": "#6366F1",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
     "list": [
@@ -36,20 +42,20 @@
         "selectedIconPath": "/assets/tabBar/index-select.png"
       },
       {
-        "pagePath": "pages/exam/index/index",
-        "text": "刷题",
+        "pagePath": "pages/practice/index",
+        "text": "练习",
         "iconPath": "/assets/tabBar/exam.png",
         "selectedIconPath": "/assets/tabBar/exam-select.png"
       },
       {
-        "pagePath": "pages/record/index",
-        "text": "错题",
-        "iconPath": "/assets/tabBar/record.png",
-        "selectedIconPath": "/assets/tabBar/record-select.png"
+        "pagePath": "pages/ai-workbench/index",
+        "text": "AI",
+        "iconPath": "/assets/tabBar/exam.png",
+        "selectedIconPath": "/assets/tabBar/exam-select.png"
       },
       {
         "pagePath": "pages/my/index/index",
-        "text": "大师",
+        "text": "我的",
         "iconPath": "/assets/tabBar/my.png",
         "selectedIconPath": "/assets/tabBar/my-select.png"
       }

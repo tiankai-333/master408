@@ -77,6 +77,18 @@ const router = createRouter({
       ]
     },
     {
+      path: '/ai-config',
+      component: () => import('@/layout/index.vue'),
+      children: [
+        {
+          path: 'index',
+          component: () => import('@/views/ai-config/index.vue'),
+          name: 'AiConfig',
+          meta: { title: '密钥管理' }
+        }
+      ]
+    },
+    {
       path: '/user',
       component: () => import('@/layout/index.vue'),
       children: [

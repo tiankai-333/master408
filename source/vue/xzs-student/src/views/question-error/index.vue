@@ -56,6 +56,9 @@
                   <el-button type="primary" size="small" class="ai-analyze-btn" :loading="aiAnalyzing" @click="analyzeQuestion" :disabled="!selectItem.questionItem">
                     <el-icon><MagicStick /></el-icon> {{ aiAnalyzing ? 'AI分析中...' : 'AI分析' }}
                   </el-button>
+                  <el-button type="danger" size="small" plain class="delete-btn" :loading="deleting" @click="deleteAnswer" :disabled="!selectItem.questionItem">
+                    <el-icon><Delete /></el-icon> {{ deleting ? '删除中...' : '移出错题本' }}
+                  </el-button>
                 </div>
               </div>
             </template>
@@ -80,8 +83,8 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { WarningFilled, Document, Edit, View, MagicStick } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { WarningFilled, Document, Edit, View, MagicStick, Delete } from '@element-plus/icons-vue'
 import { useEnumItemStore } from '@/store/modules/enumItem'
 import Pagination from '@/components/Pagination/index.vue'
 import questionAnswerApi from '@/api/questionAnswer'
@@ -97,7 +100,9 @@ const tableData = ref([])
 const total = ref(0)
 const qAnswerLoading = ref(false)
 const selectItem = ref({ questionType: 0, questionItem: null, answerItem: null })
+const currentRowId = ref(null)
 const aiAnalyzing = ref(false)
+const deleting = ref(false)
 const aiAnalysisResult = ref(null)
 const selectedStyle = ref('default')
 
@@ -129,7 +134,33 @@ const itemSelect = (row) => {
   qAnswerShow(row.id)
 }
 
+const deleteAnswer = () => {
+  if (!currentRowId.value) return
+  ElMessageBox.confirm('确定要将此题移出错题本吗？', '确认删除', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    deleting.value = true
+    questionAnswerApi.deleteById(currentRowId.value).then(re => {
+      deleting.value = false
+      if (re.code === 1) {
+        ElMessage.success('已移出错题本')
+        selectItem.value = { questionType: 0, questionItem: null, answerItem: null }
+        aiAnalysisResult.value = null
+        currentRowId.value = null
+        search()
+      } else {
+        ElMessage.error(re.message)
+      }
+    }).catch(() => {
+      deleting.value = false
+    })
+  }).catch(() => {})
+}
+
 const qAnswerShow = (id) => {
+  currentRowId.value = id
   qAnswerLoading.value = true
   aiAnalysisResult.value = null
   questionAnswerApi.select(id).then(re => {
@@ -169,7 +200,13 @@ const analyzeQuestion = async () => {
     default: questionType = '未知'
   }
   const titleContent = question.title || question.titleContent || question.content || ''
-  const payload = { questionType, questionContent: titleContent, options, correctAnswer, style: selectedStyle.value }
+  const payload = {
+    questionType,
+    questionContent: titleContent,
+    options,
+    correctAnswer,
+    style: selectedStyle.value
+  }
   try {
     let received = ''
     await questionApi.analyzeQuestionStream(payload, {
@@ -367,6 +404,7 @@ onMounted(() => {
       &:hover { opacity: 0.9; transform: translateY(-2px); }
       .el-icon { margin-right: 5px; color: #fff; font-size: 14px; }
     }
+    .delete-btn { border-radius: 20px; }
   }
 }
 .question-list-card {

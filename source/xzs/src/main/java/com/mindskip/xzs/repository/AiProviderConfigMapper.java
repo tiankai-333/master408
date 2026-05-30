@@ -20,6 +20,8 @@ public interface AiProviderConfigMapper {
 
     int update(AiProviderConfig config);
 
+    int deleteById(@Param("id") Integer id);
+
     int updateTestResult(@Param("id") Integer id,
                          @Param("success") Boolean success,
                          @Param("message") String message);
@@ -29,4 +31,6 @@ public interface AiProviderConfigMapper {
     List<Map<String, Object>> selectUsageByDay(@Param("days") Integer days);
 
     Map<String, Object> selectUsageSummary(@Param("days") Integer days);
+
+    List<Map<String, Object>> selectRecentLogs(@Param("days") Integer days, @Param("limit") Integer limit);
 }

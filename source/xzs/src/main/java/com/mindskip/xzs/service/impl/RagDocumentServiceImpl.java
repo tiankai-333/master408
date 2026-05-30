@@ -22,6 +22,13 @@ public class RagDocumentServiceImpl implements RagDocumentService {
     }
 
     @Override
+    public int backfillFromQuestions() {
+        int documents = ragDocumentMapper.backfillDocumentsFromQuestions();
+        int chunks = ragDocumentMapper.backfillChunksFromQuestions();
+        return documents + chunks;
+    }
+
+    @Override
     public List<RagChunkRecord> listIndexableChunks(int limit) {
         int safeLimit = limit <= 0 ? 100 : Math.min(limit, 1000);
         return ragDocumentMapper.selectIndexableChunks(safeLimit);

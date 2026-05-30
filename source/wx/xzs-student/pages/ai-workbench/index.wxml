@@ -1,0 +1,178 @@
+<view class="page">
+
+  <!-- 功能四宫格 -->
+  <view class="func-grid">
+    <view class="func-btn {{selectedSubject ? 'func-btn--active' : ''}}" bind:tap="toggleSubject">{{selectedSubject || '科目'}}</view>
+    <view class="func-btn {{selectedPoint ? 'func-btn--active' : ''}}" bind:tap="toggleKnowledge">{{selectedPoint ? selectedPoint.name : '知识点'}}</view>
+    <view class="func-btn {{selectedExam ? 'func-btn--active' : ''}}" bind:tap="randomExam">{{selectedExam.name || '真题'}}</view>
+    <view class="func-btn {{selectedMistake ? 'func-btn--active' : ''}}" bind:tap="randomMistake">{{selectedMistake.shortTitle || '错题'}}</view>
+  </view>
+
+  <!-- 科目选择弹窗 -->
+  <view class="compose-modal" wx:if="{{subjectPickerVisible}}">
+    <view class="compose-mask" bind:tap="closeSubjectPicker"></view>
+    <view class="compose-dialog popup-dialog">
+      <view class="compose-title">选择科目</view>
+      <view class="subject-pick-list">
+        <view class="subject-pick-item {{selectedSubject === item ? 'subject-pick-item--active' : ''}}"
+              wx:for="{{subjects}}" wx:key="index"
+              bind:tap="confirmSubjectPick" data-subject="{{item}}">
+          {{item}}
+        </view>
+      </view>
+      <view class="popup-footer">
+        <view class="popup-clear" bind:tap="clearSubjectPick">清除</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 知识点选择弹窗 -->
+  <view class="compose-modal" wx:if="{{knowledgePickerVisible}}">
+    <view class="compose-mask" bind:tap="closeKnowledgePicker"></view>
+    <view class="compose-dialog popup-dialog">
+      <view class="compose-title">选择知识点</view>
+      <view class="picker-search">
+        <input class="picker-search-input" placeholder="搜索知识点" value="{{pickerKeyword}}" bindinput="onPickerSearch" />
+      </view>
+      <scroll-view scroll-y class="popup-scroll popup-scroll--kp">
+        <view class="picker-group" wx:for="{{pickerGroups}}" wx:key="name">
+          <view class="picker-group-title">{{item.name}}（{{item.points.length}}）</view>
+          <view class="picker-item {{selectedPoint && selectedPoint.id === pt.id ? 'picker-item--active' : ''}}"
+                wx:for="{{item.points}}" wx:for-item="pt" wx:key="id"
+                bind:tap="confirmKnowledgePick" data-id="{{pt.id}}" data-name="{{pt.name}}" data-desc="{{pt.description}}">
+            <text class="picker-item-name">{{pt.name}}</text>
+            <text class="picker-item-sub" wx:if="{{pt.description}}">{{pt.description}}</text>
+          </view>
+        </view>
+        <view class="popup-empty" wx:if="{{!pickerGroups.length}}">暂无匹配知识点</view>
+      </scroll-view>
+      <view class="popup-footer">
+        <view class="popup-clear" bind:tap="clearKnowledgePick">清除</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 上下文卡片 -->
+  <view class="context-card" wx:if="{{contextMode !== 'none'}}">
+    <view class="context-icon">{{contextType === 'knowledge' ? '📖' : contextType === 'exam_question' ? '📝' : '❌'}}</view>
+    <view class="context-info">
+      <text class="context-label">{{contextType === 'knowledge' ? '知识点' : contextType === 'exam_question' ? '真题' : '错题'}}</text>
+      <text class="context-name">{{contextName}}</text>
+    </view>
+    <text class="context-clear" bind:tap="clearContext">×</text>
+  </view>
+
+  <!-- 对话消息区 -->
+  <scroll-view scroll-y scroll-into-view="{{scrollToId}}" class="chat-area">
+    <view class="chat-welcome" wx:if="{{messages.length === 0}}">
+      <view class="welcome-avatar">AI</view>
+      <text class="welcome-text">{{welcomeMsg}}</text>
+    </view>
+
+    <view class="message {{item.role === 'user' ? 'message--user' : 'message--assistant'}}"
+          wx:for="{{messages}}" wx:key="index" id="msg-{{index}}">
+      <view class="msg-avatar" wx:if="{{item.role === 'assistant'}}">AI</view>
+      <view class="msg-bubble {{item.role === 'user' ? 'bubble--user' : 'bubble--assistant'}}">
+        <view class="agent-draft" wx:if="{{item.agentDraft}}">
+          <view class="draft-title">练习草案</view>
+          <view class="draft-row">
+            <text>题量：{{item.agentDraft.questionCount}} 道</text>
+            <text>限时：{{item.agentDraft.minutes}} 分钟</text>
+          </view>
+          <view class="draft-row" wx:if="{{item.agentDraft.knowledgePoint}}">
+            <text>知识点：{{item.agentDraft.knowledgePoint}}</text>
+          </view>
+          <view class="draft-reason" wx:if="{{item.agentDraft.reason}}">{{item.agentDraft.reason}}</view>
+          <view class="draft-actions">
+            <view class="draft-btn draft-btn--confirm" bind:tap="confirmDraft" data-index="{{index}}">确认生成</view>
+          </view>
+        </view>
+        <rich-text nodes="{{item.html}}" wx:if="{{item.html}}"></rich-text>
+      </view>
+      <view class="msg-avatar msg-avatar--user" wx:if="{{item.role === 'user'}}">我</view>
+    </view>
+
+    <view class="message message--assistant" wx:if="{{isTyping}}">
+      <view class="msg-avatar">AI</view>
+      <view class="msg-bubble bubble--assistant">
+        <view class="typing-indicator">
+          <view class="typing-dot"></view>
+          <view class="typing-dot"></view>
+          <view class="typing-dot"></view>
+        </view>
+      </view>
+    </view>
+    <view id="msg-bottom"></view>
+  </scroll-view>
+
+  <!-- 聊天栏上方：画像、组卷、风格 -->
+  <view class="action-bar">
+    <view class="action-btn" bind:tap="quickAction" data-action="weak">画像</view>
+    <view class="action-btn action-btn--primary" bind:tap="quickAction" data-action="compose">组卷</view>
+    <view class="action-btn action-btn--style" bind:tap="showStylePicker">{{aiStyles[aiStyleIndex]}} ▾</view>
+  </view>
+
+  <!-- 风格选择弹窗 -->
+  <view class="style-sheet" wx:if="{{styleVisible}}">
+    <view class="style-mask" bind:tap="closeStyle"></view>
+    <view class="style-list">
+      <view class="style-item {{aiStyleIndex === index ? 'style-item--active' : ''}}"
+            wx:for="{{aiStyles}}" wx:key="index"
+            bind:tap="selectStyle" data-index="{{index}}">
+        {{item}}
+        <text class="style-check" wx:if="{{aiStyleIndex === index}}">✓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 输入区 -->
+  <view class="input-area">
+    <textarea class="input-field" placeholder="输入问题或描述..." value="{{inputMessage}}"
+              bindinput="onInput" bindconfirm="sendMessage" confirm-type="send"
+              auto-height maxlength="2000" adjust-position="{{true}}" />
+    <view class="send-btn {{inputMessage.trim() ? 'send-btn--active' : ''}}" bind:tap="sendMessage">发送</view>
+  </view>
+
+  <!-- 通用选择弹窗 -->
+  <view class="compose-modal" wx:if="{{popupType}}">
+    <view class="compose-mask" bind:tap="closePopup"></view>
+    <view class="compose-dialog popup-dialog">
+      <view class="compose-title">{{popupTitle}}</view>
+      <view class="popup-random" bind:tap="popupRandom">随机</view>
+      <scroll-view scroll-y class="popup-scroll">
+        <view class="popup-item" wx:for="{{popupItems}}" wx:key="id"
+              bind:tap="popupSelect" data-index="{{index}}">
+          <text class="popup-item-name">{{item.name}}</text>
+          <text class="popup-item-sub" wx:if="{{item.sub}}">{{item.sub}}</text>
+        </view>
+      </scroll-view>
+      <view class="popup-empty" wx:if="{{!popupLoading && popupItems.length === 0}}">暂无数据</view>
+    </view>
+  </view>
+
+  <!-- 组卷弹窗 -->
+  <view class="compose-modal" wx:if="{{composeVisible}}">
+    <view class="compose-mask" bind:tap="closeCompose"></view>
+    <view class="compose-dialog">
+      <view class="compose-title">生成练习</view>
+      <view class="compose-info" wx:if="{{selectedPoint}}">
+        <text>知识点：{{selectedPoint.name}}</text>
+      </view>
+      <view class="compose-row">
+        <text class="compose-label">题目数量</text>
+        <view class="stepper">
+          <view class="stepper-btn" bind:tap="changeCount" data-delta="-1">−</view>
+          <text class="stepper-value">{{composeCount}}</text>
+          <view class="stepper-btn" bind:tap="changeCount" data-delta="1">+</view>
+        </view>
+      </view>
+      <view class="compose-actions">
+        <view class="compose-cancel" bind:tap="closeCompose">取消</view>
+        <view class="compose-confirm" bind:tap="doCompose">生成</view>
+      </view>
+    </view>
+  </view>
+
+  <i-spin size="large" fix wx:if="{{spinShow}}"></i-spin>
+  <i-message id="message" />
+</view>

@@ -13,6 +13,7 @@ public class AiProviderConfig implements Serializable {
     private String apiBaseUrl;
     private String chatModel;
     private String embeddingModel;
+    private String visionModel;
     private String apiKeyCipher;
     private String apiKeyMask;
     private Boolean enabled;
@@ -35,6 +36,8 @@ public class AiProviderConfig implements Serializable {
     public void setChatModel(String chatModel) { this.chatModel = chatModel; }
     public String getEmbeddingModel() { return embeddingModel; }
     public void setEmbeddingModel(String embeddingModel) { this.embeddingModel = embeddingModel; }
+    public String getVisionModel() { return visionModel; }
+    public void setVisionModel(String visionModel) { this.visionModel = visionModel; }
     public String getApiKeyCipher() { return apiKeyCipher; }
     public void setApiKeyCipher(String apiKeyCipher) { this.apiKeyCipher = apiKeyCipher; }
     public String getApiKeyMask() { return apiKeyMask; }

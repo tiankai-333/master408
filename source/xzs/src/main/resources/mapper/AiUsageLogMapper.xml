@@ -4,6 +4,8 @@
 
     <resultMap id="BaseResultMap" type="com.mindskip.xzs.domain.ai.AiUsageLog">
         <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="key_source" property="keySource"/>
         <result column="template_id" property="templateId"/>
         <result column="style" property="style"/>
         <result column="ai_type" property="aiType"/>
@@ -15,6 +17,9 @@
         <result column="response" property="response"/>
         <result column="response_length" property="responseLength"/>
         <result column="tokens_used" property="tokensUsed"/>
+        <result column="input_tokens" property="inputTokens"/>
+        <result column="output_tokens" property="outputTokens"/>
+        <result column="cache_hit_tokens" property="cacheHitTokens"/>
         <result column="cost" property="cost"/>
         <result column="duration_ms" property="durationMs"/>
         <result column="success" property="success"/>
@@ -37,14 +42,14 @@
 
     <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiUsageLog" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_ai_usage_log (
-            template_id, style, ai_type, model, question, knowledge_points,
+            user_id, key_source, template_id, style, ai_type, model, question, knowledge_points,
             knowledge_base_ids, prompt, response, response_length,
-            tokens_used, cost, duration_ms, success, error_message,
+            tokens_used, input_tokens, output_tokens, cache_hit_tokens, cost, duration_ms, success, error_message,
             user_rating, user_feedback, create_time
         ) VALUES (
-            #{templateId}, #{style}, #{aiType}, #{model}, #{question}, #{knowledgePoints},
+            #{userId}, #{keySource}, #{templateId}, #{style}, #{aiType}, #{model}, #{question}, #{knowledgePoints},
             #{knowledgeBaseIds}, #{prompt}, #{response}, #{responseLength},
-            #{tokensUsed}, #{cost}, #{durationMs}, #{success}, #{errorMessage},
+            #{tokensUsed}, #{inputTokens}, #{outputTokens}, #{cacheHitTokens}, #{cost}, #{durationMs}, #{success}, #{errorMessage},
             #{userRating}, #{userFeedback}, #{createTime}
         )
     </insert>
@@ -70,10 +75,63 @@
     </select>
 
     <select id="getTopStyles" resultType="map">
-        SELECT style, COUNT(*) as count 
-        FROM t_ai_usage_log 
-        GROUP BY style 
-        ORDER BY count DESC 
+        SELECT style, COUNT(*) as count
+        FROM t_ai_usage_log
+        GROUP BY style
+        ORDER BY count DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectUserUsageSummary" resultType="java.util.HashMap">
+        SELECT COUNT(*) AS requestCount,
+               SUM(IFNULL(tokens_used, 0)) AS tokensUsed,
+               SUM(IFNULL(cost, 0)) AS cost,
+               SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS successCount,
+               SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS failedCount,
+               AVG(IFNULL(duration_ms, 0)) AS avgDurationMs
+        FROM t_ai_usage_log
+        WHERE user_id = #{userId}
+          AND create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+    </select>
+
+    <select id="selectUserUsageSummaryByKeySource" resultType="java.util.HashMap">
+        SELECT key_source AS keySource,
+               COUNT(*) AS requestCount,
+               SUM(IFNULL(tokens_used, 0)) AS tokensUsed,
+               SUM(IFNULL(cost, 0)) AS cost,
+               SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS successCount,
+               SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS failedCount,
+               AVG(IFNULL(duration_ms, 0)) AS avgDurationMs
+        FROM t_ai_usage_log
+        WHERE user_id = #{userId}
+          AND create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        GROUP BY key_source
+    </select>
+
+    <select id="selectUserUsageByProvider" resultType="java.util.HashMap">
+        SELECT ai_type AS provider, model, COUNT(*) AS requestCount,
+               SUM(IFNULL(tokens_used, 0)) AS tokensUsed,
+               SUM(IFNULL(cost, 0)) AS cost,
+               SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS successCount
+        FROM t_ai_usage_log
+        WHERE user_id = #{userId}
+          AND create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        GROUP BY ai_type, model
+        ORDER BY requestCount DESC
+    </select>
+
+    <select id="selectUserRecentLogs" resultType="java.util.HashMap">
+        SELECT id, key_source AS keySource, style AS taskType, ai_type AS provider, model,
+               LEFT(question, 80) AS question,
+               tokens_used AS tokensUsed, cache_hit_tokens AS cacheHitTokens,
+               input_tokens AS inputTokens, output_tokens AS outputTokens,
+               cost, duration_ms AS durationMs,
+               success, LEFT(error_message, 100) AS errorMessage,
+               DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+        FROM t_ai_usage_log
+        WHERE user_id = #{userId}
+          AND create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        ORDER BY create_time DESC
         LIMIT #{limit}
     </select>
 

@@ -4,6 +4,9 @@ logging:
     root: info
     com.mindskip.xzs: info
 
+server:
+  port: 8003
+
 spring:
   devtools:
     restart:
@@ -19,3 +22,11 @@ spring:
 mybatis:
   configuration:
     lazy-loading-enabled: false
+
+ai:
+  rag:
+    vector:
+      enabled: true
+      qdrant:
+        url: http://127.0.0.1:6333
+        collection: xzs_408_chunks

@@ -43,21 +43,25 @@ public class QuestionController extends BaseApiController {
     }
 
     @RequestMapping(value = "/analyze-image", method = RequestMethod.POST)
-    public RestResponse analyzeImageQuestion(@RequestParam("file") MultipartFile file) {
+    public RestResponse analyzeImageQuestion(@RequestParam(value = "file", required = false) MultipartFile file) {
+        AnalysisService.setCurrentUserId(getCurrentUser().getId());
         try {
             if (file == null || file.isEmpty()) {
                 return RestResponse.fail(2, "请选择要识别的图片");
             }
-            
+
             String result = questionService.analyzeImageQuestion(file);
             return RestResponse.ok(result);
         } catch (Exception e) {
             return RestResponse.fail(2, "图片识别失败：" + e.getMessage());
+        } finally {
+            AnalysisService.clearCurrentUserId();
         }
     }
 
     @RequestMapping(value = "/analyze-question", method = RequestMethod.POST)
     public RestResponse analyzeQuestion(@RequestBody java.util.Map<String, String> requestData) {
+        AnalysisService.setCurrentUserId(getCurrentUser().getId());
         try {
             String questionType = requestData.get("questionType");
             String questionContent = requestData.get("questionContent");
@@ -96,13 +100,17 @@ public class QuestionController extends BaseApiController {
         } catch (Exception e) {
             logger.error("题目分析失败", e);
             return RestResponse.fail(2, "题目分析失败：" + e.getMessage());
+        } finally {
+            AnalysisService.clearCurrentUserId();
         }
     }
 
     @RequestMapping(value = "/analyze-question-stream", method = RequestMethod.POST, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter analyzeQuestionStream(@RequestBody java.util.Map<String, String> requestData) {
         SseEmitter emitter = new SseEmitter(600000L);
+        final Integer userId = getCurrentUser().getId();
         CompletableFuture.runAsync(() -> {
+            AnalysisService.setCurrentUserId(userId);
             try {
                 String questionType = requestData.get("questionType");
                 String questionContent = requestData.get("questionContent");
@@ -138,6 +146,8 @@ public class QuestionController extends BaseApiController {
                 } catch (Exception ignored) {
                 }
                 emitter.completeWithError(e);
+            } finally {
+                AnalysisService.clearCurrentUserId();
             }
         });
         return emitter;
@@ -146,4 +156,5 @@ public class QuestionController extends BaseApiController {
     private void sendEvent(SseEmitter emitter, String name, String data) throws IOException {
         emitter.send(SseEmitter.event().name(name).data(data == null ? "" : data));
     }
+
 }

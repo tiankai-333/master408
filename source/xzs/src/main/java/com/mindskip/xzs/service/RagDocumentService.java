@@ -8,6 +8,8 @@ public interface RagDocumentService {
 
     int backfillFromLegacyKnowledgeBase();
 
+    int backfillFromQuestions();
+
     List<RagChunkRecord> listIndexableChunks(int limit);
 
     void markIndexed(Long chunkId, String model, Integer dimension, String collectionName, String vectorId);

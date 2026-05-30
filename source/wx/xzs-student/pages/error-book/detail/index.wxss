@@ -131,3 +131,24 @@
   color: #999;
   font-size: 13px;
 }
+
+.delete-section {
+  padding: 20px 15px 30px;
+}
+
+.delete-btn {
+  width: 100%;
+  height: 44px;
+  line-height: 44px;
+  background: #fff;
+  color: #f56c6c;
+  border: 1px solid #f56c6c;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.delete-btn[disabled] {
+  color: #fab6b6;
+  border-color: #fab6b6;
+  background: #fff;
+}

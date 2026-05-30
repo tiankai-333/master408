@@ -9,6 +9,7 @@
         <result column="api_base_url" property="apiBaseUrl"/>
         <result column="chat_model" property="chatModel"/>
         <result column="embedding_model" property="embeddingModel"/>
+        <result column="vision_model" property="visionModel"/>
         <result column="api_key_cipher" property="apiKeyCipher"/>
         <result column="api_key_mask" property="apiKeyMask"/>
         <result column="enabled" property="enabled"/>
@@ -34,10 +35,10 @@
 
     <insert id="insert" parameterType="com.mindskip.xzs.domain.ai.AiProviderConfig" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO ai_provider_config (
-            provider_code, provider_name, api_base_url, chat_model, embedding_model,
+            provider_code, provider_name, api_base_url, chat_model, embedding_model, vision_model,
             api_key_cipher, api_key_mask, enabled, priority
         ) VALUES (
-            #{providerCode}, #{providerName}, #{apiBaseUrl}, #{chatModel}, #{embeddingModel},
+            #{providerCode}, #{providerName}, #{apiBaseUrl}, #{chatModel}, #{embeddingModel}, #{visionModel},
             #{apiKeyCipher}, #{apiKeyMask}, #{enabled}, #{priority}
         )
     </insert>
@@ -48,6 +49,7 @@
             api_base_url = #{apiBaseUrl},
             chat_model = #{chatModel},
             embedding_model = #{embeddingModel},
+            vision_model = #{visionModel},
             <if test="apiKeyCipher != null and apiKeyCipher != ''">
                 api_key_cipher = #{apiKeyCipher},
                 api_key_mask = #{apiKeyMask},
@@ -57,6 +59,10 @@
             update_time = NOW()
         WHERE id = #{id}
     </update>
+
+    <delete id="deleteById">
+        DELETE FROM ai_provider_config WHERE id = #{id}
+    </delete>
 
     <update id="updateTestResult">
         UPDATE ai_provider_config SET
@@ -99,5 +105,19 @@
                AVG(IFNULL(duration_ms, 0)) AS avgDurationMs
         FROM t_ai_usage_log
         WHERE create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+    </select>
+
+    <select id="selectRecentLogs" resultType="java.util.HashMap">
+        SELECT id, style AS taskType, ai_type AS provider, model,
+               LEFT(question, 80) AS question,
+               tokens_used AS tokensUsed, cache_hit_tokens AS cacheHitTokens,
+               input_tokens AS inputTokens, output_tokens AS outputTokens,
+               cost, duration_ms AS durationMs,
+               success, LEFT(error_message, 100) AS errorMessage,
+               DATE_FORMAT(create_time, '%Y-%m-%d %H:%i:%s') AS createTime
+        FROM t_ai_usage_log
+        WHERE create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        ORDER BY create_time DESC
+        LIMIT #{limit}
     </select>
 </mapper>

@@ -1,0 +1,163 @@
+.page {
+  padding: 16px;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.detail-header {
+  margin-bottom: 16px;
+}
+
+.detail-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.detail-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.explain-btn {
+  margin-bottom: 16px !important;
+}
+
+.related-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.related-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip-label {
+  font-size: 12px;
+  color: #999;
+  font-weight: 600;
+}
+
+.chip {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: #2d8cf0;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+}
+
+.knowledge-html {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #334155;
+  overflow: hidden;
+}
+
+.knowledge-html h1,
+.knowledge-html h2,
+.knowledge-html h3,
+.knowledge-html h4 {
+  margin: 12px 0 8px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.knowledge-html h1 { font-size: 18px; }
+.knowledge-html h2 { font-size: 16px; }
+.knowledge-html h3 { font-size: 15px; }
+
+.knowledge-html p {
+  margin: 8px 0;
+}
+
+.knowledge-html table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.knowledge-html th,
+.knowledge-html td {
+  border: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.knowledge-html th {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.knowledge-html code {
+  background: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.knowledge-html pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.knowledge-html pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.knowledge-html img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.knowledge-html ul,
+.knowledge-html ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.knowledge-html blockquote {
+  border-left: 3px solid #6366F1;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #64748b;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 13px;
+}

@@ -2,13 +2,20 @@ package com.mindskip.xzs.service.impl;
 
 import com.mindskip.xzs.domain.ExamPaper;
 import com.mindskip.xzs.domain.Question;
+import com.mindskip.xzs.domain.TaskExam;
+import com.mindskip.xzs.domain.TextContent;
 import com.mindskip.xzs.domain.User;
 import com.mindskip.xzs.domain.enums.ExamPaperTypeEnum;
+import com.mindskip.xzs.domain.task.TaskItemObject;
+import com.mindskip.xzs.repository.ExamPaperMapper;
 import com.mindskip.xzs.repository.QuestionMapper;
+import com.mindskip.xzs.repository.TaskExamMapper;
 import com.mindskip.xzs.service.AiPaperComposeService;
 import com.mindskip.xzs.service.ExamPaperService;
+import com.mindskip.xzs.service.TextContentService;
 import com.mindskip.xzs.utility.DateTimeUtil;
 import com.mindskip.xzs.utility.ExamUtil;
+import com.mindskip.xzs.utility.JsonUtil;
 import com.mindskip.xzs.viewmodel.admin.exam.ExamPaperEditRequestVM;
 import com.mindskip.xzs.viewmodel.admin.exam.ExamPaperTitleItemVM;
 import com.mindskip.xzs.viewmodel.admin.question.QuestionEditRequestVM;
@@ -18,9 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,13 +44,22 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
     private static final int DEFAULT_MINUTES = 15;
     private static final int DEFAULT_QUESTION_COUNT = 5;
     private static final int MAX_QUESTION_COUNT = 5;
+    private static final List<Integer> CORE_408_SUBJECT_IDS = Arrays.asList(1, 2, 3, 4);
 
     private final QuestionMapper questionMapper;
     private final ExamPaperService examPaperService;
+    private final TextContentService textContentService;
+    private final TaskExamMapper taskExamMapper;
+    private final ExamPaperMapper examPaperMapper;
 
-    public AiPaperComposeServiceImpl(QuestionMapper questionMapper, ExamPaperService examPaperService) {
+    public AiPaperComposeServiceImpl(QuestionMapper questionMapper, ExamPaperService examPaperService,
+                                     TextContentService textContentService, TaskExamMapper taskExamMapper,
+                                     ExamPaperMapper examPaperMapper) {
         this.questionMapper = questionMapper;
         this.examPaperService = examPaperService;
+        this.textContentService = textContentService;
+        this.taskExamMapper = taskExamMapper;
+        this.examPaperMapper = examPaperMapper;
     }
 
     @Override
@@ -60,30 +79,37 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
             selected = selected.stream().limit(count).collect(Collectors.toList());
         }
 
-        if (selected.size() < count && Boolean.TRUE.equals(request.getPreferMistakes()) && userId != null) {
-            selected.addAll(questionMapper.selectMistakesForAiPaper(
-                    userId,
-                    subjectId,
-                    normalize(request.getKnowledgePoint()),
-                    request.getSourceYear(),
-                    request.getQuestionTypes(),
-                    mergeExcludeIds(request.getExcludeQuestionIds(), selected),
-                    request.getExcludeSourceYears(),
-                    count - selected.size()
-            ));
-        }
+        List<Integer> subjectIds = (subjectId != null) ? Collections.singletonList(subjectId) : CORE_408_SUBJECT_IDS;
 
-        if (selected.size() < count) {
-            List<Integer> excludeQuestionIds = mergeExcludeIds(request.getExcludeQuestionIds(), selected);
-            selected.addAll(questionMapper.selectForAiPaper(
-                    subjectId,
-                    normalize(request.getKnowledgePoint()),
-                    request.getSourceYear(),
-                    request.getQuestionTypes(),
-                    excludeQuestionIds,
-                    request.getExcludeSourceYears(),
-                    count - selected.size()
-            ));
+        for (Integer sid : subjectIds) {
+            if (selected.size() >= count) break;
+            int remain = count - selected.size();
+
+            if (Boolean.TRUE.equals(request.getPreferMistakes()) && userId != null) {
+                selected.addAll(questionMapper.selectMistakesForAiPaper(
+                        userId,
+                        sid,
+                        normalize(request.getKnowledgePoint()),
+                        request.getSourceYear(),
+                        request.getQuestionTypes(),
+                        mergeExcludeIds(request.getExcludeQuestionIds(), selected),
+                        request.getExcludeSourceYears(),
+                        remain
+                ));
+            }
+
+            if (selected.size() < count) {
+                remain = count - selected.size();
+                selected.addAll(questionMapper.selectForAiPaper(
+                        sid,
+                        normalize(request.getKnowledgePoint()),
+                        request.getSourceYear(),
+                        request.getQuestionTypes(),
+                        mergeExcludeIds(request.getExcludeQuestionIds(), selected),
+                        request.getExcludeSourceYears(),
+                        remain
+                ));
+            }
         }
 
         selected = distinctById(selected);
@@ -95,10 +121,12 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
         ExamPaperEditRequestVM paperVM = buildPaperVM(request, paperSubjectId, minutes, selected);
         ExamPaper paper = examPaperService.savePaperFromVM(paperVM, user);
 
+        createPersonalTask(paper, user);
+
         AiPaperComposeResponseVM response = new AiPaperComposeResponseVM();
         response.setPaperId(paper.getId());
         response.setPaperName(paper.getName());
-        response.setUrl("/student/do?id=" + paper.getId());
+        response.setUrl("/do?id=" + paper.getId());
         response.setQuestionCount(selected.size());
         response.setMinutes(minutes);
         response.setQuestionIds(selected.stream().map(Question::getId).collect(Collectors.toList()));
@@ -115,7 +143,8 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
         paperVM.setSuggestTime(minutes);
 
         Date start = new Date();
-        Date end = DateTimeUtil.addDuration(start, Duration.ofMinutes(minutes));
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
+        Date end = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
         paperVM.setLimitDateTime(Arrays.asList(DateTimeUtil.dateFormat(start), DateTimeUtil.dateFormat(end)));
 
         ExamPaperTitleItemVM titleItem = new ExamPaperTitleItemVM();
@@ -207,5 +236,28 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
             }
         }
         return new ArrayList<>(map.values());
+    }
+
+    private void createPersonalTask(ExamPaper paper, User user) {
+        Date now = new Date();
+        TaskItemObject itemObject = new TaskItemObject();
+        itemObject.setExamPaperId(paper.getId());
+        itemObject.setExamPaperName(paper.getName());
+        itemObject.setItemOrder(1);
+
+        TextContent textContent = new TextContent();
+        textContent.setContent(JsonUtil.toJsonStr(Collections.singletonList(itemObject)));
+        textContent.setCreateTime(now);
+        textContentService.insertByFilter(textContent);
+
+        TaskExam taskExam = new TaskExam();
+        taskExam.setTitle(paper.getName());
+        taskExam.setFrameTextContentId(textContent.getId());
+        taskExam.setCreateUser(user == null ? null : user.getId());
+        taskExam.setCreateUserName(user == null ? null : user.getUserName());
+        taskExam.setCreateTime(now);
+        taskExam.setDeleted(false);
+        taskExamMapper.insertSelective(taskExam);
+        examPaperMapper.updateTaskPaper(taskExam.getId(), Collections.singletonList(paper.getId()));
     }
 }

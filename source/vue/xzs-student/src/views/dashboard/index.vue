@@ -89,35 +89,65 @@
         </div>
 
         <div class="task-content" v-loading="taskLoading">
-          <el-collapse accordion v-if="taskList.length !== 0" class="task-collapse">
-            <el-collapse-item :title="taskItem.title" :name="taskItem.id" :key="taskItem.id" v-for="taskItem in taskList">
-              <table class="index-task-table">
-                <tr v-for="paperItem in taskItem.paperItems" :key="paperItem.examPaperId">
-                  <td class="index-task-table-paper">
+          <template v-if="taskList.length !== 0">
+            <div v-for="taskItem in visibleTasks" :key="taskItem.id" class="task-group">
+              <div class="task-group-header">
+                <span class="task-group-title">{{ taskItem.title }}</span>
+                <span class="task-group-date" v-if="taskItem.createTime">{{ formatDate(taskItem.createTime) }}</span>
+              </div>
+              <div v-for="paperItem in taskItem.paperItems" :key="paperItem.examPaperId" class="task-paper-row">
+                <div class="task-paper-name">
+                  <el-icon><Document /></el-icon>
+                  {{ paperItem.examPaperName }}
+                </div>
+                <div class="task-paper-status">
+                  <el-tag :type="statusTagFormatter(paperItem.status)" v-if="paperItem.status !== null" size="small">
+                    {{ statusTextFormatter(paperItem.status) }}
+                  </el-tag>
+                  <el-tag v-else size="small" effect="plain">待完成</el-tag>
+                </div>
+                <div class="task-paper-action">
+                  <router-link target="_blank" :to="{ path: '/do', query: { id: paperItem.examPaperId } }" v-if="paperItem.status === null">
+                    <el-button type="primary" size="small"><el-icon><VideoPlay /></el-icon>开始答题</el-button>
+                  </router-link>
+                  <router-link target="_blank" :to="{ path: '/edit', query: { id: paperItem.examPaperAnswerId } }" v-else-if="paperItem.status === 1">
+                    <el-button type="warning" size="small"><el-icon><Edit /></el-icon>批改试卷</el-button>
+                  </router-link>
+                  <router-link target="_blank" :to="{ path: '/read', query: { id: paperItem.examPaperAnswerId } }" v-else-if="paperItem.status === 2">
+                    <el-button type="success" size="small"><el-icon><View /></el-icon>查看试卷</el-button>
+                  </router-link>
+                </div>
+              </div>
+            </div>
+            <div v-if="completedTasks.length > 0" class="task-completed-toggle">
+              <el-button text @click="showCompleted = !showCompleted">
+                {{ showCompleted ? '隐藏已完成' : '显示已完成 (' + completedTasks.length + ')' }}
+                <el-icon><component :is="showCompleted ? 'ArrowUp' : 'ArrowDown'" /></el-icon>
+              </el-button>
+            </div>
+            <template v-if="showCompleted">
+              <div v-for="taskItem in completedTasks" :key="'c-' + taskItem.id" class="task-group task-group-completed">
+                <div class="task-group-header">
+                  <span class="task-group-title">{{ taskItem.title }}</span>
+                  <span class="task-group-date" v-if="taskItem.createTime">{{ formatDate(taskItem.createTime) }}</span>
+                </div>
+                <div v-for="paperItem in taskItem.paperItems" :key="paperItem.examPaperId" class="task-paper-row">
+                  <div class="task-paper-name">
                     <el-icon><Document /></el-icon>
                     {{ paperItem.examPaperName }}
-                  </td>
-                  <td width="90px">
-                    <el-tag :type="statusTagFormatter(paperItem.status)" v-if="paperItem.status !== null" size="small">
-                      {{ statusTextFormatter(paperItem.status) }}
-                    </el-tag>
-                    <el-tag v-else size="small" effect="plain">待完成</el-tag>
-                  </td>
-                  <td width="132px">
-                    <router-link target="_blank" :to="{ path: '/do', query: { id: paperItem.examPaperId } }" v-if="paperItem.status === null">
-                      <el-button type="primary" size="small"><el-icon><VideoPlay /></el-icon>开始答题</el-button>
-                    </router-link>
-                    <router-link target="_blank" :to="{ path: '/edit', query: { id: paperItem.examPaperAnswerId } }" v-else-if="paperItem.status === 1">
-                      <el-button type="warning" size="small"><el-icon><Edit /></el-icon>批改试卷</el-button>
-                    </router-link>
-                    <router-link target="_blank" :to="{ path: '/read', query: { id: paperItem.examPaperAnswerId } }" v-else-if="paperItem.status === 2">
+                  </div>
+                  <div class="task-paper-status">
+                    <el-tag type="success" size="small">完成</el-tag>
+                  </div>
+                  <div class="task-paper-action">
+                    <router-link target="_blank" :to="{ path: '/read', query: { id: paperItem.examPaperAnswerId } }">
                       <el-button type="success" size="small"><el-icon><View /></el-icon>查看试卷</el-button>
                     </router-link>
-                  </td>
-                </tr>
-              </table>
-            </el-collapse-item>
-          </el-collapse>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </template>
           <div v-else class="empty-flow">
             <div class="empty-pulse">
               <el-icon><Tickets /></el-icon>
@@ -223,6 +253,11 @@
         </div>
       </section>
     </main>
+
+    <div class="qr-float">
+      <img src="/miniprogram-qrcode.jpg" alt="小程序二维码" />
+      <span>小程序</span>
+    </div>
   </div>
 </template>
 
@@ -238,6 +273,8 @@ import {
   Timer,
   Calendar,
   MagicStick,
+  ArrowDown,
+  ArrowUp,
   Reading,
   Search,
   DataAnalysis
@@ -291,6 +328,21 @@ const statusTagFormatter = (status) => {
 
 const statusTextFormatter = (status) => {
   return enumItemStore.enumFormat(enumItemStore.exam.examPaperAnswer.statusEnum, status)
+}
+
+const showCompleted = ref(false)
+
+const isTaskDone = (task) => {
+  return task.paperItems && task.paperItems.length > 0 && task.paperItems.every(p => p.status === 2)
+}
+
+const visibleTasks = computed(() => taskList.value.filter(t => !isTaskDone(t)))
+
+const completedTasks = computed(() => taskList.value.filter(t => isTaskDone(t)))
+
+const formatDate = (dateStr) => {
+  const d = new Date(dateStr)
+  return `${d.getMonth() + 1}月${d.getDate()}日`
 }
 
 const getPaperYear = (name) => {
@@ -689,54 +741,68 @@ onMounted(() => {
   min-height: 128px;
 }
 
-.task-collapse {
-  border: none;
+.task-group {
+  margin-bottom: 16px;
+}
 
-  :deep(.el-collapse-item__header) {
-    min-height: 52px;
-    padding: 0 14px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #172033;
-  }
+.task-group-completed {
+  opacity: 0.65;
+}
 
-  :deep(.el-collapse-item__wrap) {
-    border-bottom: none;
-  }
+.task-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 14px 8px;
+}
 
-  :deep(.el-collapse-item__content) {
-    padding: 16px 4px 0;
+.task-group-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #172033;
+}
+
+.task-group-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.task-paper-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eef2f7;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background-color: #f8fafc;
   }
 }
 
-.index-task-table {
-  width: 100%;
-  border-collapse: collapse;
+.task-paper-name {
+  flex: 1;
+  color: #334155;
+  font-size: 15px;
 
-  tr {
-    transition: background 0.2s ease;
+  .el-icon {
+    color: #2563eb;
+    margin-right: 8px;
   }
+}
 
-  tr:hover {
-    background-color: #f8fafc;
-  }
+.task-paper-status {
+  width: 80px;
+  text-align: center;
+}
 
-  td {
-    padding: 13px 10px;
-    border-bottom: 1px solid #eef2f7;
-  }
+.task-paper-action {
+  width: 130px;
+  text-align: right;
+}
 
-  .index-task-table-paper {
-    color: #334155;
-    font-size: 15px;
-
-    .el-icon {
-      color: #2563eb;
-      margin-right: 8px;
-    }
-  }
+.task-completed-toggle {
+  padding: 8px 14px;
+  text-align: center;
 }
 
 .empty-flow {
@@ -1149,6 +1215,33 @@ onMounted(() => {
     .el-button {
       width: 100%;
     }
+  }
+}
+
+.qr-float {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100;
+  text-align: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+
+  img {
+    width: 100px;
+    height: 100px;
+    border-radius: 6px;
+    display: block;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
   }
 }
 </style>

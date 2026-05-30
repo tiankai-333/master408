@@ -40,9 +40,9 @@
             <el-icon><MagicStick /></el-icon>
             408Master
           </el-menu-item>
-          <el-menu-item index="/user/index">
-            <el-icon><User /></el-icon>
-            学生档案
+          <el-menu-item index="/ai-config/index">
+            <el-icon><Key /></el-icon>
+            密钥管理
           </el-menu-item>
         </el-menu>
         <div class="head-user">
@@ -84,7 +84,7 @@ import userApi from '@/api/user'
 import avatarDefault from '@/assets/avatar.png'
 import {
   Reading, HomeFilled, Document, Tickets, WarningFilled,
-  Search, Share, User, Bell, SwitchButton, MagicStick
+  Search, Share, User, Bell, SwitchButton, MagicStick, Key
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -97,7 +97,7 @@ const userInfo = reactive({
 })
 
 const routeSelect = (path) => {
-  const topPath = ['/', '/index', '/paper/index', '/record/index', '/question/index', '/question/ai-analyze', '/knowledge-graph/index', '/user/index']
+  const topPath = ['/', '/index', '/paper/index', '/record/index', '/question/index', '/question/ai-analyze', '/knowledge-graph/index', '/ai-config/index', '/user/index']
   if (topPath.indexOf(path) >= 0) {
     return path
   }

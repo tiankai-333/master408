@@ -46,6 +46,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
     private final SubjectService subjectService;
     private final QuestionContentService questionContentService;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.mindskip.xzs.ai.AnalysisService analysisService;
+
     @Value("${ai.api.key}")
     private String aiApiKey;
 
@@ -362,103 +365,17 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
 
     @Override
     public String analyzeImageQuestion(MultipartFile file) throws Exception {
-        // 将图片转换为Base64编码
         byte[] fileBytes = file.getBytes();
         String base64Image = Base64.getEncoder().encodeToString(fileBytes);
-        
-        // 获取文件扩展名
+
         String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null && originalFilename.contains(".") 
-            ? originalFilename.substring(originalFilename.lastIndexOf(".") + 1) 
+        String extension = originalFilename != null && originalFilename.contains(".")
+            ? originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
             : "png";
-        
-        // 构建图片数据URL
+
         String imageDataUrl = "data:image/" + extension + ";base64," + base64Image;
-        
-        System.out.println("Image file: " + originalFilename + ", size: " + fileBytes.length + " bytes");
-        System.out.println("Image data URL length: " + imageDataUrl.length());
-        
-        // 调用AI API分析图片
-        String result = callAiApiWithImage(imageDataUrl);
-        System.out.println("AI API response: " + result);
-        
-        return result;
-    }
 
-    private String callAiApiWithImage(String imageDataUrl) throws Exception {
-        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(60000);
-        factory.setReadTimeout(300000);
-        org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate(factory);
-        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.set("Content-Type", "application/json");
-
-        java.util.Map<String, Object> requestBody = new java.util.HashMap<>();
-
-        if ("glm".equals(aiApiType)) {
-            headers.set("Authorization", "Bearer " + aiApiKey);
-            requestBody.put("model", "glm-4.6v");
-            requestBody.put("messages", java.util.Arrays.asList(
-                new java.util.HashMap<String, Object>() {{ 
-                    put("role", "system"); 
-                    put("content", "你是一个题目分析助手，需要识别图片中的所有题目内容。图片中可能包含多道题目，请逐一分析。对于每道题目，提取以下信息：题目类型（单选题、多选题、判断题、填空题、简答题）、题目内容（题干）、选项（如果有）、正确答案、解析（如果有）。请以JSON数组格式返回结果，数组中每个元素代表一道题目，不要包含任何多余的文字描述。");
-                }},
-                new java.util.HashMap<String, Object>() {{ 
-                    put("role", "user"); 
-                    put("content", java.util.Arrays.asList(
-                        new java.util.HashMap<String, String>() {{ put("type", "text"); put("text", "请分析这张图片中的所有题目，以JSON数组格式返回"); }},
-                        new java.util.HashMap<String, Object>() {{ 
-                            put("type", "image_url"); 
-                            java.util.Map<String, String> imageUrlMap = new java.util.HashMap<>();
-                            imageUrlMap.put("url", imageDataUrl);
-                            put("image_url", imageUrlMap); 
-                        }}
-                    ));
-                }}
-            ));
-            requestBody.put("temperature", 0.7);
-            requestBody.put("max_tokens", 8192);
-        } else {
-            headers.set("Authorization", "Bearer " + aiApiKey);
-            requestBody.put("model", "gpt-4o");
-            requestBody.put("messages", java.util.Arrays.asList(
-                new java.util.HashMap<String, Object>() {{ 
-                    put("role", "system"); 
-                    put("content", "你是一个题目分析助手，需要识别图片中的所有题目内容。图片中可能包含多道题目，请逐一分析。对于每道题目，提取以下信息：题目类型（单选题、多选题、判断题、填空题、简答题）、题目内容（题干）、选项（如果有）、正确答案、解析（如果有）。请以JSON数组格式返回结果，数组中每个元素代表一道题目，不要包含任何多余的文字描述。");
-                }},
-                new java.util.HashMap<String, Object>() {{ 
-                    put("role", "user"); 
-                    put("content", java.util.Arrays.asList(
-                        new java.util.HashMap<String, String>() {{ put("type", "text"); put("text", "请分析这张图片中的题目"); }},
-                        new java.util.HashMap<String, String>() {{ put("type", "image_url"); put("image_url", imageDataUrl); }}
-                    ));
-                }}
-            ));
-            requestBody.put("temperature", 0.7);
-        }
-
-        org.springframework.http.HttpEntity<java.util.Map<String, Object>> entity = new org.springframework.http.HttpEntity<>(requestBody, headers);
-        
-        try {
-            org.springframework.http.ResponseEntity<String> response = restTemplate.postForEntity(aiApiUrl, entity, String.class);
-
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            com.fasterxml.jackson.databind.JsonNode rootNode = mapper.readTree(response.getBody());
-            
-            if ("glm".equals(aiApiType)) {
-                String resultContent = rootNode.path("choices").get(0).path("message").path("content").asText();
-                resultContent = resultContent.replaceAll("^[`\\s]*json[\\s]*", "");
-                resultContent = resultContent.replaceAll("[`\\s]*$", "");
-                return resultContent;
-            } else {
-                String resultContent = rootNode.path("choices").get(0).path("message").path("content").asText();
-                resultContent = resultContent.replaceAll("^[`\\s]*json[\\s]*", "");
-                resultContent = resultContent.replaceAll("[`\\s]*$", "");
-                return resultContent;
-            }
-        } catch (org.springframework.web.client.HttpClientErrorException e) {
-            throw new Exception("API调用失败: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
-        }
+        return analysisService.analyzeImage(imageDataUrl);
     }
 
     @Override
@@ -497,7 +414,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question> implements Qu
 
         if ("glm".equals(aiApiType)) {
             headers.set("Authorization", "Bearer " + aiApiKey);
-            requestBody.put("model", "glm-4.6v");
+            requestBody.put("model", "glm-4-flash");
             requestBody.put("messages", java.util.Arrays.asList(
                 new java.util.HashMap<String, Object>() {{ 
                     put("role", "system"); 

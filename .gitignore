@@ -52,6 +52,8 @@ Thumbs.db
 *.pdf
 
 # Deploy runtime data
+deploy/.env
+deploy/.env.acr
 deploy/mysql-data/
 deploy/qdrant-data/
 deploy/sql/

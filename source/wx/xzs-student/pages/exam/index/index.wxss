@@ -1,7 +1,125 @@
-.exam-tab-view {
-  margin-top: 42px;
+.page {
+  background: #f5f7fb;
+  min-height: 100vh;
+}
+
+/* ====== 科目选择页 ====== */
+
+.subject-page {
+  padding: 24rpx;
+}
+
+.subject-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 24rpx;
+}
+
+.subject-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.subject-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 28rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #E0E7FF;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+}
+
+.subject-item-name {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #111827;
+}
+
+.subject-item-arrow {
+  font-size: 36rpx;
+  color: #CBD5E1;
+}
+
+/* ====== 返回栏 ====== */
+
+.back-row {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #E5E7EB;
+}
+
+.back-btn {
+  font-size: 28rpx;
+  color: #6366F1;
+  font-weight: 600;
+  margin-right: 20rpx;
+}
+
+.back-subject {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ====== 试卷列表 ====== */
+
+.exam-list {
+  padding: 12rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.exam-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.exam-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.exam-card-meta {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.exam-card-arrow {
+  font-size: 20px;
+  color: #cbd5e1;
+  margin-left: 10px;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 120rpx 40rpx;
+  color: #94a3b8;
+  font-size: 28rpx;
 }
 
 .xzs-load-more {
-  margin-top: 60px !important;
+  margin-top: 20px !important;
 }

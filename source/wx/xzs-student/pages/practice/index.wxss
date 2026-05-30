@@ -1,0 +1,56 @@
+.practice-page {
+  min-height: 100vh;
+  padding: 24rpx;
+  box-sizing: border-box;
+  background: #FAFAFE;
+}
+
+.section-title {
+  color: #111827;
+  font-size: 36rpx;
+  font-weight: 800;
+  margin-bottom: 28rpx;
+}
+
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.entry-card {
+  padding: 40rpx 32rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  border: 1rpx solid #E0E7FF;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.entry-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 10rpx;
+}
+
+.entry-desc {
+  font-size: 28rpx;
+  color: #6B7280;
+  line-height: 1.5;
+}
+
+.entry-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+}
+
+.accent-indigo { background: linear-gradient(90deg, #6366F1, #818CF8); }
+.accent-teal   { background: linear-gradient(90deg, #0D9488, #2DD4BF); }
+.accent-rose   { background: linear-gradient(90deg, #EF4444, #F87171); }
+.accent-violet { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.accent-amber  { background: linear-gradient(90deg, #F59E0B, #FBBF24); }

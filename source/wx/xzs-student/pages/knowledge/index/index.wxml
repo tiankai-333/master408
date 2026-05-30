@@ -1,0 +1,40 @@
+<view class="page">
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="搜索知识点"
+      value="{{keyword}}"
+      bindinput="onKeywordInput"
+      confirm-type="search"
+    />
+  </view>
+
+  <i-collapse accordion current="{{expandedGroup}}" bindchange="onCollapseChange">
+    <i-collapse-item
+      wx:for="{{filteredGroups}}"
+      wx:key="name"
+      title="{{item.name}}（{{item.points.length}}）"
+      name="{{item.name}}"
+    >
+      <i-cell-group slot="content">
+        <i-cell
+          wx:for="{{item.points}}"
+          wx:for-item="point"
+          wx:key="id"
+          title="{{point.name}}"
+          label="{{point.description}}"
+          is-link
+          data-id="{{point.id}}"
+          bind:click="goDetail"
+        />
+      </i-cell-group>
+    </i-collapse-item>
+  </i-collapse>
+
+  <view class="empty-tip" wx:if="{{!spinShow && filteredGroups.length === 0}}">
+    <text>没有匹配的知识点</text>
+  </view>
+
+  <i-spin size="large" fix wx:if="{{spinShow}}"></i-spin>
+  <i-message id="message" />
+</view>
