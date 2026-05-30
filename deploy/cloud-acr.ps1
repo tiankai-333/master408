@@ -35,16 +35,20 @@ $ProjectRoot = Split-Path $DeployDir -Parent
 
 # ---- 加载 .env.acr ----
 $AcrRegion     = 'cn-hangzhou'
-$AcrRegistry   = 'registry.cn-hangzhou.aliyuncs.com'
-$AcrNamespace  = '408master'
+$AcrRegistry   = 'crpi-7p9hgqhc4rdznlbt.cn-hangzhou.personal.cr.aliyuncs.com'
+$AcrNamespace  = 'doushijiaxiang'
+$AcrRepo       = '408master'
 $AcrUsername   = ''
 $AcrPassword   = ''
 $ImageTag      = 'latest'
 $Server        = 'root@127.0.0.1'
 $Remote        = '/opt/xzs-deploy'
 
-# 加载 .env.acr
+# 加载 .env.acr（优先从 deploy 目录加载）
 $acrEnvFile = Join-Path $DeployDir '.env.acr'
+if (-not (Test-Path $acrEnvFile)) {
+    $acrEnvFile = Join-Path (Split-Path $DeployDir -Parent) '.env.acr'
+}
 if (Test-Path $acrEnvFile) {
     Get-Content $acrEnvFile | ForEach-Object {
         if ($_ -match '^\s*([^#][^=]+?)\s*=\s*(.+)$') {
@@ -54,6 +58,7 @@ if (Test-Path $acrEnvFile) {
                 'ACR_REGION'    { $AcrRegion = $val }
                 'ACR_REGISTRY'  { $AcrRegistry = $val }
                 'ACR_NAMESPACE' { $AcrNamespace = $val }
+                'ACR_REPO'      { $AcrRepo = $val }
                 'ACR_USERNAME'  { $AcrUsername = $val }
                 'ACR_PASSWORD'  { $AcrPassword = $val }
                 'IMAGE_TAG'     { $ImageTag = $val }
@@ -62,8 +67,11 @@ if (Test-Path $acrEnvFile) {
     }
 }
 
-# 加载 .env（服务器配置）
+# 加载 .env（服务器配置，优先从 deploy 目录加载）
 $envFile = Join-Path $DeployDir '.env'
+if (-not (Test-Path $envFile)) {
+    $envFile = Join-Path (Split-Path $DeployDir -Parent) '.env'
+}
 if (Test-Path $envFile) {
     Get-Content $envFile | ForEach-Object {
         if ($_ -match '^\s*([^#][^=]+?)\s*=\s*(.+)$') {
@@ -82,9 +90,9 @@ if (-not $Tag) {
     $Tag = Get-Date -Format 'yyyyMMdd'
 }
 
-# ---- 镜像地址 ----
-$BackendImage = "${AcrRegistry}/${AcrNamespace}/backend:${Tag}"
-$NginxImage   = "${AcrRegistry}/${AcrNamespace}/nginx:${Tag}"
+# ---- 镜像地址（个人版 ACR: registry/namespace/repo:tag） ----
+$BackendImage = "${AcrRegistry}/${AcrNamespace}/${AcrRepo}:backend-${Tag}"
+$NginxImage   = "${AcrRegistry}/${AcrNamespace}/${AcrRepo}:nginx-${Tag}"
 
 # ---- 输出函数 ----
 function Write-Info($msg)  { Write-Host "[INFO]  $msg" -ForegroundColor Cyan }
@@ -126,7 +134,7 @@ function Invoke-Login {
         Write-Fail '请先在 deploy/.env.acr 中填入 ACR_USERNAME 和 ACR_PASSWORD'
     }
     $env:DOCKER_CLI_HINTS = 'false'
-    echo $AcrPassword | docker login --username $AcrUsername --password-stdin $AcrRegistry
+    docker login --username $AcrUsername --password $AcrPassword $AcrRegistry
     if ($LASTEXITCODE -eq 0) { Write-Ok 'ACR 登录成功' }
     else { Write-Fail 'ACR 登录失败，请检查用户名和密码' }
 }
@@ -328,14 +336,14 @@ function Invoke-Status {
 #  主流程
 # =============================================================================
 Write-Host ''
-Write-Host '╔═══════════════════════════════════════════════╗' -ForegroundColor Green
-Write-Host '║     408Master ACR 镜像部署工具 v1.0            ║' -ForegroundColor Green
-Write-Host '╠═══════════════════════════════════════════════╣' -ForegroundColor Green
-Write-Host ('║  ACR:      {0,-34}║' -f "$AcrNamespace ($AcrRegion)") -ForegroundColor Green
-Write-Host ('║  Tag:      {0,-34}║' -f $Tag) -ForegroundColor Green
-Write-Host ('║  后端镜像: {0,-34}║' -f $BackendImage) -ForegroundColor Green
-Write-Host ('║  Nginx:    {0,-34}║' -f $NginxImage) -ForegroundColor Green
-Write-Host '╚═══════════════════════════════════════════════╝' -ForegroundColor Green
+Write-Host '╔══════════════════════════════════════════════════╗' -ForegroundColor Green
+Write-Host '║     408Master ACR 镜像部署工具 v1.1 (个人版)      ║' -ForegroundColor Green
+Write-Host '╠══════════════════════════════════════════════════╣' -ForegroundColor Green
+Write-Host ('║  ACR:      {0,-36}║' -f "$AcrNamespace/$AcrRepo ($AcrRegion)") -ForegroundColor Green
+Write-Host ('║  Tag:      {0,-36}║' -f $Tag) -ForegroundColor Green
+Write-Host ('║  后端镜像: {0,-36}║' -f "backend-${Tag}") -ForegroundColor Green
+Write-Host ('║  Nginx:    {0,-36}║' -f "nginx-${Tag}") -ForegroundColor Green
+Write-Host '╚══════════════════════════════════════════════════╝' -ForegroundColor Green
 
 switch ($Command) {
     'login'  { Invoke-Login }

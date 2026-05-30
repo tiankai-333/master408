@@ -1,0 +1,286 @@
+@startuml ER图
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam linetype ortho
+
+title 408Master 数据库 ER 图
+
+' ---- 用户域 ----
+entity "t_user\n用户" as user #E3F2FD {
+    * id : INT <<PK>>
+    --
+    user_uuid : VARCHAR(36)
+    user_name : VARCHAR(255) <<UK>>
+    password : VARCHAR(255)
+    real_name : VARCHAR(255)
+    role : INT  <<1学生/2教师/3管理员>>
+    status : INT
+    wx_open_id : VARCHAR(255)
+}
+
+entity "t_user_token\n会话令牌" as token {
+    * id : INT <<PK>>
+    --
+    token : VARCHAR(36)
+    user_id : INT <<FK>>
+    wx_open_id : VARCHAR(255)
+}
+
+entity "t_user_event_log\n用户事件日志" as user_log {
+    * id : INT <<PK>>
+    --
+    user_id : INT <<FK>>
+    content : TEXT
+}
+
+' ---- 学科域 ----
+entity "t_subject\n学科" as subject #FFF3E0 {
+    * id : INT <<PK>>
+    --
+    name : VARCHAR(255)
+    level : INT
+    item_order : INT
+}
+
+' ---- 题目域 ----
+entity "t_question\n题目" as question #E8F5E9 {
+    * id : INT <<PK>>
+    --
+    question_type : INT <<1单选/2多选/3判断/4填空/5简答>>
+    subject_id : INT <<FK>>
+    title : TEXT
+    options : TEXT
+    correct_answer : TEXT
+    analysis : TEXT
+    difficulty : INT <<1易/2中/3难>>
+    score : INT
+    create_user : INT <<FK>>
+    info_text_content_id : INT <<FK>>
+}
+
+entity "t_text_content\n富文本内容" as text_content {
+    * id : INT <<PK>>
+    --
+    content : TEXT
+    embedding : LONGTEXT
+}
+
+entity "question_content\n规范化题目版本" as q_content {
+    * id : INT <<PK>>
+    --
+    question_id : INT <<FK>>
+    version : INT
+    title : LONGTEXT
+    options : LONGTEXT
+    correct_answer : LONGTEXT
+    analysis : LONGTEXT
+    is_current : BIT
+}
+
+entity "question_knowledge_point\n题目-知识点关联" as q_kp {
+    * id : INT <<PK>>
+    --
+    question_id : INT <<FK>>
+    knowledge_point_id : INT <<FK>>
+    relevance : DECIMAL(3,2)
+}
+
+' ---- 试卷域 ----
+entity "t_exam_paper\n试卷" as paper #FCE4EC {
+    * id : INT <<PK>>
+    --
+    name : VARCHAR(255)
+    subject_id : INT <<FK>>
+    paper_type : INT
+    score : INT
+    question_count : INT
+    suggest_time : INT
+    frame_text_content_id : INT <<FK>>
+    create_user : INT <<FK>>
+    task_exam_id : INT <<FK>>
+}
+
+entity "t_exam_paper_answer\n答卷记录" as paper_answer {
+    * id : INT <<PK>>
+    --
+    exam_paper_id : INT <<FK>>
+    create_user : INT <<FK>>
+    system_score : INT
+    user_score : INT
+    paper_score : INT
+    do_time : INT
+    status : INT
+}
+
+entity "t_exam_paper_question_customer_answer\n逐题答题记录" as pq_answer {
+    * id : INT <<PK>>
+    --
+    question_id : INT <<FK>>
+    exam_paper_id : INT <<FK>>
+    exam_paper_answer_id : INT <<FK>>
+    customer_score : INT
+    question_score : INT
+    answer : VARCHAR(255)
+    do_right : BIT
+    create_user : INT <<FK>>
+}
+
+entity "t_task_exam\n考试任务" as task {
+    * id : INT <<PK>>
+    --
+    title : VARCHAR(255)
+    frame_text_content_id : INT <<FK>>
+    create_user : INT <<FK>>
+}
+
+' ---- 知识点域 ----
+entity "knowledge_point\n知识点" as kp #E1BEE7 {
+    * id : INT <<PK>>
+    --
+    name : VARCHAR(100)
+    subject_id : INT <<FK>>
+    parent_id : INT <<FK>> <<自引用>>
+    level : INT
+    sort_order : INT
+}
+
+entity "knowledge_content\n知识点内容" as kp_content {
+    * id : INT <<PK>>
+    --
+    knowledge_point_id : INT <<FK>> <<UK>>
+    summary_text : TEXT
+}
+
+entity "knowledge_point_relation\n知识点关系" as kp_relation {
+    * id : INT <<PK>>
+    --
+    source_knowledge_point_id : INT <<FK>>
+    target_knowledge_point_id : INT <<FK>>
+    relation_type : VARCHAR(30)
+    weight : DECIMAL(6,4)
+}
+
+' ---- 学习追踪域 ----
+entity "student_mistake_book\n错题本" as mistake #BBDEFB {
+    * id : BIGINT <<PK>>
+    --
+    user_id : INT <<FK>>
+    question_id : INT <<FK>>
+    knowledge_point_id : INT <<FK>>
+    mistake_reason : TEXT
+    status : VARCHAR(30)
+    wrong_count : INT
+}
+
+entity "student_learning_event\n学习事件" as learning_event {
+    * id : BIGINT <<PK>>
+    --
+    user_id : INT <<FK>>
+    event_type : VARCHAR(50)
+    question_id : INT <<FK>>
+    is_correct : BIT
+    score_rate : DECIMAL(6,4)
+    duration_seconds : INT
+}
+
+entity "student_knowledge_state\n知识掌握状态" as kp_state {
+    * id : BIGINT <<PK>>
+    --
+    user_id : INT <<FK>>
+    knowledge_point_id : INT <<FK>>
+    mastery : DECIMAL(6,4)
+    attempt_count : INT
+    correct_count : INT
+}
+
+entity "t_user_learning_profile\n学习画像" as profile {
+    * id : INT <<PK>>
+    --
+    user_id : INT <<UK>>
+    profile_summary : TEXT
+    strengths : TEXT
+    weaknesses : TEXT
+}
+
+' ---- AI 域 ----
+entity "ai_provider_config\nAI 供应商配置" as ai_provider {
+    * id : INT <<PK>>
+    --
+    provider_code : VARCHAR(50) <<UK>>
+    provider_name : VARCHAR(255)
+    api_base_url : VARCHAR(500)
+    chat_model : VARCHAR(100)
+    api_key_cipher : VARCHAR(500)
+    enabled : BIT
+}
+
+entity "ai_run_log\nAI 运行日志" as ai_log {
+    * id : BIGINT <<PK>>
+    --
+    user_id : INT <<FK>>
+    request_text : LONGTEXT
+    response_text : LONGTEXT
+    model_name : VARCHAR(100)
+    prompt_tokens : INT
+    latency_ms : INT
+}
+
+' ---- RAG 域 ----
+entity "rag_document\nRAG 文档" as rag_doc #F3E5F5 {
+    * id : BIGINT <<PK>>
+    --
+    document_type : VARCHAR(50)
+    title : VARCHAR(500)
+    subject_id : INT <<FK>>
+    status : VARCHAR(30)
+}
+
+entity "rag_chunk\n文本切片" as rag_chunk {
+    * id : BIGINT <<PK>>
+    --
+    document_id : BIGINT <<FK>>
+    content : LONGTEXT
+    token_count : INT
+    knowledge_point_id : INT <<FK>>
+}
+
+' ===== 关系 =====
+user ||--o{ token
+user ||--o{ user_log
+user ||--o{ profile
+user ||--o{ mistake
+user ||--o{ learning_event
+user ||--o{ kp_state
+user ||--o{ paper_answer
+user ||--o{ pq_answer
+user ||--o{ paper : "创建"
+
+subject ||--o{ question
+subject ||--o{ paper
+subject ||--o{ kp
+
+question ||--o{ q_content
+question ||--o{ q_kp
+question ||--o{ pq_answer
+question ||--o{ mistake
+question ||--o{ learning_event
+question }o--|| text_content
+
+paper ||--o{ paper_answer
+paper ||--o{ pq_answer
+paper }o--|| text_content
+paper }o--o| task
+
+paper_answer ||--o{ pq_answer
+
+kp ||--o| kp_content
+kp ||--o{ kp_relation
+kp ||--o{ q_kp
+kp ||--o{ kp_state
+kp ||--o{ mistake
+kp ||--o{ rag_chunk
+
+rag_doc ||--o{ rag_chunk
+
+@enduml

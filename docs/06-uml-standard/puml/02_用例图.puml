@@ -1,0 +1,121 @@
+@startuml 用例图
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+title 408Master 用例图
+
+left to right direction
+
+' ---- 参与者 ----
+actor "学生" as student #E3F2FD
+actor "管理员" as admin #FFF3E0
+actor "微信用户" as wx_user #E8F5E9
+
+' ---- 学生用例 ----
+rectangle "学生端" as student_pkg {
+    usecase "登录/注册" as UC_S01
+    usecase "查看仪表盘" as UC_S02
+    usecase "浏览试卷列表" as UC_S03
+    usecase "参加考试" as UC_S04
+    usecase "查看答题结果" as UC_S05
+    usecase "浏览题目" as UC_S06
+    usecase "AI 题目解析" as UC_S07
+    usecase "AI 工作台对话" as UC_S08
+    usecase "查看知识图谱" as UC_S09
+    usecase "错题本管理" as UC_S10
+    usecase "答题记录查询" as UC_S11
+    usecase "AI 智能组卷" as UC_S12
+    usecase "AI 练习规划" as UC_S13
+    usecase "配置 AI 密钥" as UC_S14
+    usecase "个人中心" as UC_S15
+}
+
+' ---- 管理员用例 ----
+rectangle "管理端" as admin_pkg {
+    usecase "管理后台登录" as UC_A01
+    usecase "管理数据面板" as UC_A02
+    usecase "用户管理" as UC_A03
+    usecase "学科管理" as UC_A04
+    usecase "题目管理\n(增删改查/导入)" as UC_A05
+    usecase "试卷管理\n(创建/编辑/发布)" as UC_A06
+    usecase "任务管理\n(布置考试)" as UC_A07
+    usecase "批阅答卷" as UC_A08
+    usecase "消息通知" as UC_A09
+    usecase "AI 提示词模板管理" as UC_A10
+    usecase "AI 知识库管理" as UC_A11
+    usecase "AI 供应商配置" as UC_A12
+    usecase "AI 调优日志" as UC_A13
+}
+
+' ---- 小程序用例 ----
+rectangle "小程序端" as wx_pkg {
+    usecase "微信授权登录" as UC_W01
+    usecase "参加考试" as UC_W02
+    usecase "查看答题结果" as UC_W03
+    usecase "AI 题目解析" as UC_W04
+    usecase "错题本" as UC_W05
+    usecase "知识图谱" as UC_W06
+    usecase "AI 工作台" as UC_W07
+    usecase "学习日历" as UC_W08
+    usecase "练习模式" as UC_W09
+    usecase "AI 生成试卷" as UC_W10
+}
+
+' ---- 学生关系 ----
+student --> UC_S01
+student --> UC_S02
+student --> UC_S03
+student --> UC_S04
+student --> UC_S05
+student --> UC_S06
+student --> UC_S07
+student --> UC_S08
+student --> UC_S09
+student --> UC_S10
+student --> UC_S11
+student --> UC_S12
+student --> UC_S13
+student --> UC_S14
+student --> UC_S15
+
+UC_S07 ..> UC_S08 : <<extend>>
+UC_S12 ..> UC_S08 : <<extend>>
+UC_S13 ..> UC_S08 : <<extend>>
+
+' ---- 管理员关系 ----
+admin --> UC_A01
+admin --> UC_A02
+admin --> UC_A03
+admin --> UC_A04
+admin --> UC_A05
+admin --> UC_A06
+admin --> UC_A07
+admin --> UC_A08
+admin --> UC_A09
+admin --> UC_A10
+admin --> UC_A11
+admin --> UC_A12
+admin --> UC_A13
+
+UC_A06 ..> UC_A05 : <<include>>
+UC_A07 ..> UC_A06 : <<include>>
+UC_A08 ..> UC_A06 : <<include>>
+
+' ---- 小程序关系 ----
+wx_user --> UC_W01
+wx_user --> UC_W02
+wx_user --> UC_W03
+wx_user --> UC_W04
+wx_user --> UC_W05
+wx_user --> UC_W06
+wx_user --> UC_W07
+wx_user --> UC_W08
+wx_user --> UC_W09
+wx_user --> UC_W10
+
+UC_W04 ..> UC_W07 : <<extend>>
+UC_W10 ..> UC_W07 : <<extend>>
+
+@enduml

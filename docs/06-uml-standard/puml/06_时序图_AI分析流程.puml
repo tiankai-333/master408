@@ -1,0 +1,64 @@
+@startuml 时序图_AI分析流程
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+title 408Master AI 工作台分析流程时序图
+
+actor 学生 as student #E3F2FD
+participant "学生端\nVue 3" as vue
+participant "Nginx" as nginx
+participant "AiWorkbenchController\n/AIAnalysisController" as controller
+participant "AiOrchestratorService\nAI 编排器" as orchestrator
+participant "AiIntentRouter\n意图路由" as router
+participant "AnalysisService\n分析服务" as analysis
+participant "RagService\nRAG 检索" as rag
+participant "StudentGraphService\n学习画像" as profile
+database "MySQL" as mysql
+database "Qdrant\n向量库" as qdrant
+participant "智谱 GLM\nChat API" as glm
+
+== 1. 发起 AI 分析 ==
+student -> vue : 点击「AI 解析」或\n在工作台输入问题
+vue -> nginx : GET /api/student/ai/workbench/stream\n(Accept: text/event-stream)
+nginx -> controller : stream(request)
+controller -> orchestrator : streamChat(request)
+
+== 2. 意图识别 ==
+orchestrator -> router : classifyIntent(query)
+router --> orchestrator : intent=explain_question\n(或 explain_knowledge /\ncompose_paper / ...)
+
+== 3. RAG 知识检索 ==
+orchestrator -> rag : retrieve(query, topK=5)
+rag -> qdrant : search(embedding,\ncollection=xzs_408_chunks)
+qdrant --> rag : Top-K 相关知识切片
+rag -> mysql : INSERT rag_retrieval_log\n(检索日志)
+rag --> orchestrator : List<RagChunk>\n(相关知识内容)
+
+== 4. 加载学生画像 ==
+orchestrator -> profile : getProfile(userId)
+profile -> mysql : SELECT student_knowledge_state\n+ student_learning_event
+mysql --> profile : 掌握度、薄弱点
+profile --> orchestrator : 学习画像数据
+
+== 5. 构建 Prompt 并调用 LLM ==
+orchestrator -> orchestrator : 组装 Prompt\n(系统提示 + 知识切片\n+ 画像 + 用户问题)
+orchestrator -> analysis : analyzeStream(prompt)
+analysis -> mysql : SELECT ai_provider_config\nWHERE enabled=1
+mysql --> analysis : GLM 配置
+analysis -> glm : POST /v4/chat/completions\n(stream=true)
+glm --> analysis : SSE token 流
+analysis --> orchestrator : Flux<String>
+
+== 6. 流式响应 ==
+orchestrator --> controller : Flux<String>
+controller --> nginx : SSE data: {...}
+nginx --> vue : SSE 流式数据
+vue --> student : 逐字显示 AI 回复
+
+== 7. 记录日志 ==
+orchestrator -> mysql : INSERT ai_run_log\n(请求/响应/Token数/耗时)
+orchestrator -> mysql : INSERT rag_answer_citation\n(引用的知识切片)
+orchestrator -> mysql : INSERT student_learning_event\n(AI 交互事件)
+
+@enduml

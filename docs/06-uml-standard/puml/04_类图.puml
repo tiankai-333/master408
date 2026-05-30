@@ -1,0 +1,267 @@
+@startuml 类图
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+title 408Master 核心类图
+
+' ==== 用户域 ====
+package "用户域" #E3F2FD {
+    class User {
+        - id : Integer
+        - userUuid : String
+        - userName : String
+        - password : String
+        - realName : String
+        - role : Integer
+        - status : Integer
+        - wxOpenId : String
+        + getUserId() : Integer
+        + isAdmin() : boolean
+        + isStudent() : boolean
+    }
+
+    class UserToken {
+        - id : Integer
+        - token : String
+        - userId : Integer
+        - wxOpenId : String
+    }
+
+    class RoleEnum {
+        STUDENT = 1
+        TEACHER = 2
+        ADMIN = 3
+    }
+}
+
+' ==== 学科域 ====
+package "学科域" #FFF3E0 {
+    class Subject {
+        - id : Integer
+        - name : String
+        - level : Integer
+        - itemName : String
+    }
+}
+
+' ==== 题目域 ====
+package "题目域" #E8F5E9 {
+    class Question {
+        - id : Integer
+        - questionType : Integer
+        - subjectId : Integer
+        - title : String
+        - options : String
+        - correctAnswer : String
+        - analysis : String
+        - difficulty : Integer
+        - score : Integer
+        - infoTextContentId : Integer
+    }
+
+    class QuestionTypeEnum {
+        SingleChoice = 1
+        MultipleChoice = 2
+        TrueFalse = 3
+        GapFilling = 4
+        ShortAnswer = 5
+    }
+
+    class QuestionContent {
+        - id : Integer
+        - questionId : Integer
+        - version : Integer
+        - title : String
+        - correctAnswer : String
+        - isCurrent : Boolean
+    }
+
+    class QuestionItemObject {
+        - id : Integer
+        - content : String
+        - score : Integer
+    }
+}
+
+' ==== 试卷域 ====
+package "试卷域" #FCE4EC {
+    class ExamPaper {
+        - id : Integer
+        - name : String
+        - subjectId : Integer
+        - paperType : Integer
+        - score : Integer
+        - questionCount : Integer
+        - suggestTime : Integer
+        - frameTextContentId : Integer
+    }
+
+    class ExamPaperAnswer {
+        - id : Integer
+        - examPaperId : Integer
+        - createUser : Integer
+        - systemScore : Integer
+        - userScore : Integer
+        - paperScore : Integer
+        - doTime : Integer
+        - status : Integer
+    }
+
+    class ExamPaperQuestionCustomerAnswer {
+        - id : Integer
+        - questionId : Integer
+        - examPaperId : Integer
+        - examPaperAnswerId : Integer
+        - answer : String
+        - customerScore : Integer
+        - doRight : Boolean
+    }
+
+    class TaskExam {
+        - id : Integer
+        - title : String
+        - gradeLevel : Integer
+    }
+}
+
+' ==== 知识点域 ====
+package "知识点域" #E1BEE7 {
+    class KnowledgePoint {
+        - id : Integer
+        - name : String
+        - subjectId : Integer
+        - parentId : Integer
+        - level : Integer
+        - sortOrder : Integer
+    }
+
+    class KnowledgePointRelation {
+        - id : Integer
+        - sourceKpId : Integer
+        - targetKpId : Integer
+        - relationType : String
+        - weight : BigDecimal
+    }
+
+    class KnowledgeContent {
+        - id : Integer
+        - knowledgePointId : Integer
+        - summaryText : String
+    }
+}
+
+' ==== 学习追踪域 ====
+package "学习追踪域" #BBDEFB {
+    class StudentMistakeBook {
+        - id : Long
+        - userId : Integer
+        - questionId : Integer
+        - knowledgePointId : Integer
+        - mistakeReason : String
+        - status : String
+        - wrongCount : Integer
+    }
+
+    class StudentLearningEvent {
+        - id : Long
+        - userId : Integer
+        - eventType : String
+        - questionId : Integer
+        - isCorrect : Boolean
+        - scoreRate : BigDecimal
+        - durationSeconds : Integer
+    }
+
+    class StudentKnowledgeState {
+        - id : Long
+        - userId : Integer
+        - knowledgePointId : Integer
+        - mastery : BigDecimal
+        - correctCount : Integer
+        - wrongCount : Integer
+    }
+
+    class UserLearningProfile {
+        - id : Integer
+        - userId : Integer
+        - profileSummary : String
+        - strengths : String
+        - weaknesses : String
+    }
+}
+
+' ==== AI 域 ====
+package "AI 智能域" #F3E5F5 {
+    class AiOrchestratorService {
+        + orchestrate(request) : AiResponse
+        + streamChat(request) : Flux<String>
+    }
+
+    class AiIntentRouter {
+        + classifyIntent(query) : AiIntent
+    }
+
+    class AnalysisService {
+        - promptTemplates : Map
+        + analyze(question, style) : String
+        + analyzeStream(question, style) : Flux<String>
+    }
+
+    class RagService {
+        + retrieve(query, topK) : List<RagChunk>
+        + embed(text) : float[]
+    }
+
+    class AiPromptTemplate {
+        - id : Integer
+        - style : String
+        - name : String
+        - systemPrompt : String
+        - userPromptTemplate : String
+    }
+
+    class AiProviderConfig {
+        - id : Integer
+        - providerCode : String
+        - apiBaseUrl : String
+        - chatModel : String
+        - enabled : Boolean
+    }
+}
+
+' ==== 关系 ====
+User "1" -- "0..*" UserToken : owns
+User "1" -- "0..*" ExamPaper : creates
+User "1" -- "0..*" ExamPaperAnswer : submits
+User "1" -- "0..*" StudentMistakeBook : has
+User "1" -- "0..*" StudentLearningEvent : generates
+User "1" -- "0..1" UserLearningProfile : has
+User --> RoleEnum
+
+Subject "1" -- "0..*" Question : contains
+Subject "1" -- "0..*" ExamPaper : covers
+Subject "1" -- "0..*" KnowledgePoint : has
+
+Question "1" -- "0..*" QuestionContent : versions
+Question "1" -- "0..*" ExamPaperQuestionCustomerAnswer : answered_in
+Question "1" -- "0..*" StudentMistakeBook : appears_in
+Question --> QuestionTypeEnum
+
+ExamPaper "1" -- "0..*" ExamPaperAnswer : has
+ExamPaper "1" -- "0..*" ExamPaperQuestionCustomerAnswer : contains
+ExamPaperAnswer "1" -- "0..*" ExamPaperQuestionCustomerAnswer : includes
+
+KnowledgePoint "1" -- "0..1" KnowledgeContent : has
+KnowledgePoint "1" -- "0..*" KnowledgePointRelation : relates
+KnowledgePoint "1" -- "0..*" StudentKnowledgeState : tracked_by
+KnowledgePoint --> KnowledgePoint : parent
+
+AiOrchestratorService --> AiIntentRouter : uses
+AiOrchestratorService --> AnalysisService : delegates
+AiOrchestratorService --> RagService : retrieves
+AnalysisService --> AiPromptTemplate : loads
+AnalysisService --> AiProviderConfig : calls
+
+@enduml

@@ -1,0 +1,95 @@
+@startuml 部署图
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+title 408Master 部署图 (Docker Compose)
+
+' ---- 云服务器 ----
+node "云服务器 (ECS)\nUbuntu / CentOS" as server #E8F5E9 {
+
+    node "Docker Engine" as docker {
+
+        artifact "Nginx 容器\nxzs-nginx" as nginx_container #FFF3E0 {
+            component [Nginx 1.25\n反向代理] as nginx
+            component [静态资源\nstudent / admin] as static_files
+        }
+
+        artifact "后端容器\nxzs-backend" as backend_container #E3F2FD {
+            component [Spring Boot\nJDK 17\n端口 8000] as backend
+        }
+
+        artifact "MySQL 容器\nxzs-mysql" as mysql_container #FCE4EC {
+            database "MySQL 8.0\n端口 3306\n数据库 xzs" as mysql
+        }
+
+        artifact "Qdrant 容器\nxzs-qdrant" as qdrant_container #E1BEE7 {
+            database "Qdrant\n端口 6333\n集合 xzs_408_chunks" as qdrant
+        }
+
+        artifact "Docker 网络\nxzs-net (bridge)" as network {
+        }
+    }
+
+    folder "/opt/xzs-deploy" as deploy_dir {
+        folder "mysql-data/" as mysql_vol
+        folder "qdrant-data/" as qdrant_vol
+        file "docker-compose.yml" as compose
+    }
+}
+
+' ---- 本地开发机 ----
+node "本地开发机\nWindows" as local #BBDEFB {
+    artifact "Docker Desktop" as local_docker {
+    }
+    folder "deploy/" as local_deploy {
+        file "Dockerfile" as dockerfile
+        file "Dockerfile.nginx" as nginx_dockerfile
+        file ".env.acr" as env_acr
+    }
+}
+
+' ---- 阿里云 ACR ----
+cloud "阿里云 ACR 个人版\ncn-hangzhou" as acr #F3E5F5 {
+    artifact "408master 仓库" as acr_repo {
+        component [backend-20260530] as acr_backend
+        component [nginx-20260530] as acr_nginx
+    }
+}
+
+' ---- 外部 AI 服务 ----
+cloud "智谱 AI\nopen.bigmodel.cn" as zhipu {
+    component [GLM Chat API] as glm_api
+    component [Embedding API] as embed_api
+}
+
+' ---- 用户 ----
+actor "学生" as student_user
+actor "管理员" as admin_user
+actor "微信用户" as wx_user
+
+' ---- 用户到服务器 ----
+student_user --> nginx_container : http://ip/student/\n(浏览器)
+admin_user --> nginx_container : http://ip/admin/\n(浏览器)
+wx_user --> nginx_container : https://ip/api/wx/\n(小程序)
+
+' ---- 容器间通信 ----
+nginx --> backend : proxy_pass\n/api -> :8000
+nginx --> static_files : 静态文件
+
+backend --> mysql : JDBC\nmysql:3306/xzs
+backend --> qdrant : HTTP\nqdrant:6333
+backend --> glm_api : HTTPS\n/v4/chat/completions
+backend --> embed_api : HTTPS\n/v4/embeddings
+
+' ---- 数据卷挂载 ----
+mysql_container --> mysql_vol : /var/lib/mysql
+qdrant_container --> qdrant_vol : /qdrant/storage
+
+' ---- 本地到 ACR ----
+local_docker --> acr_repo : docker push\n(镜像推送)
+acr_repo --> mysql_container : 不涉及
+acr_repo --> backend_container : docker pull\n(镜像拉取)
+acr_repo --> nginx_container : docker pull\n(镜像拉取)
+
+@enduml

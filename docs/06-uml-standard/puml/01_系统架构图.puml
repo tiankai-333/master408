@@ -1,0 +1,105 @@
+@startuml 系统架构图
+!theme plain
+skinparam componentStyle rectangle
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+title 408Master 系统架构图
+
+' ---- 客户端 ----
+package "客户端" as client #E3F2FD {
+    [Web 学生端\nVue 3 + Vite] as student_web
+    [Web 管理端\nVue 3 + Vite] as admin_web
+    [微信小程序\nWXML + WXSS] as wx_mini
+}
+
+' ---- 网关层 ----
+package "网关层" as gateway #FFF3E0 {
+    [Nginx\n反向代理 + 静态资源] as nginx
+}
+
+' ---- 应用层 ----
+package "应用层" as app #E8F5E9 {
+    package "Spring Boot 后端" as backend {
+        [学生 API\ncontroller/student] as student_api
+        [管理 API\ncontroller/admin] as admin_api
+        [小程序 API\ncontroller/wx] as wx_api
+    }
+
+    package "核心业务服务" as services {
+        [考试服务\nExamPaperService] as exam_svc
+        [题目服务\nQuestionService] as question_svc
+        [用户服务\nUserService] as user_svc
+    }
+
+    package "AI 智能服务" as ai_services {
+        [AI 编排器\nAiOrchestratorService] as orchestrator
+        [意图路由\nAiIntentRouter] as intent_router
+        [分析服务\nAnalysisService] as analysis_svc
+        [RAG 检索\nRagService] as rag_svc
+        [组卷服务\nAiPaperComposeService] as paper_svc
+        [练习规划\nAiAgentPlannerService] as planner_svc
+    }
+
+    package "学习追踪服务" as learning_services {
+        [知识图谱\nKnowledgeGraphService] as kg_svc
+        [学习画像\nStudentGraphService] as profile_svc
+        [错题本\nMistakeBookService] as mistake_svc
+    }
+}
+
+' ---- 数据层 ----
+package "数据层" as data #FCE4EC {
+    database "MySQL 8.0\n关系数据" as mysql {
+        [用户/题目/试卷\n答题记录/错题本]
+    }
+    database "Qdrant\n向量数据库" as qdrant {
+        [知识切片向量\nRAG Embeddings]
+    }
+}
+
+' ---- 外部 AI ----
+package "外部 AI 服务" as external #F3E5F5 {
+    [智谱 GLM\nChat API] as glm_chat
+    [智谱 Embedding\n向量编码] as glm_embed
+}
+
+' ---- 关系 ----
+student_web --> nginx : HTTP
+admin_web --> nginx : HTTP
+wx_mini --> nginx : HTTPS
+
+nginx --> student_api : /api/student/**
+nginx --> admin_api : /api/admin/**
+nginx --> wx_api : /api/wx/**
+
+student_api --> exam_svc
+student_api --> question_svc
+student_api --> orchestrator
+student_api --> kg_svc
+
+admin_api --> exam_svc
+admin_api --> question_svc
+admin_api --> user_svc
+
+wx_api --> exam_svc
+wx_api --> orchestrator
+
+orchestrator --> intent_router
+intent_router --> analysis_svc : 题目解析
+intent_router --> rag_svc : 知识检索
+intent_router --> planner_svc : 练习规划
+intent_router --> paper_svc : 智能组卷
+
+analysis_svc --> glm_chat
+rag_svc --> glm_embed
+rag_svc --> qdrant
+
+exam_svc --> mysql
+question_svc --> mysql
+user_svc --> mysql
+kg_svc --> mysql
+profile_svc --> mysql
+mistake_svc --> mysql
+
+@enduml

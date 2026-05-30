@@ -1,0 +1,76 @@
+@startuml 时序图_答题流程
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+title 408Master 答题流程时序图
+
+actor 学生 as student #E3F2FD
+participant "学生端\nVue 3" as vue
+participant "Nginx" as nginx
+participant "后端\nExamPaperController" as controller
+participant "ExamPaperService" as paper_svc
+participant "QuestionService" as question_svc
+participant "ExamPaperAnswerService" as answer_svc
+database "MySQL" as mysql
+
+== 1. 浏览试卷列表 ==
+student -> vue : 进入试卷中心
+vue -> nginx : GET /api/student/exam/paper/page
+nginx -> controller : page()
+controller -> paper_svc : page(request)
+paper_svc -> mysql : SELECT t_exam_paper\nWHERE deleted=0
+mysql --> paper_svc : 试卷列表
+paper_svc --> controller : PageInfo<ExamPaper>
+controller --> nginx : RestResponse
+nginx --> vue : JSON
+vue --> student : 展示试卷列表
+
+== 2. 开始考试 ==
+student -> vue : 点击「开始考试」
+vue -> nginx : POST /api/student/exam/paper/select/45
+nginx -> controller : select(45)
+controller -> paper_svc : select(45)
+paper_svc -> mysql : SELECT t_exam_paper\nWHERE id=45
+mysql --> paper_svc : 试卷信息(含题目JSON)
+paper_svc --> controller : ExamPaperVO
+controller --> nginx : RestResponse<ExamPaperVO>
+nginx --> vue : 试卷+题目数据
+vue --> student : 进入答题页面\n显示题目+选项
+
+== 3. 提交答题 ==
+student -> vue : 逐题作答后点击「提交」
+vue -> nginx : POST /api/student/exam/paper/answer/answerSubmit
+nginx -> controller : answerSubmit(answerVO)
+controller -> answer_svc : answerSubmit(answerVO)
+
+answer_svc -> mysql : INSERT t_exam_paper_answer\n(总分、用时、状态)
+answer_svc -> mysql : INSERT t_exam_paper_question_customer_answer\n(逐题答案、得分)
+
+' 客观题自动判分
+answer_svc -> question_svc : judgeQuestion(answer)
+question_svc -> mysql : SELECT correct_answer\nFROM t_question
+question_svc --> answer_svc : 判分结果
+
+' 更新学习事件
+answer_svc -> mysql : INSERT student_learning_event\n(答题事件、正确率、耗时)
+answer_svc -> mysql : INSERT/UPDATE student_mistake_book\n(错题记录，如答错)
+
+answer_svc --> controller : 提交结果
+controller --> nginx : RestResponse
+nginx --> vue : 提交成功
+vue --> student : 显示得分结果
+
+== 4. 查看答卷详情 ==
+student -> vue : 点击「查看结果」
+vue -> nginx : POST /api/student/exam/paper/read/45
+nginx -> controller : read(45)
+controller -> answer_svc : read(45)
+answer_svc -> mysql : SELECT t_exam_paper_answer\n+ t_exam_paper_question_customer_answer
+mysql --> answer_svc : 答题详情
+answer_svc --> controller : ExamPaperReadVO
+controller --> nginx : RestResponse
+nginx --> vue : 逐题答案+正确答案+解析
+vue --> student : 展示答题报告
+
+@enduml
