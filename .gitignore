@@ -66,3 +66,5 @@ deploy/*.jar
 # Python cache
 __pycache__/
 *.pyc
+database/backup/*.sql
+database/current/source.sql
