@@ -1,0 +1,24 @@
+<text class="i-class i-icon" style="font-size: {{size}}px; {{color ? 'color: ' + color : ''}}">{{iconMap[type] || ''}}</text>
+
+<wxs module="iconMap">
+module.exports = {
+    "success": "✓",
+    "success_no_circle": "✓",
+    "info": "ⓘ",
+    "warn": "⚠",
+    "waiting": "⏳",
+    "clear": "✖",
+    "search": "⌕",
+    "close": "✖",
+    "collection": "☆",
+    "collection_fill": "★",
+    "like": "♡",
+    "like_fill": "♥",
+    "star": "☆",
+    "star_fill": "★",
+    "delete": "✖",
+    "prompt": "❓",
+    "download": "⬇",
+    "refresh": "↻"
+}
+</wxs>

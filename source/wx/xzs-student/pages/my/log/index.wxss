@@ -1,6 +1,4 @@
 /* pages/user/log/index.wxss */
-@import '/component/iView/steps/index.wxss';
-@import '/component/iView/step/index.wxss';
 
 .i-step-ico {
   background: #fff !important;
