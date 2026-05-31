@@ -534,6 +534,11 @@ Mermaid 很适合在网页中快速渲染图，但它不是完整 UML 工具。�
 | `puml/rag-class.puml` | 标准 RAG 类图 |
 | `puml/ai-runtime-class.puml` | 标准 AI Runtime 类图 |
 | `puml/deployment.puml` | 标准部署图 |
+| `puml/12_时序图_微信小程序认证.puml` | 小程序认证时序图 |
+| `puml/13_时序图_知识图谱.puml` | 知识图谱时序图 |
+| `puml/14_时序图_AI组卷流程.puml` | 小程序 AI 组卷时序图 |
+| `puml/15_活动图_小程序学习流程.puml` | 小程序学生学习活动图 |
+| `puml/16_状态图_小程序页面导航.puml` | 小程序页面导航状态图 |
 
 ## 12. 检查清单
 

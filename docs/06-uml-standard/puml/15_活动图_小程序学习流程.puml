@@ -1,0 +1,86 @@
+@startuml 活动图_小程序学习流程
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam ActivityDiamondFontSize 13
+skinparam ActivityFontSize 13
+
+title 408Master 微信小程序学生学习活动图
+
+start
+
+:打开小程序;
+:wx.login() 获取 code;
+
+if (已绑定账号?) then (是)
+  :自动登录获取 token;
+else (否)
+  :跳转绑定页;
+  :输入用户名+密码;
+  :POST /auth/bind;
+  :保存 token;
+endif
+
+:进入首页(4 Tab);
+
+partition "练习刷题" {
+  :切换到「练习」Tab;
+  :浏览试卷列表;
+  :选择试卷开始考试;
+  :逐题作答(单选/多选/判断/填空/简答);
+  :提交试卷;
+  :查看得分结果;
+  :查看答题详情(逐题解析);
+}
+
+partition "AI 智能助手" {
+  :切换到「AI」Tab;
+  :选择科目;
+  :选择知识点(可选);
+
+  fork
+    :AI自由对话;
+    :输入问题;
+    :POST /ai/workbench;
+    :渲染AI回答(Markdown);
+  fork again
+    :点击「AI组卷」;
+    :选择题目数量(1~10道);
+    :POST /ai/agent/plan;
+    :查看练习草案;
+    :确认生成;
+    :进入答题页;
+  fork again
+    :点击「画像」;
+    :发送学习画像分析请求;
+    :查看薄弱知识点+复习建议;
+  end fork
+}
+
+partition "知识图谱" {
+  :浏览知识目录;
+  :按科目筛选知识点;
+  :搜索知识点;
+  :查看知识点详情(摘要、关联题目);
+}
+
+partition "错题本" {
+  :浏览错题列表;
+  :选择错题查看详情;
+  :查看题目+我的答案+正确答案;
+  fork
+    :请求AI分析错题;
+  fork again
+    :重新作答;
+  end fork
+}
+
+partition "个人中心" {
+  :查看个人信息;
+  :查看做题记录;
+  :查看消息通知;
+}
+
+stop
+
+@enduml

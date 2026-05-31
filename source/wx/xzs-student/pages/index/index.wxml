@@ -1,7 +1,14 @@
 <view class="home-page">
 
-  <!-- 问候 -->
-  <view class="greeting">{{greeting}}</view>
+  <!-- 问候 + 天气 -->
+  <view class="greeting-row">
+    <text class="greeting">{{greeting}}</text>
+    <picker wx:if="{{weather}}" mode="selector" range="{{cityList}}" value="{{cityIndex}}" bindchange="onCityChange">
+      <view class="weather-badge">
+        <text>{{weather.icon}} {{weather.temperature}}° {{weather.city}} ▾</text>
+      </view>
+    </picker>
+  </view>
 
   <!-- 学习概览 -->
   <view class="stats-bar" wx:if="{{userStats}}">

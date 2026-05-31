@@ -5,6 +5,10 @@ Page({
     spinShow: false,
     userStats: null,
     greeting: '',
+    weather: null,
+    selectedCity: '松江区',
+    cityIndex: 0,
+    cityList: ['松江区','浦东新区','黄浦区','徐汇区','长宁区','静安区','普陀区','虹口区','杨浦区','闵行区','宝山区','嘉定区','金山区','青浦区','奉贤区','崇明区','北京市','广州市','深圳市','杭州市','南京市','成都市','武汉市','西安市','重庆市','苏州市','天津市','长沙市','合肥市'],
     weekdays: ['日', '一', '二', '三', '四', '五', '六'],
     weekDays: [],
     weekLabel: '',
@@ -18,13 +22,16 @@ Page({
     var now = new Date()
     var h = now.getHours()
     var g = h >= 6 && h < 12 ? '早上好 ☀️' : h >= 12 && h < 14 ? '中午好 🌤' : h >= 14 && h < 18 ? '下午好 🌅' : '晚上好 🌙'
-    this.setData({ selectedDate: this.formatDate(now), greeting: g })
+    var city = wx.getStorageSync('selectedCity') || '松江区'
+    var idx = this.data.cityList.indexOf(city)
+    this.setData({ selectedDate: this.formatDate(now), greeting: g, selectedCity: city, cityIndex: idx >= 0 ? idx : 0 })
     this.buildWeek(0)
   },
 
   onShow: function () {
     this.loadMonthData()
     this.loadUserStats()
+    this.loadWeather()
   },
 
   formatDate: function (d) {
@@ -135,6 +142,35 @@ Page({
 
   updateDayDetail: function () {
     this.setData({ dayDetail: this.data.monthData[this.data.selectedDate] || null })
+  },
+
+  // ====== Weather ======
+
+  loadWeather: function () {
+    var city = this.data.selectedCity
+    var cacheKey = 'weather_' + city
+    var cached = wx.getStorageSync(cacheKey)
+    if (cached && cached.timestamp && Date.now() - cached.timestamp < 30 * 60 * 1000) {
+      this.setData({ weather: cached.data })
+      return
+    }
+    var _this = this
+    app.formPost('/api/wx/student/weather/current', { city: city }).then(function (res) {
+      if (res.code === 1) {
+        _this.setData({ weather: res.response })
+        wx.setStorageSync(cacheKey, { data: res.response, timestamp: Date.now() })
+      }
+    }).catch(function (e) {
+      console.error('[weather] failed:', e)
+    })
+  },
+
+  onCityChange: function (e) {
+    var idx = e.detail.value
+    var city = this.data.cityList[idx]
+    wx.setStorageSync('selectedCity', city)
+    this.setData({ selectedCity: city, cityIndex: idx, weather: null })
+    this.loadWeather()
   },
 
   // ====== Navigation ======

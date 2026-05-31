@@ -4,8 +4,7 @@
     "i-cell": "/component/iView/cell/index",
     "i-load-more": "/component/iView/load-more/index",
     "i-message": "/component/iView/message/index",
-    "i-spin": "/component/iView/spin/index",
-    "i-tag": "/component/iView/tag/index"
+    "i-spin": "/component/iView/spin/index"
   },
   "enablePullDownRefresh": true,
   "navigationBarTitleText": "错题本"

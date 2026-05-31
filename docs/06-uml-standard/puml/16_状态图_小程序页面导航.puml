@@ -1,0 +1,84 @@
+@startuml 状态图_小程序页面导航
+!theme plain
+skinparam backgroundColor #FEFAFE
+skinparam shadowing false
+
+skinparam state {
+  BackgroundColor<<tab>> #E0E7FF
+  BackgroundColor<<page>> #F3F4F6
+  BackgroundColor<<modal>> #FFF7ED
+  BackgroundColor<<result>> #ECFDF5
+}
+
+title 408Master 微信小程序页面导航状态图
+
+state "首页\npages/index/index" as home <<tab>>
+state "练习\npages/practice/index" as practice <<tab>>
+state "AI工作台\npages/ai-workbench/index" as aiWorkbench <<tab>>
+state "我的\npages/my/index/index" as my <<tab>>
+
+state "试卷列表\npages/exam/index/index" as examIndex <<page>>
+state "答题页\npages/exam/do/index" as examDo <<page>>
+state "答卷详情\npages/exam/read/index" as examRead <<page>>
+state "做题记录\npages/record/index" as record <<page>>
+
+state "错题列表\npages/error-book/index/index" as errorBook <<page>>
+state "错题详情\npages/error-book/detail/index" as errorDetail <<page>>
+
+state "知识目录\npages/knowledge/index/index" as knowledgeIndex <<page>>
+state "知识点详情\npages/knowledge/detail/index" as knowledgeDetail <<page>>
+
+state "AI分析页\npages/ai-analyze/index/index" as aiAnalyze <<page>>
+
+state "组卷弹窗\n(composeVisible)" as composeModal <<modal>>
+state "科目选择弹窗" as subjectModal <<modal>>
+state "知识点选择弹窗" as knowledgeModal <<modal>>
+
+state "答题结果弹窗\n(得分)" as resultModal <<result>>
+
+state "个人信息\npages/my/info/index" as myInfo <<page>>
+state "消息列表\npages/my/message/list/index" as msgList <<page>>
+
+state "绑定页\npages/user/bind/index" as bindPage <<page>>
+
+[*] --> home : 启动小程序\napp.js onLoad
+
+home --> bindPage : 未绑定
+bindPage --> home : 绑定成功
+
+home --> practice : Tab「练习」
+home --> aiWorkbench : Tab「AI」
+home --> my : Tab「我的」
+
+practice --> home : Tab「首页」
+aiWorkbench --> home : Tab「首页」
+my --> home : Tab「首页」
+practice --> aiWorkbench : Tab「AI」
+aiWorkbench --> practice : Tab「练习」
+my --> aiWorkbench : Tab「AI」
+aiWorkbench --> my : Tab「我的」
+practice --> my : Tab「我的」
+my --> practice : Tab「练习」
+
+home --> examIndex : 点击试卷
+examIndex --> examDo : 开始考试
+examDo --> examRead : 提交后查看详情
+examDo --> resultModal : 提交成功
+
+home --> errorBook : 点击错题本
+errorBook --> errorDetail : 选择错题
+errorDetail --> aiAnalyze : AI分析错题
+
+home --> knowledgeIndex : 点击知识目录
+knowledgeIndex --> knowledgeDetail : 选择知识点
+
+aiWorkbench --> subjectModal : 点击科目行
+aiWorkbench --> knowledgeModal : 点击知识点行
+aiWorkbench --> composeModal : 点击AI组卷
+composeModal --> examDo : 确认生成\nnavigateTo
+
+my --> myInfo : 个人信息
+my --> msgList : 消息
+my --> record : 做题记录
+
+@enduml

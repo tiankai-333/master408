@@ -1,0 +1,87 @@
+@startuml 时序图_AI组卷流程
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+title 408Master 微信小程序 AI 组卷流程时序图
+
+actor "学生" as student #E3F2FD
+participant "AI工作台\n(WXML)" as wx
+participant "WxStudentController\n/api/wx/student" as api
+participant "AiPaperComposeService" as composeSvc
+participant "ExamPaperService" as paperSvc
+database "MySQL" as mysql
+entity "AI Provider" as llm
+
+== 1. 选择科目与知识点 ==
+
+student -> wx : 打开AI工作台
+wx -> api : POST /api/wx/student/subject/list
+api --> wx : 科目列表
+student -> wx : 选择科目
+wx -> api : POST /api/wx/student/knowledge-graph/graph
+api --> wx : 知识图谱(节点+分类)
+student -> wx : 选择知识点
+
+== 2. 发起组卷 ==
+
+student -> wx : 点击「AI组卷」
+wx -> wx : 弹出数量选择弹窗\n(步进器 1~10 道)
+student -> wx : 选择题目数量，点击「生成」
+
+wx -> api : POST /api/wx/student/ai/agent/plan\n{ questionCount, minutes,\n  contextKnowledgePoint, preferMistakes }
+activate api
+
+api -> composeSvc : composePlan(count, knowledgePoint, preferMistakes)
+activate composeSvc
+
+composeSvc -> mysql : SELECT candidate questions\nFROM t_question\nWHERE subject + knowledgePoint
+mysql --> composeSvc : candidate question list
+
+alt 候选题目充足
+  composeSvc -> composeSvc : 筛选 + 随机选题
+  composeSvc -> llm : 生成练习建议(题量、限时、理由)
+  llm --> composeSvc : { questionCount, minutes, reason }
+  composeSvc --> api : AgentDraft {\n  candidateQuestionIds,\n  candidateEnough=true,\n  questionCount, minutes, reason\n}
+else 候选题目不足
+  composeSvc --> api : AgentDraft {\n  candidateEnough=false\n}
+end
+deactivate composeSvc
+
+api --> wx : RestResponse<AgentDraft>
+deactivate api
+
+alt candidateEnough
+  wx --> student : 显示练习草案卡片\n(题量、限时、知识点、理由)
+else 题目不足
+  wx --> student : 提示"题目不足，请换知识点"
+end
+
+== 3. 确认生成 ==
+
+student -> wx : 点击「确认生成」
+wx -> api : POST /api/wx/student/ai/agent/confirm\n{ title, questionIds, questionCount,\n  minutes, preferMistakes, runLogId }
+activate api
+
+api -> composeSvc : confirmPlan(draft)
+composeSvc -> paperSvc : createPaper(title, questions)
+paperSvc -> mysql : INSERT t_exam_paper\n(试卷主表)
+paperSvc -> mysql : INSERT t_exam_paper_question\n(题目关联)
+paperSvc --> composeSvc : paperId
+composeSvc --> api : { paperId }
+deactivate composeSvc
+
+api --> wx : RestResponse { paperId }
+deactivate api
+
+wx -> wx : wx.navigateTo\n/pages/exam/do/index?id={paperId}
+
+== 4. 进入答题 ==
+
+wx -> api : POST /api/wx/student/exampaper/select/{paperId}
+api -> mysql : SELECT t_exam_paper\n+ t_question + items
+mysql --> api : 试卷+题目数据
+api --> wx : ExamPaperVO (含titleItems)
+wx --> student : 进入答题页面\n倒计时+进度条+题目
+
+@enduml

@@ -7,11 +7,27 @@
 
 /* ====== 问候 ====== */
 
+.greeting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0 8rpx;
+}
+
 .greeting {
   font-size: 40rpx;
   font-weight: 800;
   color: #111827;
-  padding: 12rpx 0 8rpx;
+}
+
+.weather-badge {
+  font-size: 24rpx;
+  color: #6B7280;
+  background: #fff;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid #E0E7FF;
+  flex-shrink: 0;
 }
 
 /* ====== 学习概览 ====== */
