@@ -1,0 +1,94 @@
+.keys-page {
+  padding: 15px;
+  background: #f7f7f7;
+  min-height: 100vh;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.key-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.key-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.key-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.key-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+}
+
+.key-status {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  color: #fff;
+}
+
+.status-on { background: #67c23a; }
+.status-off { background: #909399; }
+
+.key-row {
+  display: flex;
+  align-items: center;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.key-label {
+  color: #999;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.key-value {
+  color: #333;
+  word-break: break-all;
+}
+
+.key-action {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  gap: 10px;
+}
+
+.test-btn {
+  font-size: 13px;
+  color: #fff;
+  background: #6366f1;
+  padding: 4px 14px;
+  border-radius: 4px;
+}
+
+.test-btn--loading { background: #a5b4fc; }
+
+.test-result { font-size: 12px; }
+.text-green { color: #67c23a; }
+.text-red { color: #f56c6c; }
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  padding: 20px 0;
+}

@@ -154,37 +154,41 @@ public class UserController extends BaseWXApiController {
             Map<String, Object> stats = new HashMap<>();
 
             Map<String, Object> totalRow = jdbcTemplate.queryForMap(
-                    "SELECT COUNT(*) AS total_questions, " +
-                            "COALESCE(SUM(CASE WHEN do_right = TRUE THEN 1 ELSE 0 END), 0) AS correct_questions " +
-                            "FROM t_exam_paper_question_customer_answer WHERE create_user = ? AND subject_id IN (1,2,3,4)",
+                    "SELECT COUNT(*) AS total_count, " +
+                            "COALESCE(SUM(question_correct), 0) AS total_correct, " +
+                            "COALESCE(SUM(question_count), 0) AS total_questions " +
+                            "FROM t_exam_paper_answer WHERE create_user = ? AND status = 2",
                     userId);
+            int totalCount = toInt(totalRow.get("total_count"));
+            int totalCorrect = toInt(totalRow.get("total_correct"));
             int totalQuestions = toInt(totalRow.get("total_questions"));
-            int correctQuestions = toInt(totalRow.get("correct_questions"));
-            stats.put("totalQuestions", totalQuestions);
-            stats.put("accuracy", totalQuestions == 0 ? 0 : Math.round(correctQuestions * 100.0 / totalQuestions));
-            stats.put("weakPoints", Math.max(0, totalQuestions - correctQuestions));
+            stats.put("totalQuestions", totalCount);
+            stats.put("accuracy", totalCount == 0 ? 0 : Math.round(totalCorrect * 100.0 / totalQuestions));
+            stats.put("weakPoints", Math.max(0, totalQuestions - totalCorrect));
 
             List<Map<String, Object>> subjects = new ArrayList<>();
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(
                     "SELECT s.id, s.name, " +
-                            "COUNT(a.id) AS total_questions, " +
-                            "COALESCE(SUM(CASE WHEN a.do_right = TRUE THEN 1 ELSE 0 END), 0) AS correct_questions " +
+                            "COUNT(a.id) AS total_count, " +
+                            "COALESCE(SUM(a.question_correct), 0) AS total_correct, " +
+                            "COALESCE(SUM(a.question_count), 0) AS total_questions " +
                             "FROM t_subject s " +
-                            "LEFT JOIN t_exam_paper_question_customer_answer a " +
-                            "  ON a.subject_id = s.id AND a.create_user = ? " +
-                            "WHERE s.deleted = FALSE AND s.id <> 5 " +
+                            "LEFT JOIN t_exam_paper_answer a " +
+                            "  ON a.subject_id = s.id AND a.create_user = ? AND a.status = 2 " +
+                            "WHERE s.deleted = FALSE " +
                             "GROUP BY s.id, s.name, s.item_order " +
                             "ORDER BY s.item_order",
                     userId);
             for (Map<String, Object> row : rows) {
-                int subjectTotal = toInt(row.get("total_questions"));
-                int subjectCorrect = toInt(row.get("correct_questions"));
+                int subjectTotal = toInt(row.get("total_count"));
+                int subjectQuestions = toInt(row.get("total_questions"));
+                int subjectCorrect = toInt(row.get("total_correct"));
                 Map<String, Object> subject = new HashMap<>();
                 subject.put("id", row.get("id"));
                 subject.put("name", row.get("name"));
                 subject.put("totalQuestions", subjectTotal);
                 subject.put("done", subjectTotal);
-                subject.put("accuracy", subjectTotal == 0 ? 0 : Math.round(subjectCorrect * 100.0 / subjectTotal));
+                subject.put("accuracy", subjectQuestions == 0 ? 0 : Math.round(subjectCorrect * 100.0 / subjectQuestions));
                 subjects.add(subject);
             }
             stats.put("subjects", subjects);
@@ -192,6 +196,43 @@ public class UserController extends BaseWXApiController {
             return RestResponse.ok(stats);
         } catch (Exception e) {
             return RestResponse.fail(2, "获取统计数据失败");
+        }
+    }
+
+    @RequestMapping(value = "/calendar", method = RequestMethod.POST)
+    public RestResponse<Map<String, Object>> calendar(@RequestParam String month) {
+        try {
+            Integer userId = getCurrentUser().getId();
+
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                    "SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date, " +
+                            "COUNT(*) AS exam_count, " +
+                            "COALESCE(SUM(question_correct), 0) AS correct_count, " +
+                            "COALESCE(SUM(question_count), 0) AS question_count " +
+                            "FROM t_exam_paper_answer " +
+                            "WHERE create_user = ? AND status = 2 AND DATE_FORMAT(create_time, '%Y-%m') = ? " +
+                            "GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d') " +
+                            "ORDER BY date",
+                    userId, month);
+
+            List<Map<String, Object>> days = new ArrayList<>();
+            for (Map<String, Object> row : rows) {
+                int total = toInt(row.get("question_count"));
+                int correct = toInt(row.get("correct_count"));
+                Map<String, Object> day = new HashMap<>();
+                day.put("date", row.get("date"));
+                day.put("questionCount", total);
+                day.put("accuracy", total == 0 ? 0 : Math.round(correct * 100.0 / total));
+                day.put("wrongCount", total - correct);
+                day.put("aiCount", 0);
+                days.add(day);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("days", days);
+            return RestResponse.ok(response);
+        } catch (Exception e) {
+            return RestResponse.fail(2, "获取日历数据失败");
         }
     }
 

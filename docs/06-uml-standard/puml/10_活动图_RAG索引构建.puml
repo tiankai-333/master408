@@ -1,0 +1,76 @@
+@startuml RAG索引构建活动图
+title RAG 索引构建活动图\nAiConfigController.ragIndex() → RagDocumentService → RagService
+
+start
+
+:管理员调用\nPOST /api/admin/ai-config/rag/index\n{ source: "all" | "questions" | "knowledge" };
+
+switch (source 参数)
+case ("questions" 或 "all")
+  :RagDocumentService.backfillFromQuestions();
+  note right
+    从 t_question + t_text_content
+    回填 rag_document + rag_chunk 表
+    用已有题目数据作为 RAG 源
+  end note
+case ("knowledge" 或 "all")
+  :RagDocumentService.backfillFromLegacyKnowledgeBase();
+  note right
+    从 t_ai_knowledge_base
+    回填 rag_document + rag_chunk 表
+  end note
+endswitch
+
+:ragDocumentService.listIndexableChunks(batchSize);
+
+while (还有未索引的 chunk?) is (是)
+  :取出一个 RagChunkRecord;
+  :ragService.embed(chunk.contentText);
+  note right
+    调用 embedding-2 模型
+    返回 float[] 向量
+    Provider 优先级:
+    1. AiUserKey (用户私钥)
+    2. AiProviderConfig (公共密钥)
+    3. application.yml 默认
+  end note
+
+  if (向量化成功?) then (是)
+    :ragIndexService.upsert(chunk, embedding);
+    note right
+      Qdrant: upsert 到 xzs_408_chunks
+      Cosine 距离度量
+    end note
+    :标记 chunk 状态 = indexed;
+  else (否)
+    :标记 chunk 状态 = failed;
+  endif
+endwhile (否)
+
+stop
+
+== 查询时检索路径 (RagService.retrieve) ==
+
+start
+:用户发起 AI 分析请求;
+
+if (ragIndexService.isEnabled()?) then (Qdrant 启用)
+  :retrieveFromQdrant();
+  note right
+    embed(query) → Qdrant 搜索
+    score > 0.5 过滤
+    返回 Top-K chunks
+  end note
+else (Qdrant 未启用)
+  :内存余弦相似度回退;
+  note right
+    TextContentMapper.selectAllWithEmbedding()
+    加载 t_text_content 中有 embedding 的行
+    Java 内存计算 cosine similarity
+    缓存 5 分钟
+  end note
+endif
+
+stop
+
+@enduml

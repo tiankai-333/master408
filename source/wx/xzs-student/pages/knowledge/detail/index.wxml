@@ -8,19 +8,15 @@
   </view>
   <view class="detail-desc" wx:elif="{{point.description}}">{{point.description}}</view>
 
-  <i-button type="primary" size="small" bind:click="explainKnowledge" custom-class="explain-btn">
-    AI 讲解这个知识点
-  </i-button>
-
   <view class="related-section" wx:if="{{parentPoint || children.length}}">
     <view class="related-title">关联知识点</view>
     <view class="chip-list">
       <view class="chip-label" wx:if="{{parentPoint}}">上级</view>
-      <view class="chip" wx:if="{{parentPoint}}" bind:click="goParent">{{parentPoint.name}}</view>
+      <view class="chip chip-parent" wx:if="{{parentPoint}}" bindtap="goParent">{{parentPoint.name}}</view>
     </view>
-    <view class="chip-list" wx:if="{{children.length}}" style="margin-top: 6px;">
+    <view class="chip-list" wx:if="{{children.length}}" style="margin-top: 12rpx;">
       <view class="chip-label">下级</view>
-      <view class="chip" wx:for="{{children}}" wx:key="id" data-id="{{item.id}}" bind:click="goChild">
+      <view class="chip chip-child" wx:for="{{children}}" wx:key="id" data-id="{{item.id}}" bindtap="goChild">
         {{item.name}}
       </view>
     </view>

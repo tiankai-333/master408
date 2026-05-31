@@ -4,10 +4,14 @@ Page({
   data: {
     mode: 'real',
     subjects: [
-      { id: 1, name: '数据结构', icon: '🧱' },
-      { id: 2, name: '计算机组成原理', icon: '⚙️' },
-      { id: 3, name: '操作系统', icon: '🖥' },
-      { id: 4, name: '计算机网络', icon: '🌐' }
+      { id: 1, name: '数据结构' },
+      { id: 2, name: '计算机组成原理' },
+      { id: 3, name: '操作系统' },
+      { id: 4, name: '计算机网络' },
+      { id: 5, name: '408综合' },
+      { id: 6, name: '数学1' },
+      { id: 9, name: '英语1' },
+      { id: 11, name: '政治' }
     ],
     selectedSubjectId: null,
     currentSubjectName: '',
@@ -30,12 +34,22 @@ Page({
     this.setData({ mode: mode })
 
     if (mode === 'real') {
-      // 真题模式：先显示科目选择，不加载试卷
+      // 真题模式：从后端加载科目列表
+      this.loadSubjects()
       return
     }
     // 限时/专项模式：直接加载限时试卷
     this.setData({ spinShow: true, queryParam: { paperType: 4, pageIndex: 1, pageSize: app.globalData.pageSize } })
     this.search(true)
+  },
+
+  loadSubjects: function () {
+    var _this = this
+    app.formPost('/api/wx/student/subject/list', {}).then(function (res) {
+      if (res.code === 1) {
+        _this.setData({ subjects: res.response })
+      }
+    })
   },
 
   selectSubject: function (e) {
@@ -75,7 +89,9 @@ Page({
 
   search: function (override) {
     var _this = this
+    _this.loading = true
     app.formPost('/api/wx/student/exampaper/pageList', this.data.queryParam).then(function (res) {
+      _this.loading = false
       _this.setData({ spinShow: false })
       wx.stopPullDownRefresh()
       if (res.code === 1) {
@@ -90,6 +106,7 @@ Page({
         }
       }
     }).catch(function (e) {
+      _this.loading = false
       _this.setData({ spinShow: false })
       app.message(e, 'error')
     })

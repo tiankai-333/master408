@@ -7,7 +7,6 @@
     "pages/user/bind/index",
     "pages/exam/index/index",
     "pages/exam/do/index",
-    "pages/exam/edit/index",
     "pages/exam/read/index",
     "pages/record/index",
     "pages/my/info/index",
@@ -21,7 +20,8 @@
     "pages/ai-workbench/index",
     "pages/knowledge/index/index",
     "pages/knowledge/detail/index",
-    "pages/paper-generate/index"
+    "pages/paper-generate/index",
+    "pages/my/ai-keys/index"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
@@ -50,8 +50,8 @@
       {
         "pagePath": "pages/ai-workbench/index",
         "text": "AI",
-        "iconPath": "/assets/tabBar/exam.png",
-        "selectedIconPath": "/assets/tabBar/exam-select.png"
+        "iconPath": "/assets/tabBar/record.png",
+        "selectedIconPath": "/assets/tabBar/record-select.png"
       },
       {
         "pagePath": "pages/my/index/index",

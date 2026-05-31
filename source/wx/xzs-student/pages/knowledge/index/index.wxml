@@ -9,27 +9,26 @@
     />
   </view>
 
-  <i-collapse accordion current="{{expandedGroup}}" bindchange="onCollapseChange">
-    <i-collapse-item
-      wx:for="{{filteredGroups}}"
-      wx:key="name"
-      title="{{item.name}}（{{item.points.length}}）"
-      name="{{item.name}}"
-    >
-      <i-cell-group slot="content">
-        <i-cell
-          wx:for="{{item.points}}"
-          wx:for-item="point"
-          wx:key="id"
-          title="{{point.name}}"
-          label="{{point.description}}"
-          is-link
-          data-id="{{point.id}}"
-          bind:click="goDetail"
-        />
-      </i-cell-group>
-    </i-collapse-item>
-  </i-collapse>
+  <view class="subject-list">
+    <view class="subject-card" wx:for="{{filteredGroups}}" wx:key="name">
+      <view class="subject-header" bind:tap="toggleGroup" data-name="{{item.name}}">
+        <text class="subject-name">{{item.name}}</text>
+        <text class="subject-count">{{item.points.length}} 个知识点</text>
+        <text class="subject-arrow">{{expandedGroup === item.name ? '▲' : '▼'}}</text>
+      </view>
+      <view class="subject-points" wx:if="{{expandedGroup === item.name}}">
+        <view class="point-item"
+              wx:for="{{item.points}}"
+              wx:for-item="point"
+              wx:key="id"
+              data-id="{{point.id}}"
+              bind:tap="goDetail">
+          <text class="point-name">{{point.name}}</text>
+          <text class="point-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
 
   <view class="empty-tip" wx:if="{{!spinShow && filteredGroups.length === 0}}">
     <text>没有匹配的知识点</text>

@@ -1,0 +1,96 @@
+@startuml 学生学习活动图
+title 学生学习活动图（基于实际 Controller / Service）
+
+|DashboardController\n/api/student/dashboard|
+start
+:POST /index;
+note right
+  返回 IndexVM:
+  - fixedPaper (固定试卷列表)
+  - timeLimitPaper (时段试卷列表)
+end note
+
+|学生前端|
+:选择学习路径;
+
+switch (学习路径)
+case (试卷答题)
+  |ExamPaperAnswerController|
+  :POST /api/student/exampaper/answer/answerSubmit;
+  note right
+    ExamPaperAnswerServiceImpl
+    .calculateExamPaperAnswer()
+  end note
+
+  :按题型自动评分;
+  note right
+    SingleChoice(1)/TrueFalse(3):
+      answer == correct → doRight
+    MultipleChoice(2):
+      完全匹配 → doRight
+    GapFilling(4)/ShortAnswer(5):
+      customerScore = 0 (待批改)
+  end note
+
+  :发布事件\nCalculateExamPaperAnswerCompleteEvent;
+
+  |CalculateExamPaperAnswerListener|
+  :持久化 ExamPaperAnswer;
+  :持久化 ExamPaperQuestionCustomerAnswer;
+  :主观题答案 → TextContent;
+
+case (查看知识图谱)
+  |KnowledgeGraphController\n/api/student/knowledge-graph|
+  :GET /graph?subjectId=;
+  note right
+    KnowledgeGraphServiceImpl
+    .getKnowledgeGraph(subjectId)
+    构建 nodes[] + links[] + categories[]
+    nodeType: subject / knowledge_point
+  end note
+
+  :前端 ECharts 渲染力导向图;
+
+case (AI 分析)
+  |AIAnalysisController\n/api/student/ai|
+  :POST /analyze-stream\n(Accept: text/event-stream);
+  note right
+    AnalysisService + RagService
+    SSE 流式输出
+  end note
+
+  |RagService|
+  :retrieve(questionContext);
+  note right
+    Qdrant 或内存余弦相似度
+    Top-K=5, score>0.5
+  end note
+
+  :拼接 Prompt → LLM → SSE;
+
+case (AI 工作台)
+  |AiWorkbenchController\n/api/student/ai/workbench|
+  :POST /stream;
+  note right
+    AiOrchestratorServiceImpl
+    → AiIntentRouter 正则匹配意图
+    → RAG 检索 + 学生画像
+    → SSE 流式返回
+  end note
+endswitch
+
+|StudentGraphServiceImpl\n(内部调用)|
+if (答题事件触发?) then (是)
+  :recordEvent(StudentLearningEvent);
+  fork
+    :studentGraphMapper.insertEvent(event);
+  fork again
+    :studentGraphMapper.upsertKnowledgeStateFromEvent\n(userId, knowledgePointId, correct);
+  fork again
+    :if (!correct && questionId != null)\n  studentGraphMapper.upsertMistakeFromEvent(event);
+  end fork
+endif
+
+stop
+
+@enduml

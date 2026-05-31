@@ -1,0 +1,40 @@
+@startuml 答卷评分状态图
+skinparam state {
+  BackgroundColor<<submit>> #E3F2FD
+  BackgroundColor<<wait>> #FFF3E0
+  BackgroundColor<<complete>> #E8F5E9
+}
+
+title 答卷评分状态图\nExamPaperAnswer.status (ExamPaperAnswerStatusEnum)
+
+state "待批改\nWaitJudge(1)" as waitJudge <<wait>>
+state "完成\nComplete(2)" as complete <<complete>>
+
+[*] --> waitJudge : calculateExamPaperAnswer()\n存在主观题(GapFilling/ShortAnswer)
+[*] --> complete : calculateExamPaperAnswer()\n全部为客观题(SingleChoice/MultipleChoice/TrueFalse)
+
+waitJudge --> complete : ExamPaperAnswerServiceImpl.judge()\n管理员批改主观题后\nstatus = Complete(2)
+
+note right of [*]
+  评分逻辑 (calculateExamPaperAnswer):
+  ─────────────────────────────
+  SingleChoice(1): answer == correct → doRight
+  MultipleChoice(2): 完全匹配 → doRight
+  TrueFalse(3): answer == correct → doRight
+  GapFilling(4): customerScore=0, 待批改
+  ShortAnswer(5): customerScore=0, 待批改
+
+  needSaveTextContent() == true
+  ⇒ status = WaitJudge(1)
+  否则 ⇒ status = Complete(2)
+end note
+
+note right of complete
+  事件: CalculateExamPaperAnswerCompleteEvent
+  监听器: CalculateExamPaperAnswerListener
+  持久化: ExamPaperAnswer + ExamPaperQuestionCustomerAnswer
+  关联: 若 paperType == Task(6)
+        → 更新 TaskExamCustomerAnswer
+end note
+
+@enduml

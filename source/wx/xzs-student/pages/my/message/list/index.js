@@ -42,7 +42,9 @@ Page({
   },
   search: function(override) {
     let _this = this
+    _this.loading = true
     app.formPost('/api/wx/student/user/message/page', this.data.queryParam).then(res => {
+      _this.loading = false
       _this.setData({
         spinShow: false
       });
@@ -58,11 +60,12 @@ Page({
         if (re.pageNum >= re.pages) {
           this.setData({
             loadMoreLoad: false,
-            loadMoreTip: '暂无数据'
+            loadMoreTip: re.pages === 0 ? '暂无数据' : '没有更多了'
           });
         }
       }
     }).catch(e => {
+      _this.loading = false
       _this.setData({
         spinShow: false
       });

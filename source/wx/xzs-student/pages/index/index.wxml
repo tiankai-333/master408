@@ -3,10 +3,26 @@
   <!-- 问候 -->
   <view class="greeting">{{greeting}}</view>
 
+  <!-- 学习概览 -->
+  <view class="stats-bar" wx:if="{{userStats}}">
+    <view class="stats-item">
+      <text class="stats-value">{{userStats.totalQuestions || 0}}</text>
+      <text class="stats-label">总做题</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-value">{{userStats.accuracy || 0}}%</text>
+      <text class="stats-label">正确率</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-value">{{userStats.weakPoints || 0}}</text>
+      <text class="stats-label">错题</text>
+    </view>
+  </view>
+
   <!-- 周日历 -->
   <view class="section-title">
     <view class="week-arrow" bind:tap="prevWeek">◁</view>
-    <text>本周</text>
+    <text>{{weekLabel}}</text>
     <view class="week-arrow" bind:tap="nextWeek">▷</view>
   </view>
   <view class="weekday-row">
@@ -48,22 +64,28 @@
   </view>
 
   <!-- 功能入口 -->
-  <view class="section-title">快捷入口</view>
   <view class="entry-list">
-    <view class="entry-card" bind:tap="goTab" data-url="/pages/practice/index">
+    <view class="entry-card" bind:tap="goPage" data-url="/pages/ai-analyze/index/index">
       <view class="entry-accent accent-indigo"></view>
-      <view class="entry-name">去练习</view>
-      <view class="entry-desc">真题、专项、错题、限时训练</view>
-    </view>
-    <view class="entry-card" bind:tap="goTab" data-url="/pages/ai-workbench/index">
-      <view class="entry-accent accent-violet"></view>
-      <view class="entry-name">AI 助手</view>
-      <view class="entry-desc">对话、拍照识题、智能组卷</view>
+      <view class="entry-name">拍照识题</view>
+      <view class="entry-desc">拍照识别题目</view>
     </view>
     <view class="entry-card" bind:tap="goPage" data-url="/pages/knowledge/index/index">
       <view class="entry-accent accent-teal"></view>
       <view class="entry-name">知识目录</view>
       <view class="entry-desc">按科目浏览知识点</view>
+    </view>
+  </view>
+
+  <!-- 网页地址 -->
+  <view class="web-link-card">
+    <view class="web-link-row" bind:tap="copyLink" data-url="https://wx.hhhuu.com/student/">
+      <text class="web-link-label">网页地址</text>
+      <text class="web-link-value">https://wx.hhhuu.com/student/</text>
+    </view>
+    <view class="web-link-row" bind:tap="copyLink" data-url="https://mastertooling.shop/student/">
+      <text class="web-link-label">备用地址</text>
+      <text class="web-link-value">https://mastertooling.shop/student/</text>
     </view>
   </view>
 

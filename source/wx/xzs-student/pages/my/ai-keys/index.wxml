@@ -1,0 +1,72 @@
+<view class="keys-page">
+  <view class="section-title">公共密钥</view>
+  <view class="key-list" wx:if="{{publicProviders.length > 0}}">
+    <view class="key-card" wx:for="{{publicProviders}}" wx:key="id">
+      <view class="key-header">
+        <text class="key-name">{{item.providerName || item.providerCode}}</text>
+        <text class="key-status {{item.enabled ? 'status-on' : 'status-off'}}">{{item.enabled ? '启用' : '停用'}}</text>
+      </view>
+      <view class="key-row" wx:if="{{item.chatModel}}">
+        <text class="key-label">模型</text>
+        <text class="key-value">{{item.chatModel}}</text>
+      </view>
+      <view class="key-row" wx:if="{{item.apiKeyMask}}">
+        <text class="key-label">密钥</text>
+        <text class="key-value">{{item.apiKeyMask}}</text>
+      </view>
+      <view class="key-row" wx:if="{{item.lastTestSuccess !== null}}">
+        <text class="key-label">测试</text>
+        <text class="key-value {{item.lastTestSuccess ? 'text-green' : 'text-red'}}">{{item.lastTestSuccess ? '通过' : '失败'}}</text>
+      </view>
+      <view class="key-action">
+        <view class="test-btn {{testingId === 'public_' + item.id ? 'test-btn--loading' : ''}}"
+              bind:tap="testProvider" data-id="{{item.id}}" data-type="public">
+          {{testingId === 'public_' + item.id ? '测试中...' : '测试'}}
+        </view>
+        <view class="test-result" wx:if="{{testResults['public_' + item.id]}}">
+          <text class="{{testResults['public_' + item.id].success ? 'text-green' : 'text-red'}}">
+            {{testResults['public_' + item.id].success ? '连接正常' : testResults['public_' + item.id].message}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="empty-tip" wx:else>暂无公共密钥</view>
+
+  <view class="section-title" style="margin-top:20px">私人密钥</view>
+  <view class="key-list" wx:if="{{privateKeys.length > 0}}">
+    <view class="key-card" wx:for="{{privateKeys}}" wx:key="id">
+      <view class="key-header">
+        <text class="key-name">{{item.providerName || item.providerCode}}</text>
+        <text class="key-status {{item.enabled ? 'status-on' : 'status-off'}}">{{item.enabled ? '启用' : '停用'}}</text>
+      </view>
+      <view class="key-row" wx:if="{{item.chatModel}}">
+        <text class="key-label">模型</text>
+        <text class="key-value">{{item.chatModel}}</text>
+      </view>
+      <view class="key-row" wx:if="{{item.apiKeyMask}}">
+        <text class="key-label">密钥</text>
+        <text class="key-value">{{item.apiKeyMask}}</text>
+      </view>
+      <view class="key-row" wx:if="{{item.lastTestSuccess !== null}}">
+        <text class="key-label">测试</text>
+        <text class="key-value {{item.lastTestSuccess ? 'text-green' : 'text-red'}}">{{item.lastTestSuccess ? '通过' : '失败'}}</text>
+      </view>
+      <view class="key-action">
+        <view class="test-btn {{testingId === 'private_' + item.id ? 'test-btn--loading' : ''}}"
+              bind:tap="testProvider" data-id="{{item.id}}" data-type="private">
+          {{testingId === 'private_' + item.id ? '测试中...' : '测试'}}
+        </view>
+        <view class="test-result" wx:if="{{testResults['private_' + item.id]}}">
+          <text class="{{testResults['private_' + item.id].success ? 'text-green' : 'text-red'}}">
+            {{testResults['private_' + item.id].success ? '连接正常' : testResults['private_' + item.id].message}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="empty-tip" wx:else>暂无私人密钥</view>
+
+  <i-spin size="large" fix wx:if="{{loading}}"></i-spin>
+  <i-message id="message" />
+</view>

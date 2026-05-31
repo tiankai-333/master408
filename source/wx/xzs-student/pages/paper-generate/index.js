@@ -1,13 +1,9 @@
 const app = getApp()
+const constants = require('../../utils/constants.js')
 
 Page({
   data: {
-    subjects: [
-      { id: 1, name: '数据结构' },
-      { id: 2, name: '计算机组成原理' },
-      { id: 3, name: '操作系统' },
-      { id: 4, name: '计算机网络' }
-    ],
+    subjects: constants.subjects,
     selectedSubject: null,
     questionCount: 10,
     generating: false
@@ -31,7 +27,7 @@ Page({
 
     this.setData({ generating: true })
 
-    app.formPost('/api/wx/student/exampaper/auto-generate', {
+    app.jsonPost('/api/wx/student/ai/compose-paper', {
       subjectId: selectedSubject,
       questionCount
     }).then(res => {
@@ -43,7 +39,7 @@ Page({
       }
     }).catch(err => {
       this.setData({ generating: false })
-      app.message('自动组卷接口待接入', 'error')
+      app.message(err || '生成失败，请稍后再试', 'error')
     })
   }
 })

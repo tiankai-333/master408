@@ -1,10 +1,12 @@
 var app = getApp()
 var markdown = require('../../utils/markdown.js')
+var constants = require('../../utils/constants.js')
 
 Page({
   data: {
     spinShow: false,
-    subjects: ['数据结构', '计算机组成原理', '操作系统', '计算机网络'],
+    subjects: constants.subjectNames,
+    subjectNameToId: constants.subjectNameToId,
     selectedSubject: '',
     subjectVisible: false,
     subjectPickerVisible: false,
@@ -25,8 +27,8 @@ Page({
     inputMessage: '',
     isTyping: false,
     scrollToId: 'msg-bottom',
-    aiStyles: ['标准解析', '费曼风格', '柏拉图式', '第一性原理'],
-    aiStyleIds: ['default', 'feynman', 'plato', 'first-principles'],
+    aiStyles: constants.aiStyleNames,
+    aiStyleIds: constants.aiStyleIds,
     aiStyleIndex: 0,
     styleVisible: false,
     composeVisible: false,
@@ -36,10 +38,77 @@ Page({
 
   onLoad: function () {
     this.loadKnowledgeGraph()
+    this.loadSubjects()
+    this.restoreSession()
   },
 
   onShow: function () {
     if (this.data.messages && this.data.messages.length > 0) this.scrollToBottom()
+  },
+
+  onHide: function () {
+    this.saveSession()
+  },
+
+  onUnload: function () {
+    this.saveSession()
+  },
+
+  saveSession: function () {
+    var data = this.data
+    try {
+      wx.setStorageSync('ai_session', {
+        messages: data.messages,
+        selectedSubject: data.selectedSubject,
+        selectedPoint: data.selectedPoint,
+        selectedExam: data.selectedExam,
+        selectedMistake: data.selectedMistake,
+        contextMode: data.contextMode,
+        contextName: data.contextName,
+        contextType: data.contextType,
+        aiStyleIndex: data.aiStyleIndex,
+        inputMessage: data.inputMessage
+      })
+    } catch (e) {}
+  },
+
+  restoreSession: function () {
+    try {
+      var session = wx.getStorageSync('ai_session')
+      if (!session) return
+      this.setData({
+        messages: session.messages || [],
+        selectedSubject: session.selectedSubject || '',
+        selectedPoint: session.selectedPoint || null,
+        selectedExam: session.selectedExam || null,
+        selectedMistake: session.selectedMistake || null,
+        contextMode: session.contextMode || 'none',
+        contextName: session.contextName || '',
+        contextType: session.contextType || '',
+        aiStyleIndex: session.aiStyleIndex || 0,
+        inputMessage: session.inputMessage || ''
+      })
+    } catch (e) {}
+  },
+
+  // ====== Subjects ======
+
+  loadSubjects: function () {
+    var _this = this
+    app.formPost('/api/wx/student/subject/list', {}).then(function (res) {
+      if (res.code === 1 && res.response && res.response.length > 0) {
+        var subjects = res.response
+        var names = []
+        var nameToId = {}
+        for (var i = 0; i < subjects.length; i++) {
+          var s = subjects[i]
+          if (s.deleted) continue
+          names.push(s.name)
+          nameToId[s.name] = s.id
+        }
+        _this.setData({ subjects: names, subjectNameToId: nameToId })
+      }
+    }).catch(function () {})
   },
 
   // ====== Knowledge graph ======
@@ -51,7 +120,9 @@ Page({
         var data = res.response || {}
         _this.setData({ groups: _this.buildGroups(data.nodes || [], data.categories || []) })
       }
-    }).catch(function () {})
+    }).catch(function (e) {
+      app.message('加载知识图谱失败', 'error')
+    })
   },
 
   buildGroups: function (nodes, categories) {
@@ -84,8 +155,7 @@ Page({
 
   toggleSubject: function () {
     if (this.data.selectedSubject) {
-      this.setData({ selectedSubject: '', selectedPoint: null, selectedPointDetail: null, contextMode: 'none', contextName: '', contextType: '' })
-      this.updateWelcome()
+      this.setData({ selectedSubject: '', selectedPoint: null, selectedPointDetail: null })
     } else {
       this.setData({ subjectPickerVisible: true })
     }
@@ -93,12 +163,11 @@ Page({
 
   confirmSubjectPick: function (e) {
     var subject = e.currentTarget.dataset.subject
-    this.setData({ selectedSubject: subject, subjectPickerVisible: false })
+    this.setData({ selectedSubject: subject, selectedPoint: null, selectedPointDetail: null, subjectPickerVisible: false })
   },
 
   clearSubjectPick: function () {
-    this.setData({ selectedSubject: '', selectedPoint: null, selectedPointDetail: null, contextMode: 'none', contextName: '', contextType: '', subjectPickerVisible: false })
-    this.updateWelcome()
+    this.setData({ selectedSubject: '', selectedPoint: null, selectedPointDetail: null, subjectPickerVisible: false })
   },
 
   closeSubjectPicker: function () {
@@ -107,8 +176,7 @@ Page({
 
   toggleKnowledge: function () {
     if (this.data.selectedPoint) {
-      this.setData({ selectedPoint: null, selectedPointDetail: null, contextMode: 'none', contextName: '', contextType: '' })
-      this.updateWelcome()
+      this.setData({ selectedPoint: null, selectedPointDetail: null })
     } else {
       var groups = this.buildPickerGroups('')
       this.setData({ knowledgePickerVisible: true, pickerKeyword: '', pickerGroups: groups })
@@ -117,9 +185,12 @@ Page({
 
   confirmKnowledgePick: function (e) {
     var point = { id: e.currentTarget.dataset.id, name: e.currentTarget.dataset.name, description: e.currentTarget.dataset.desc || '' }
-    this.setData({ selectedPoint: point, contextMode: 'knowledge', contextName: point.name, contextType: 'knowledge', knowledgePickerVisible: false })
-    this.updateWelcome()
-    this.loadPointDetail(point.id)
+    var groupName = e.currentTarget.dataset.group
+    var update = { selectedPoint: point, knowledgePickerVisible: false }
+    if (!this.data.selectedSubject && groupName) {
+      update.selectedSubject = groupName
+    }
+    this.setData(update)
   },
 
   loadPointDetail: function (id) {
@@ -128,12 +199,13 @@ Page({
       if (res.code === 1) {
         _this.setData({ selectedPointDetail: res.response || {} })
       }
-    }).catch(function () {})
+    }).catch(function (e) {
+      app.message('加载知识点详情失败', 'error')
+    })
   },
 
   clearKnowledgePick: function () {
-    this.setData({ selectedPoint: null, selectedPointDetail: null, contextMode: 'none', contextName: '', contextType: '', knowledgePickerVisible: false })
-    this.updateWelcome()
+    this.setData({ selectedPoint: null, selectedPointDetail: null, knowledgePickerVisible: false })
   },
 
   closeKnowledgePicker: function () {
@@ -244,7 +316,7 @@ Page({
   setExamContext: function (q) {
     var shortTitle = q.title || ('真题 #' + q.id)
     if (shortTitle.length > 24) shortTitle = shortTitle.substring(0, 24) + '...'
-    var questionTypeMap = { 1: '单选题', 2: '多选题', 3: '判断题', 4: '填空题', 5: '简答题' }
+    var questionTypeMap = constants.questionTypeMap
 
     this.setData({
       isTyping: false,
@@ -279,7 +351,7 @@ Page({
 
     var queryParam = { pageIndex: 1, pageSize: 50 }
     if (subject) {
-      var subjectMap = { '数据结构': 1, '计算机组成原理': 2, '操作系统': 3, '计算机网络': 4 }
+      var subjectMap = _this.data.subjectNameToId
       if (subjectMap[subject]) queryParam.subjectId = subjectMap[subject]
     }
 
@@ -317,7 +389,7 @@ Page({
   },
 
   setWrongContext: function (qVM, aVM, answerId) {
-    var questionTypeMap = { 1: '单选题', 2: '多选题', 3: '判断题', 4: '填空题', 5: '简答题' }
+    var questionTypeMap = constants.questionTypeMap
     var title = qVM.titleContent || qVM.title || ''
     var shortTitle = title
     if (shortTitle.length > 24) shortTitle = shortTitle.substring(0, 24) + '...'
@@ -388,13 +460,13 @@ Page({
 
   // ====== Chat ======
 
-  onInput: function (e) { this.setData({ inputMessage: e.detail.value }) },
+  onInput: function (e) { this.setData({ inputMessage: e.detail.value, canSend: !!(e.detail.value || '').trim() }) },
 
   sendMessage: function () {
     var msg = (this.data.inputMessage || '').trim()
     if (!msg || this.data.isTyping) return
     this.sendDirect(msg)
-    this.setData({ inputMessage: '' })
+    this.setData({ inputMessage: '', canSend: false })
   },
 
   sendDirect: function (msg) {
@@ -497,6 +569,41 @@ Page({
 
   scrollToBottom: function () { var _this = this; setTimeout(function () { _this.setData({ scrollToId: 'msg-bottom' }) }, 100) },
 
+  // ====== Compose from top ======
+
+  onComposeTap: function () {
+    this.setData({ composeVisible: true })
+  },
+
+  doWeakCompose: function () {
+    var _this = this
+    var msg = '请根据我的错题记录生成针对性练习'
+    var userMsg = { role: 'user', content: msg, html: markdown.renderMarkdown(msg) }
+    _this.setData({ messages: _this.data.messages.concat([userMsg]), isTyping: true })
+    _this.scrollToBottom()
+
+    var payload = {
+      intent: 'practice_plan',
+      style: _this.data.aiStyleIds[_this.data.aiStyleIndex],
+      userMessage: msg
+    }
+    app.jsonPost('/api/wx/student/ai/workbench', payload).then(function (res) {
+      _this.setData({ isTyping: false })
+      if (res.code === 1) {
+        var data = res.response || {}
+        var assistantMsg = { role: 'assistant', content: data.analysis || '', html: data.analysis ? markdown.renderMarkdown(data.analysis) : '' }
+        if (data.agentDraft) assistantMsg.agentDraft = data.agentDraft
+        _this.setData({ messages: _this.data.messages.concat([assistantMsg]) })
+      } else {
+        _this.setData({ messages: _this.data.messages.concat([{ role: 'assistant', content: '处理失败：' + (res.message || ''), html: '<p>处理失败</p>' }]) })
+      }
+      _this.scrollToBottom()
+    }).catch(function (e) {
+      _this.setData({ isTyping: false })
+      app.message(e || '网络错误', 'error')
+    })
+  },
+
   // ====== Action bar ======
 
   quickAction: function (e) {
@@ -505,8 +612,60 @@ Page({
       this.setData({ composeVisible: true })
       return
     }
-    var presets = { weak: '请分析我的薄弱知识点并给出复习建议' }
-    if (presets[action]) this.sendDirect(presets[action])
+    var _this = this
+    var msg = '请分析我的薄弱知识点并给出复习建议'
+    var userMsg = { role: 'user', content: msg, html: markdown.renderMarkdown(msg) }
+    _this.setData({ messages: _this.data.messages.concat([userMsg]), isTyping: true })
+    _this.scrollToBottom()
+
+    app.formPost('/api/wx/student/user/stats', {}).then(function (statsRes) {
+      var payload = {
+        intent: 'learning_profile',
+        style: _this.data.aiStyleIds[_this.data.aiStyleIndex],
+        userMessage: msg
+      }
+      var ctx = _this.buildContext()
+      if (!ctx) ctx = { contextType: 'none' }
+      if (statsRes.code === 1 && statsRes.response) {
+        ctx.userStats = statsRes.response
+      }
+      payload.context = ctx
+      app.jsonPost('/api/wx/student/ai/workbench', payload).then(function (res) {
+        _this.setData({ isTyping: false })
+        if (res.code === 1) {
+          var data = res.response || {}
+          var assistantMsg = { role: 'assistant', content: data.analysis || '', html: data.analysis ? markdown.renderMarkdown(data.analysis) : '' }
+          if (data.agentDraft) assistantMsg.agentDraft = data.agentDraft
+          _this.setData({ messages: _this.data.messages.concat([assistantMsg]) })
+        } else {
+          _this.setData({ messages: _this.data.messages.concat([{ role: 'assistant', content: '处理失败：' + (res.message || ''), html: '<p>处理失败</p>' }]) })
+        }
+        _this.scrollToBottom()
+      }).catch(function (e) {
+        _this.setData({ isTyping: false })
+        app.message(e || '网络错误', 'error')
+      })
+    }).catch(function () {
+      _this.setData({ isTyping: false })
+      app.message('获取学习统计失败', 'error')
+    })
+  },
+
+  onPaste: function () {
+    var _this = this
+    wx.getClipboardData({
+      success: function (res) {
+        if (res.data) {
+          var current = _this.data.inputMessage || ''
+          _this.setData({ inputMessage: current + res.data, canSend: true })
+        }
+      }
+    })
+  },
+
+  clearChat: function () {
+    this.setData({ messages: [], inputMessage: '', canSend: false })
+    this.saveSession()
   },
 
   // ====== Style ======
@@ -528,15 +687,20 @@ Page({
     var _this = this
     var point = _this.data.selectedPoint
     var count = _this.data.composeCount
+    var hasSubject = !!_this.data.selectedSubject
+    var subjectId = _this.data.subjectNameToId ? _this.data.subjectNameToId[_this.data.selectedSubject] : null
     _this.setData({ composeVisible: false })
 
-    var userMsg = { role: 'user', content: '生成' + count + '道练习', html: '<p>生成' + count + '道练习</p>' }
+    var label = hasSubject ? ('生成' + count + '道练习') : ('生成' + count + '道错题练习')
+    var userMsg = { role: 'user', content: label, html: '<p>' + label + '</p>' }
     _this.setData({ messages: _this.data.messages.concat([userMsg]), isTyping: true })
     _this.scrollToBottom()
 
     app.jsonPost('/api/wx/student/ai/agent/plan', {
-      message: '生成练习', contextKnowledgePoint: point ? point.name : '',
-      questionCount: count, minutes: Math.max(count * 3, 10), preferMistakes: true
+      message: hasSubject ? '生成练习' : '根据错题生成练习',
+      subjectId: subjectId,
+      contextKnowledgePoint: point ? point.name : '',
+      questionCount: count, minutes: Math.max(count * 3, 10), preferMistakes: !hasSubject
     }).then(function (res) {
       _this.setData({ isTyping: false })
       if (res.code === 1 && res.response) {

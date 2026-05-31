@@ -51,6 +51,9 @@
     </view>
   </view>
 
-  <i-spin size="large" fix wx:if="{{isAnalyzing}}"></i-spin>
+  <view class="analyzing-bar" wx:if="{{isAnalyzing}}">
+    <view class="analyzing-dot"></view>
+    <text class="analyzing-text">AI 识别中，请稍候...</text>
+  </view>
   <i-message id="message" />
 </view>

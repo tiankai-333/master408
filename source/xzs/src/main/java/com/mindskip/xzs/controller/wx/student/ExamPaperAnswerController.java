@@ -21,6 +21,8 @@ import com.mindskip.xzs.viewmodel.student.exam.ExamPaperSubmitItemVM;
 import com.mindskip.xzs.viewmodel.student.exam.ExamPaperSubmitVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/wx/student/exampaper/answer")
 @ResponseBody
 public class ExamPaperAnswerController extends BaseWXApiController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExamPaperAnswerController.class);
 
     private final ExamPaperAnswerService examPaperAnswerService;
     private final SubjectService subjectService;
@@ -69,23 +73,31 @@ public class ExamPaperAnswerController extends BaseWXApiController {
 
     @RequestMapping(value = "/answerSubmit", method = RequestMethod.POST)
     public RestResponse answerSubmit(HttpServletRequest request) {
-        ExamPaperSubmitVM examPaperSubmitVM = requestToExamPaperSubmitVM(request);
-        User user = getCurrentUser();
-        ExamPaperAnswerInfo examPaperAnswerInfo = examPaperAnswerService.calculateExamPaperAnswer(examPaperSubmitVM, user);
-        if (null == examPaperAnswerInfo) {
-            return RestResponse.fail(2, "试卷不能重复做");
+        try {
+            ExamPaperSubmitVM examPaperSubmitVM = requestToExamPaperSubmitVM(request);
+            logger.info("answerSubmit paperId={} doTime={} items={}",
+                    examPaperSubmitVM.getId(), examPaperSubmitVM.getDoTime(),
+                    examPaperSubmitVM.getAnswerItems() != null ? examPaperSubmitVM.getAnswerItems().size() : 0);
+            User user = getCurrentUser();
+            ExamPaperAnswerInfo examPaperAnswerInfo = examPaperAnswerService.calculateExamPaperAnswer(examPaperSubmitVM, user);
+            if (null == examPaperAnswerInfo) {
+                return RestResponse.fail(2, "试卷不能重复做");
+            }
+            ExamPaperAnswer examPaperAnswer = examPaperAnswerInfo.getExamPaperAnswer();
+            Integer userScore = examPaperAnswer.getUserScore();
+            String scoreVm = ExamUtil.scoreToVM(userScore);
+            UserEventLog userEventLog = new UserEventLog(user.getId(), user.getUserName(), user.getRealName(), new Date());
+            String content = user.getUserName() + " 提交试卷：" + examPaperAnswerInfo.getExamPaper().getName()
+                    + " 得分：" + scoreVm
+                    + " 耗时：" + ExamUtil.secondToVM(examPaperAnswer.getDoTime());
+            userEventLog.setContent(content);
+            eventPublisher.publishEvent(new CalculateExamPaperAnswerCompleteEvent(examPaperAnswerInfo));
+            eventPublisher.publishEvent(new UserEvent(userEventLog));
+            return RestResponse.ok(scoreVm);
+        } catch (Exception e) {
+            logger.error("answerSubmit failed", e);
+            return RestResponse.fail(2, "提交失败：" + e.getMessage());
         }
-        ExamPaperAnswer examPaperAnswer = examPaperAnswerInfo.getExamPaperAnswer();
-        Integer userScore = examPaperAnswer.getUserScore();
-        String scoreVm = ExamUtil.scoreToVM(userScore);
-        UserEventLog userEventLog = new UserEventLog(user.getId(), user.getUserName(), user.getRealName(), new Date());
-        String content = user.getUserName() + " 提交试卷：" + examPaperAnswerInfo.getExamPaper().getName()
-                + " 得分：" + scoreVm
-                + " 耗时：" + ExamUtil.secondToVM(examPaperAnswer.getDoTime());
-        userEventLog.setContent(content);
-        eventPublisher.publishEvent(new CalculateExamPaperAnswerCompleteEvent(examPaperAnswerInfo));
-        eventPublisher.publishEvent(new UserEvent(userEventLog));
-        return RestResponse.ok(scoreVm);
     }
 
     private ExamPaperSubmitVM requestToExamPaperSubmitVM(HttpServletRequest request) {
@@ -131,5 +143,11 @@ public class ExamPaperAnswerController extends BaseWXApiController {
         vm.setPaper(paper);
         vm.setAnswer(answer);
         return RestResponse.ok(vm);
+    }
+
+    @PostMapping(value = "/judge")
+    public RestResponse judge(@RequestBody ExamPaperSubmitVM examPaperSubmitVM) {
+        String score = examPaperAnswerService.judge(examPaperSubmitVM);
+        return RestResponse.ok(score);
     }
 }

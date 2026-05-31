@@ -1,0 +1,130 @@
+@startuml 知识图谱查询时序图
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+title 知识图谱查询时序图\nKnowledgeGraphController → KnowledgeGraphServiceImpl
+
+actor "学生" as student
+participant "前端\n(Vue / ECharts)" as frontend
+participant "KnowledgeGraphController\n/api/student/knowledge-graph" as ctrl
+participant "KnowledgeGraphServiceImpl" as svc
+participant "KnowledgePointMapper" as kpMap
+participant "QuestionKnowledgePointMapper" as qkpMap
+participant "KnowledgeContentMapper" as kcMap
+
+== 查询知识图谱 ==
+
+student -> frontend : 打开知识图谱页面
+activate frontend
+
+frontend -> ctrl : GET /api/student/knowledge-graph/graph\n?subjectId=1
+activate ctrl
+
+ctrl -> svc : getKnowledgeGraph(subjectId)
+activate svc
+
+svc -> kpMap : findAll() 或 findBySubjectId(subjectId)
+activate kpMap
+kpMap --> svc : List<KnowledgePoint>
+deactivate kpMap
+
+svc -> svc : 构建 nodes[] + links[] + categories[]
+note right
+  nodeType: "subject" (symbolSize=80)
+          或 "knowledge_point" (按level)
+  linkType: "包含"
+  relations:
+  - subject → knowledge_point
+  - parentKP → childKP (parent_id 自引用)
+  categories: 按 subjectId 分组(用于着色)
+end note
+
+svc --> ctrl : { nodes, links, categories }
+deactivate svc
+
+ctrl --> frontend : JSON 图谱数据
+deactivate ctrl
+
+frontend -> frontend : ECharts 力导向图渲染
+frontend --> student : 展示知识图谱
+deactivate frontend
+
+== 查看知识点详情 ==
+
+student -> frontend : 点击某知识点节点
+activate frontend
+
+frontend -> ctrl : GET /api/student/knowledge-graph\n/knowledge-point/{id}
+activate ctrl
+
+ctrl -> svc : getKnowledgePointDetail(id)
+activate svc
+
+svc -> kpMap : findById(id)
+kpMap --> svc : KnowledgePoint (name, level, description)
+
+svc -> kcMap : findCurrentByKnowledgePointId(id)
+activate kcMap
+kcMap --> svc : KnowledgeContent\n(htmlRef, summaryText, sourceUrl)
+deactivate kcMap
+
+svc -> kpMap : findById(parentId)
+kpMap --> svc : 父知识点
+
+svc -> kpMap : findByParentId(id)
+kpMap --> svc : List<KnowledgePoint> 子知识点
+
+svc -> qkpMap : findByKnowledgePointId(id)
+activate qkpMap
+qkpMap --> svc : List<QuestionKnowledgePoint>
+deactivate qkpMap
+
+alt 有关联题目
+  svc -> svc : 返回关联题目列表
+else 无直接关联 (fallback)
+  svc -> svc : findFallbackQuestions()
+  note right
+    构建关键词搜索:
+    1. 知识点名称 + 子节点名称
+    2. 别名字典映射
+       (例: "查找" → "顺序查找,折半查找,...")
+    3. 搜索 t_question 的
+       tags / title_text / analysis_text
+  end note
+end
+
+svc --> ctrl : 知识点详情 + 关联题目
+deactivate svc
+
+ctrl --> frontend : JSON
+deactivate ctrl
+
+frontend --> student : 弹窗展示详情
+deactivate frontend
+
+== 反向查询：题目关联知识点 ==
+
+student -> frontend : 查看某题的知识点
+activate frontend
+
+frontend -> ctrl : GET /api/student/knowledge-graph\n/question/{questionId}/knowledge-points
+activate ctrl
+
+ctrl -> svc : getQuestionKnowledgePoints(questionId)
+activate svc
+
+svc -> qkpMap : findByQuestionId(questionId)
+activate qkpMap
+qkpMap --> svc : List<QuestionKnowledgePoint>\n(含 knowledgePointId + relevance)
+deactivate qkpMap
+
+svc --> ctrl : 关联的知识点列表
+deactivate svc
+
+ctrl --> frontend : JSON
+deactivate ctrl
+
+frontend --> student : 展示关联知识点标签
+deactivate frontend
+
+@enduml

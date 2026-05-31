@@ -44,7 +44,7 @@ Page({
 
   loadHtmlContent: function (htmlRef, fallbackText) {
     var _this = this
-    var base = (app.globalData.baseAPI || '').replace(/\/$/, '')
+    var base = (app.globalData.staticBase || '').replace(/\/$/, '')
     var url = htmlRef
     if (!/^https?:\/\//i.test(url)) {
       url = base + '/' + url.replace(/^\//, '')
@@ -52,6 +52,7 @@ Page({
     wx.request({
       url: url,
       dataType: 'text',
+      header: { 'token': wx.getStorageSync('token') },
       success: function (res) {
         if (res.statusCode === 200 && res.data) {
           _this.setData({ htmlContent: res.data })
@@ -59,7 +60,7 @@ Page({
           _this.setData({ htmlContent: '' })
         }
       },
-      fail: function () {
+      fail: function (err) {
         _this.setData({ htmlContent: '' })
       }
     })
@@ -72,7 +73,9 @@ Page({
         if (res.code === 1) {
           _this.setData({ relatedQuestions: res.response || [] })
         }
-      }).catch(function () {})
+      }).catch(function (e) {
+        app.message('加载题目失败', 'error')
+      })
   },
 
   goParent: function () {

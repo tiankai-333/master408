@@ -30,4 +30,6 @@ public interface ExamPaperMapper extends BaseMapper<ExamPaper> {
     int updateTaskPaper(@Param("taskId") Integer taskId,@Param("paperIds") List<Integer> paperIds);
 
     int clearTaskPaper(@Param("paperIds") List<Integer> paperIds);
+
+    long countByCreateUserAndSubjectAndKeyword(@Param("createUser") Integer createUser, @Param("subjectId") Integer subjectId, @Param("keyword") String keyword);
 }

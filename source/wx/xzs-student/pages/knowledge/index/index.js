@@ -33,6 +33,7 @@ Page({
   },
 
   buildGroups: function (nodes, categories) {
+    var allowedSubjects = ['数据结构', '计算机组成原理', '操作系统', '计算机网络']
     var pointNodes = []
     var i, node
     for (i = 0; i < nodes.length; i++) {
@@ -74,7 +75,7 @@ Page({
 
     var result = []
     for (var key in groupMap) {
-      if (groupMap[key].points.length > 0) {
+      if (groupMap[key].points.length > 0 && allowedSubjects.indexOf(key) >= 0) {
         result.push(groupMap[key])
       }
     }
@@ -111,8 +112,16 @@ Page({
     this.setData({ expandedGroup: e.detail })
   },
 
+  toggleGroup: function (e) {
+    var name = e.currentTarget.dataset.name
+    this.setData({ expandedGroup: this.data.expandedGroup === name ? '' : name })
+  },
+
   goDetail: function (e) {
     var id = e.currentTarget.dataset.id
+    if (typeof id === 'string') {
+      id = id.replace(/^kp_/, '')
+    }
     wx.navigateTo({ url: '/pages/knowledge/detail/index?id=' + id })
   }
 })

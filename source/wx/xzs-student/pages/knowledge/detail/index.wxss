@@ -21,10 +21,6 @@
   line-height: 1.7;
 }
 
-.explain-btn {
-  margin-bottom: 16px !important;
-}
-
 .related-section {
   margin-bottom: 16px;
   padding: 12px;
@@ -55,12 +51,16 @@
 
 .chip {
   display: inline-block;
-  padding: 4px 10px;
-  font-size: 13px;
-  color: #2d8cf0;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  padding: 16rpx 28rpx;
+  font-size: 28rpx;
+  color: #4F46E5;
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
   border-radius: 999px;
+}
+
+.chip:active {
+  background: #C7D2FE;
 }
 
 .knowledge-html {

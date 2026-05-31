@@ -1,20 +1,7 @@
 var markdownUtil = require('../../../utils/markdown.js')
+var questionHtml = require('../../../utils/questionHtml.js')
+var constants = require('../../../utils/constants.js')
 var app = getApp()
-
-var questionTypeMap = {
-  1: '单选题',
-  2: '多选题',
-  3: '判断题',
-  4: '填空题',
-  5: '简答题'
-}
-
-var aiStyles = [
-  { id: 'default', name: '标准解析' },
-  { id: 'feynman', name: '费曼风格' },
-  { id: 'plato', name: '柏拉图式' },
-  { id: 'first-principles', name: '第一性原理' }
-]
 
 Page({
   data: {
@@ -27,7 +14,7 @@ Page({
     aiResult: '',
     aiResultHtml: '',
     aiStyleIndex: 0,
-    aiStyleNames: aiStyles.map(function (s) { return s.name })
+    aiStyleNames: constants.aiStyles.map(function (s) { return s.name })
   },
 
   onLoad: function (options) {
@@ -41,12 +28,16 @@ Page({
     var _this = this
     app.formPost('/api/wx/student/question/answer/select/' + id, {})
       .then(function (res) {
-        _this.setData({ spinShow: false })
         if (res.code === 1) {
-          _this.setData({
-            questionVM: res.response.questionVM,
-            answerVM: res.response.questionAnswerVM
+          questionHtml.resolveQuestionVM(res.response.questionVM).then(function (resolved) {
+            _this.setData({
+              spinShow: false,
+              questionVM: resolved,
+              answerVM: res.response.questionAnswerVM
+            })
           })
+        } else {
+          _this.setData({ spinShow: false })
         }
       }).catch(function (e) {
         _this.setData({ spinShow: false })
@@ -63,8 +54,8 @@ Page({
     var a = this.data.answerVM
     if (!q) return
 
-    var style = aiStyles[this.data.aiStyleIndex].id
-    var questionType = questionTypeMap[q.questionType] || '未知'
+    var style = constants.aiStyles[this.data.aiStyleIndex].id
+    var questionType = constants.questionTypeMap[q.questionType] || '未知'
 
     var options = ''
     if (q.items && q.items.length > 0) {

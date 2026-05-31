@@ -12,7 +12,7 @@
   </i-panel>
 
   <i-panel title="密码">
-    <i-input value="{{ password }}" name="password" maxlength="-1" />
+    <i-input value="{{ password }}" name="password" maxlength="-1" password="true" />
   </i-panel>
   <i-panel title="年级">
     <picker mode="selector" range="{{ enumItem.state.user.levelEnum }}" range-key="{{'value'}}" value="{{levelIndex}}" bindchange="bindLevelChange">

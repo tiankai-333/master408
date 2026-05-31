@@ -8,5 +8,6 @@
 | `2026-05-30-local-dev-runtime-clarification.md` | 本地开发运行链路澄清：Vite、Maven、Docker、MySQL/Qdrant 端口关系和排查记录。 |
 | `github-collaboration-workflow.md` | GitHub 分支、PR、审核和团队协作记录。 |
 | `ui-learning-experience-branch.md` | UI 学习体验分支的设计目标、改动范围和后续建议。 |
+| `2026-05-31-ai-workbench-ui-polish.md` | AI 工作台 UI 打磨（组卷按钮改版、快捷操作栏）及做题页 HTML 渲染修复。 |
 
 写汇报时，这里适合支撑“项目开发过程”和“团队协作方式”章节。

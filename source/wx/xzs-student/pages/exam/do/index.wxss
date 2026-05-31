@@ -1,76 +1,267 @@
 .exam-page {
-  background: white;
+  background: #FAFAFE;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
 }
 
-.exam-count-down {
-  font-size: 15px;
-  line-height: 35px;
-}
+/* ====== 倒计时栏 ====== */
 
 .view-wrap {
   position: fixed;
   width: 100%;
-  background: #fff6f6;
+  background: linear-gradient(135deg, #6366F1, #818CF8);
   text-align: center;
-  height: 35px;
+  height: 72rpx;
+  line-height: 72rpx;
   z-index: 999;
 }
 
-.view-wrap-hidden {
-  height: 35px;
+.exam-count-down {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 2rpx;
 }
+
+.view-wrap-hidden {
+  height: 72rpx;
+}
+
+/* ====== 进度指示 ====== */
+
+.exam-progress-bar {
+  position: fixed;
+  top: 72rpx;
+  width: 100%;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  z-index: 998;
+  border-bottom: 1rpx solid #E0E7FF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exam-progress-text {
+  font-size: 26rpx;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.exam-progress-track {
+  flex: 1;
+  height: 8rpx;
+  background: #E0E7FF;
+  border-radius: 4rpx;
+  margin-left: 20rpx;
+  overflow: hidden;
+}
+
+.exam-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366F1, #818CF8);
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+.progress-placeholder {
+  height: 72rpx;
+}
+
+/* ====== 试卷标题 ====== */
 
 .exam-name-title {
   text-align: center;
-  margin-top: 10px;
-  font-size: 17px;
+  padding: 24rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #111827;
 }
+
+/* ====== 题目卡片 ====== */
 
 .exam-panel-title {
-  margin-top: 30px;
+  margin: 0 24rpx 24rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  border: 1rpx solid #E0E7FF;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+  overflow: hidden;
 }
 
-.exam-radio-item-label {
-  float: left;
-  margin-left: 10px;
-  line-height: 35px;
+.exam-cell {
+  padding: 0 !important;
 }
 
-.exam-item-left {
-  float: left;
+.exam-question-block {
+  padding: 28rpx;
+  border-bottom: 1rpx solid #F3F4F6;
 }
+
+.exam-question-block:last-child {
+  border-bottom: none;
+}
+
+.exam-question-title {
+  font-size: 30rpx;
+  color: #111827;
+  line-height: 1.7;
+  margin-bottom: 24rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+}
+
+.exam-question-num {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #6366F1;
+  margin-right: 4rpx;
+}
+
+/* ====== 选项 ====== */
+
+.exam-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.exam-option-label {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx 24rpx;
+  background: #F9FAFB;
+  border-radius: 12rpx;
+  border: 1rpx solid #E5E7EB;
+  line-height: 1.6;
+  font-size: 28rpx;
+  color: #374151;
+}
+
+.exam-option-label radio,
+.exam-option-label checkbox {
+  margin-right: 16rpx;
+  flex-shrink: 0;
+  transform: scale(0.9);
+}
+
+.exam-option-content {
+  flex: 1;
+}
+
+/* ====== 填空题 ====== */
 
 .exam-input-contain {
-  margin: 10px 2px !important;
-  border-width: 1px;
-  border-color: #dddee1;
-  border-style: solid;
-  width: 95%;
-  height: 40px;
+  display: flex;
+  align-items: center;
+  margin: 12rpx 0;
+  background: #F9FAFB;
+  border: 1rpx solid #E5E7EB;
+  border-radius: 12rpx;
+  height: 80rpx;
+  overflow: hidden;
 }
 
 .exam-input-contain-label {
-  float: left;
-  padding: 0px 15px;
-  line-height: 40px;
+  padding: 0 24rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  color: #6B7280;
+  font-weight: 600;
+  border-right: 1rpx solid #E5E7EB;
+  background: #F3F4F6;
 }
 
 .exam-input-contain-content {
-  float: left;
-  height: 40px;
+  flex: 1;
+  height: 80rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
 }
 
+/* ====== 简答题 ====== */
+
 .exam-textarea-contain {
-  margin: 10px 2px !important;
-  border-width: 1px;
-  border-color: #dddee1;
-  border-style: solid;
+  margin: 12rpx 0;
+  background: #F9FAFB;
+  border: 1rpx solid #E5E7EB;
+  border-radius: 12rpx;
+  padding: 20rpx;
+}
+
+.exam-textarea-contain textarea {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 28rpx;
+  color: #111827;
+  line-height: 1.6;
+}
+
+/* ====== 提交按钮 ====== */
+
+.exam-submit-area {
+  padding: 24rpx;
+}
+
+.exam-submit-btn {
+  width: 100%;
+  padding: 28rpx;
+  background: linear-gradient(135deg, #6366F1, #818CF8);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  text-align: center;
+  border: none;
+}
+
+/* ====== 超时弹窗 ====== */
+
+.exam-timeout-title {
+  font-size: 32rpx;
+  color: #EF4444;
+  font-weight: 700;
+  margin: 20rpx 0;
+  text-align: center;
+}
+
+/* ====== 结果弹窗 ====== */
+
+.exam-result-score {
+  font-size: 48rpx;
+  font-weight: 800;
+  color: #6366F1;
+  text-align: center;
+  padding: 20rpx 0;
+}
+
+/* ====== rich-text 内容 ====== */
+
+rich-text image, rich-text img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+rich-text pre {
+  background-color: #F3F4F6;
+  padding: 16rpx;
+  overflow-x: auto;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+}
+
+rich-text code {
+  font-family: Menlo, Monaco, Consolas, monospace;
+  font-size: 26rpx;
+}
+
+rich-text table {
+  border-collapse: collapse;
   width: 100%;
 }
 
-.exam-timeout-title{
-  font-size: 16px;
-  color: red;
-  margin-top: 10px;
-  margin-bottom: 20px;
+rich-text td, rich-text th {
+  border: 1rpx solid #E5E7EB;
+  padding: 8rpx 16rpx;
 }

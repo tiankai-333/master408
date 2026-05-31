@@ -43,28 +43,16 @@ Page({
     var _this = this
     _this.setData({ isAnalyzing: true, results: [], errorMessage: '' })
 
-    wx.uploadFile({
-      url: app.globalData.baseAPI + '/api/wx/student/question/analyze-image',
-      filePath: _this.data.imageUrl,
-      name: 'file',
-      header: { token: wx.getStorageSync('token') },
-      success: function (res) {
-        _this.setData({ isAnalyzing: false })
-        try {
-          var data = JSON.parse(res.data)
-          if (data.code === 1) {
-            var parsed = _this.parseResponse(data.response)
-            _this.setData({ results: parsed })
-          } else {
-            _this.setData({ errorMessage: data.message || '识别失败' })
-          }
-        } catch (e) {
-          _this.setData({ errorMessage: '解析结果失败' })
-        }
-      },
-      fail: function (err) {
-        _this.setData({ isAnalyzing: false, errorMessage: '上传失败：' + (err.errMsg || '网络错误') })
+    app.uploadFile('/api/wx/student/question/analyze-image', _this.data.imageUrl, 'file').then(function (data) {
+      _this.setData({ isAnalyzing: false })
+      if (data.code === 1) {
+        var parsed = _this.parseResponse(data.response)
+        _this.setData({ results: parsed })
+      } else {
+        _this.setData({ errorMessage: data.message || '识别失败' })
       }
+    }).catch(function (err) {
+      _this.setData({ isAnalyzing: false, errorMessage: '上传失败：' + (err || '网络错误') })
     })
   },
 

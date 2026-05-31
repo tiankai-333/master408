@@ -53,4 +53,3 @@
 .accent-teal   { background: linear-gradient(90deg, #0D9488, #2DD4BF); }
 .accent-rose   { background: linear-gradient(90deg, #EF4444, #F87171); }
 .accent-violet { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
-.accent-amber  { background: linear-gradient(90deg, #F59E0B, #FBBF24); }

@@ -118,7 +118,7 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
         }
 
         Integer paperSubjectId = subjectId == null ? subjectIdFromQuestions(selected) : subjectId;
-        ExamPaperEditRequestVM paperVM = buildPaperVM(request, paperSubjectId, minutes, selected);
+        ExamPaperEditRequestVM paperVM = buildPaperVM(request, paperSubjectId, minutes, selected, user);
         ExamPaper paper = examPaperService.savePaperFromVM(paperVM, user);
 
         createPersonalTask(paper, user);
@@ -134,12 +134,12 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
         return response;
     }
 
-    private ExamPaperEditRequestVM buildPaperVM(AiPaperComposeRequestVM request, Integer subjectId, int minutes, List<Question> questions) {
+    private ExamPaperEditRequestVM buildPaperVM(AiPaperComposeRequestVM request, Integer subjectId, int minutes, List<Question> questions, User user) {
         ExamPaperEditRequestVM paperVM = new ExamPaperEditRequestVM();
         paperVM.setSubjectId(subjectId);
         paperVM.setLevel(1);
         paperVM.setPaperType(ExamPaperTypeEnum.TimeLimit.getCode());
-        paperVM.setName(resolvePaperName(request));
+        paperVM.setName(resolvePaperName(request, user));
         paperVM.setSuggestTime(minutes);
 
         Date start = new Date();
@@ -162,19 +162,37 @@ public class AiPaperComposeServiceImpl implements AiPaperComposeService {
         return paperVM;
     }
 
-    private String defaultPaperName(AiPaperComposeRequestVM request) {
+    private String defaultPaperName(AiPaperComposeRequestVM request, User user) {
         String knowledgePoint = normalize(request.getKnowledgePoint());
-        String timeText = new SimpleDateFormat("MM-dd HH:mm").format(new Date());
         if (knowledgePoint != null) {
-            return "AI限时练习-" + knowledgePoint + "-" + timeText;
+            long count = examPaperMapper.countByCreateUserAndSubjectAndKeyword(user != null ? user.getId() : null, request.getSubjectId(), knowledgePoint);
+            return knowledgePoint + " 专项组卷" + (count + 1);
         }
-        return "AI限时练习-" + timeText;
+        String subjectName = subjectName(request.getSubjectId());
+        if (request.getSubjectId() != null) {
+            long count = examPaperMapper.countByCreateUserAndSubjectAndKeyword(user != null ? user.getId() : null, request.getSubjectId(), null);
+            return subjectName + " 综合组卷" + (count + 1);
+        }
+        String userName = (user != null && user.getRealName() != null) ? user.getRealName() : (user != null ? user.getUserName() : "学员");
+        long count = examPaperMapper.countByCreateUserAndSubjectAndKeyword(user != null ? user.getId() : null, null, null);
+        return userName + " 针对组卷" + (count + 1);
     }
 
-    private String resolvePaperName(AiPaperComposeRequestVM request) {
+    private String subjectName(Integer subjectId) {
+        if (subjectId == null) return "408";
+        switch (subjectId) {
+            case 1: return "数据结构";
+            case 2: return "计算机组成原理";
+            case 3: return "操作系统";
+            case 4: return "计算机网络";
+            default: return "408";
+        }
+    }
+
+    private String resolvePaperName(AiPaperComposeRequestVM request, User user) {
         String name = normalize(request.getName());
         if (name == null || "AI限时练习".equals(name)) {
-            return defaultPaperName(request);
+            return defaultPaperName(request, user);
         }
         return name;
     }

@@ -31,8 +31,10 @@ Page({
   },
   search: function (override) {
     let _this = this
+    _this.loading = true
     app.formPost('/api/wx/student/question/answer/page', this.data.queryParam)
       .then(res => {
+        _this.loading = false
         _this.setData({ spinShow: false })
         wx.stopPullDownRefresh()
         if (res.code === 1) {
@@ -47,6 +49,7 @@ Page({
           }
         }
       }).catch(e => {
+        _this.loading = false
         _this.setData({ spinShow: false })
         app.message(e, 'error')
       })

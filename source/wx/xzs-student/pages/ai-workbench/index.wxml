@@ -1,11 +1,22 @@
 <view class="page">
 
-  <!-- 功能四宫格 -->
-  <view class="func-grid">
-    <view class="func-btn {{selectedSubject ? 'func-btn--active' : ''}}" bind:tap="toggleSubject">{{selectedSubject || '科目'}}</view>
-    <view class="func-btn {{selectedPoint ? 'func-btn--active' : ''}}" bind:tap="toggleKnowledge">{{selectedPoint ? selectedPoint.name : '知识点'}}</view>
-    <view class="func-btn {{selectedExam ? 'func-btn--active' : ''}}" bind:tap="randomExam">{{selectedExam.name || '真题'}}</view>
-    <view class="func-btn {{selectedMistake ? 'func-btn--active' : ''}}" bind:tap="randomMistake">{{selectedMistake.shortTitle || '错题'}}</view>
+  <!-- 顶部三行：科目、知识点、组卷 -->
+  <view class="top-panel">
+    <view class="top-row" bind:tap="toggleSubject">
+      <text class="top-label">科目</text>
+      <text class="top-value {{selectedSubject ? 'top-value--active' : ''}}">{{selectedSubject || '请选择'}}</text>
+      <text class="top-arrow">›</text>
+    </view>
+    <view class="top-row" bind:tap="toggleKnowledge">
+      <text class="top-label">知识点</text>
+      <text class="top-value {{selectedPoint ? 'top-value--active' : ''}}">{{selectedPoint ? selectedPoint.name : '请选择'}}</text>
+      <text class="top-arrow">›</text>
+    </view>
+    <view class="top-row top-row--gen" bind:tap="onComposeTap">
+      <text class="top-label top-label--gen">AI组卷</text>
+      <text class="top-hint" wx:if="{{selectedSubject}}">{{selectedSubject}}{{selectedPoint ? ' · ' + selectedPoint.name : ''}}</text>
+      <text class="top-hint" wx:else>个性组卷</text>
+    </view>
   </view>
 
   <!-- 科目选择弹窗 -->
@@ -19,9 +30,6 @@
               bind:tap="confirmSubjectPick" data-subject="{{item}}">
           {{item}}
         </view>
-      </view>
-      <view class="popup-footer">
-        <view class="popup-clear" bind:tap="clearSubjectPick">清除</view>
       </view>
     </view>
   </view>
@@ -39,27 +47,14 @@
           <view class="picker-group-title">{{item.name}}（{{item.points.length}}）</view>
           <view class="picker-item {{selectedPoint && selectedPoint.id === pt.id ? 'picker-item--active' : ''}}"
                 wx:for="{{item.points}}" wx:for-item="pt" wx:key="id"
-                bind:tap="confirmKnowledgePick" data-id="{{pt.id}}" data-name="{{pt.name}}" data-desc="{{pt.description}}">
+                bind:tap="confirmKnowledgePick" data-id="{{pt.id}}" data-name="{{pt.name}}" data-desc="{{pt.description}}" data-group="{{item.name}}">
             <text class="picker-item-name">{{pt.name}}</text>
             <text class="picker-item-sub" wx:if="{{pt.description}}">{{pt.description}}</text>
           </view>
         </view>
         <view class="popup-empty" wx:if="{{!pickerGroups.length}}">暂无匹配知识点</view>
       </scroll-view>
-      <view class="popup-footer">
-        <view class="popup-clear" bind:tap="clearKnowledgePick">清除</view>
-      </view>
     </view>
-  </view>
-
-  <!-- 上下文卡片 -->
-  <view class="context-card" wx:if="{{contextMode !== 'none'}}">
-    <view class="context-icon">{{contextType === 'knowledge' ? '📖' : contextType === 'exam_question' ? '📝' : '❌'}}</view>
-    <view class="context-info">
-      <text class="context-label">{{contextType === 'knowledge' ? '知识点' : contextType === 'exam_question' ? '真题' : '错题'}}</text>
-      <text class="context-name">{{contextName}}</text>
-    </view>
-    <text class="context-clear" bind:tap="clearContext">×</text>
   </view>
 
   <!-- 对话消息区 -->
@@ -105,23 +100,16 @@
     <view id="msg-bottom"></view>
   </scroll-view>
 
-  <!-- 聊天栏上方：画像、组卷、风格 -->
+  <!-- 快捷操作栏 -->
   <view class="action-bar">
-    <view class="action-btn" bind:tap="quickAction" data-action="weak">画像</view>
-    <view class="action-btn action-btn--primary" bind:tap="quickAction" data-action="compose">组卷</view>
-    <view class="action-btn action-btn--style" bind:tap="showStylePicker">{{aiStyles[aiStyleIndex]}} ▾</view>
-  </view>
-
-  <!-- 风格选择弹窗 -->
-  <view class="style-sheet" wx:if="{{styleVisible}}">
-    <view class="style-mask" bind:tap="closeStyle"></view>
-    <view class="style-list">
-      <view class="style-item {{aiStyleIndex === index ? 'style-item--active' : ''}}"
-            wx:for="{{aiStyles}}" wx:key="index"
-            bind:tap="selectStyle" data-index="{{index}}">
-        {{item}}
-        <text class="style-check" wx:if="{{aiStyleIndex === index}}">✓</text>
-      </view>
+    <view class="action-btn action-btn--profile" bind:tap="quickAction" data-action="weak">
+      <text>画像</text>
+    </view>
+    <view class="action-btn action-btn--paste" bind:tap="onPaste">
+      <text>粘贴</text>
+    </view>
+    <view class="action-btn action-btn--clear" bind:tap="clearChat">
+      <text>清空</text>
     </view>
   </view>
 
@@ -130,33 +118,22 @@
     <textarea class="input-field" placeholder="输入问题或描述..." value="{{inputMessage}}"
               bindinput="onInput" bindconfirm="sendMessage" confirm-type="send"
               auto-height maxlength="2000" adjust-position="{{true}}" />
-    <view class="send-btn {{inputMessage.trim() ? 'send-btn--active' : ''}}" bind:tap="sendMessage">发送</view>
-  </view>
-
-  <!-- 通用选择弹窗 -->
-  <view class="compose-modal" wx:if="{{popupType}}">
-    <view class="compose-mask" bind:tap="closePopup"></view>
-    <view class="compose-dialog popup-dialog">
-      <view class="compose-title">{{popupTitle}}</view>
-      <view class="popup-random" bind:tap="popupRandom">随机</view>
-      <scroll-view scroll-y class="popup-scroll">
-        <view class="popup-item" wx:for="{{popupItems}}" wx:key="id"
-              bind:tap="popupSelect" data-index="{{index}}">
-          <text class="popup-item-name">{{item.name}}</text>
-          <text class="popup-item-sub" wx:if="{{item.sub}}">{{item.sub}}</text>
-        </view>
-      </scroll-view>
-      <view class="popup-empty" wx:if="{{!popupLoading && popupItems.length === 0}}">暂无数据</view>
-    </view>
+    <view class="send-btn {{canSend ? 'send-btn--active' : ''}}" bind:tap="sendMessage">发送</view>
   </view>
 
   <!-- 组卷弹窗 -->
   <view class="compose-modal" wx:if="{{composeVisible}}">
     <view class="compose-mask" bind:tap="closeCompose"></view>
     <view class="compose-dialog">
-      <view class="compose-title">生成练习</view>
-      <view class="compose-info" wx:if="{{selectedPoint}}">
-        <text>知识点：{{selectedPoint.name}}</text>
+      <view class="compose-title">{{selectedSubject ? '智能组卷' : '个性组卷'}}</view>
+      <view class="compose-info" wx:if="{{selectedSubject && selectedPoint}}">
+        <text>{{selectedSubject}} · {{selectedPoint.name}}</text>
+      </view>
+      <view class="compose-info" wx:elif="{{selectedSubject && !selectedPoint}}">
+        <text>{{selectedSubject}}</text>
+      </view>
+      <view class="compose-info" wx:elif="{{!selectedSubject}}">
+        <text>根据错题记录智能出题</text>
       </view>
       <view class="compose-row">
         <text class="compose-label">题目数量</text>

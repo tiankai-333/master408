@@ -6,41 +6,65 @@
   overflow: hidden;
 }
 
-/* ====== 功能四宫格 ====== */
+/* ====== 顶部三行：科目、知识点、组卷 ====== */
 
-.func-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
-  padding: 16rpx 24rpx;
+.top-panel {
   background: #fff;
   border-bottom: 1rpx solid #E5E7EB;
   flex-shrink: 0;
 }
 
-.func-btn {
-  padding: 24rpx 0;
-  text-align: center;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #4B5563;
-  background: #F3F4F6;
-  border-radius: 16rpx;
+.top-row {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 32rpx;
+  border-bottom: 1rpx solid #F3F4F6;
 }
 
-.func-btn--active {
-  background: #6366F1;
+.top-row:last-child {
+  border-bottom: none;
+}
+
+.top-row--gen {
+  background: linear-gradient(135deg, #0EA5E9, #38BDF8);
+}
+
+.top-label {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #111827;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.top-label--gen {
   color: #fff;
 }
 
-/* ====== Context card ====== */
+.top-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #9CA3AF;
+  text-align: right;
+}
 
-.context-card { display: flex; align-items: center; padding: 12rpx 24rpx; background: #EEF2FF; border-bottom: 1rpx solid #E0E7FF; flex-shrink: 0; }
-.context-icon { font-size: 28rpx; margin-right: 12rpx; }
-.context-info { flex: 1; display: flex; flex-direction: column; }
-.context-label { font-size: 20rpx; color: #818CF8; }
-.context-name { font-size: 26rpx; color: #4F46E5; font-weight: 500; }
-.context-clear { font-size: 32rpx; color: #818CF8; padding: 0 12rpx; }
+.top-value--active {
+  color: #4F46E5;
+  font-weight: 600;
+}
+
+.top-arrow {
+  font-size: 32rpx;
+  color: #D1D5DB;
+  padding-left: 12rpx;
+}
+
+.top-hint {
+  flex: 1;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: right;
+}
 
 /* ====== Chat ====== */
 
@@ -74,53 +98,20 @@
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 @keyframes typing-bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10rpx); } }
 
-/* ====== 聊天栏上方操作栏 ====== */
-
-.action-bar {
-  display: flex;
-  padding: 12rpx 24rpx;
-  gap: 16rpx;
-  background: #fff;
-  border-top: 1rpx solid #F3F4F6;
-  flex-shrink: 0;
-}
-
-.action-btn {
-  padding: 16rpx 32rpx;
-  border-radius: 28rpx;
-  font-size: 28rpx;
-  color: #4B5563;
-  background: #F3F4F6;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.action-btn--primary {
-  background: #EEF2FF;
-  color: #4F46E5;
-}
-
-.action-btn--style {
-  background: #F0FDF4;
-  color: #16A34A;
-  margin-left: auto;
-}
-
-/* ====== 风格选择弹窗 ====== */
-
-.style-sheet { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; align-items: flex-end; }
-.style-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); }
-.style-list { position: relative; width: 100%; background: #fff; border-radius: 24rpx 24rpx 0 0; padding: 32rpx; padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); z-index: 1; }
-.style-item { padding: 28rpx 16rpx; font-size: 32rpx; color: #374151; display: flex; align-items: center; justify-content: space-between; border-bottom: 1rpx solid #F3F4F6; }
-.style-item--active { color: #16A34A; font-weight: 600; }
-.style-check { color: #16A34A; font-size: 28rpx; }
-
 /* ====== Input area ====== */
 
 .input-area { display: flex; align-items: flex-end; padding: 16rpx 24rpx; padding-bottom: calc(16rpx + env(safe-area-inset-bottom)); background: #fff; border-top: 1rpx solid #E5E7EB; gap: 12rpx; flex-shrink: 0; }
 .input-field { flex: 1; min-height: 60rpx; max-height: 180rpx; padding: 12rpx 16rpx; background: #F3F4F6; border-radius: 16rpx; font-size: 28rpx; color: #111827; }
 .send-btn { padding: 14rpx 28rpx; border-radius: 16rpx; background: #E5E7EB; color: #9CA3AF; font-size: 28rpx; font-weight: 600; flex-shrink: 0; }
 .send-btn--active { background: #6366F1; color: #fff; }
+
+/* ====== Quick action bar ====== */
+
+.action-bar { display: flex; gap: 16rpx; padding: 12rpx 24rpx 0; background: #fff; flex-shrink: 0; }
+.action-btn { padding: 16rpx 36rpx; border-radius: 24rpx; font-size: 28rpx; font-weight: 500; }
+.action-btn--profile { background: #EEF2FF; color: #4F46E5; }
+.action-btn--paste { background: #F0FDF4; color: #16A34A; }
+.action-btn--clear { background: #F3F4F6; color: #6B7280; }
 
 /* ====== Compose modal ====== */
 

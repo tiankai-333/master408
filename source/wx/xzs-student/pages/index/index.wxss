@@ -14,6 +14,37 @@
   padding: 12rpx 0 8rpx;
 }
 
+/* ====== 学习概览 ====== */
+
+.stats-bar {
+  display: flex;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #E0E7FF;
+  padding: 24rpx 0;
+  margin: 16rpx 0 4rpx;
+  box-shadow: 0 2rpx 8rpx rgba(99, 102, 241, 0.06);
+}
+
+.stats-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #6366F1;
+}
+
+.stats-label {
+  font-size: 22rpx;
+  color: #6B7280;
+  margin-top: 6rpx;
+}
+
 /* ====== 标题 ====== */
 
 .section-title {
@@ -193,3 +224,34 @@
 .accent-indigo { background: linear-gradient(90deg, #6366F1, #818CF8); }
 .accent-teal   { background: linear-gradient(90deg, #0D9488, #2DD4BF); }
 .accent-violet { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+
+.web-link-card {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  border: 1rpx solid #E5E7EB;
+}
+
+.web-link-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.web-link-row:active {
+  background: #F9FAFB;
+}
+
+.web-link-label {
+  font-size: 24rpx;
+  color: #9CA3AF;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.web-link-value {
+  font-size: 24rpx;
+  color: #6366F1;
+  word-break: break-all;
+}

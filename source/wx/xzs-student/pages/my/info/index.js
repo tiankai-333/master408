@@ -53,9 +53,7 @@ Page({
     app.formPost('/api/wx/student/user/update', e.detail.value)
       .then(res => {
         if (res.code == 1) {
-          wx.reLaunch({
-            url: '/pages/my/index/index',
-          });
+          wx.navigateBack()
         } else {
           app.message(res.message, 'error')
         }

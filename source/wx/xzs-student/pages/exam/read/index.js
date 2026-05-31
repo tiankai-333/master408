@@ -1,59 +1,79 @@
-import {
-  formatSeconds,
-} from '../../../utils/util.js'
+var questionHtml = require('../../../utils/questionHtml.js')
 
-let app = getApp()
+var app = getApp()
 Page({
   data: {
     spinShow: false,
     paperId: null,
     paper: {},
-    answer: {},
-    timer: null,
-    doTime: 0,
-    remainTime: 0,
-    remainTimeStr: '',
-    modalShow: false,
-    result: 0,
-    timeOutShow: false
+    answer: {}
   },
   onLoad: function(options) {
-    let paperId = options.id
-    let _this = this
-    _this.setData({
-      spinShow: true
-    });
+    var paperId = options.id
+    var _this = this
+    _this.setData({ spinShow: true })
     app.formPost('/api/wx/student/exampaper/answer/read/' + paperId, null)
-      .then(res => {
-        _this.setData({
-          spinShow: false
-        });
+      .then(function(res) {
         if (res.code === 1) {
-          _this.setData({
-            paper: res.response.paper,
-            answer: res.response.answer,
-            paperId: paperId,
-          });
+          questionHtml.resolveExamPaper(res.response.paper).then(function(resolved) {
+            _this.setData({
+              spinShow: false,
+              paper: resolved,
+              answer: res.response.answer,
+              paperId: paperId
+            })
+          })
+        } else {
+          _this.setData({ spinShow: false })
         }
-      }).catch(e => {
-        _this.setData({
-          spinShow: false
-        });
+      }).catch(function(e) {
+        _this.setData({ spinShow: false })
         app.message(e, 'error')
       })
   },
-  onUnload() {
-    clearInterval(this.data.timer)
+
+  judgeQuestion: function(e) {
+    var _this = this
+    var itemOrder = e.currentTarget.dataset.order
+    var isCorrect = e.currentTarget.dataset.correct === 'true'
+    var answer = _this.data.answer
+    var item = answer.answerItems[itemOrder - 1]
+
+    if (!item) return
+
+    var questionScore = item.questionScore || '0'
+    var score = isCorrect ? questionScore : '0'
+
+    var judgeItem = {
+      id: item.id,
+      doRight: isCorrect,
+      score: score,
+      questionScore: questionScore
+    }
+
+    wx.showLoading({ title: '批改中', mask: true })
+    app.jsonPost('/api/wx/student/exampaper/answer/judge', {
+      id: Number(_this.data.paperId),
+      answerItems: [judgeItem]
+    }).then(function(res) {
+      wx.hideLoading()
+      if (res.code === 1) {
+        var newAnswer = JSON.parse(JSON.stringify(answer))
+        newAnswer.answerItems[itemOrder - 1].doRight = isCorrect
+        newAnswer.answerItems[itemOrder - 1].score = score
+        newAnswer.score = res.response || answer.score
+        _this.setData({ answer: newAnswer })
+        app.message('批改完成', 'success')
+      } else {
+        app.message(res.message || '批改失败', 'error')
+      }
+    }).catch(function(e) {
+      wx.hideLoading()
+      app.message(e || '批改失败', 'error')
+    })
   },
-  returnRecord() {
-    wx.reLaunch({
-      url: '/pages/record/index',
-    });
-  },
-  timeOut() {
-    clearInterval(this.data.timer)
-    this.setData({
-      timeOutShow: true
-    });
+
+  returnRecord: function() {
+    wx.navigateBack()
   }
 })

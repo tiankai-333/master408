@@ -1,0 +1,112 @@
+@startuml 微信小程序认证时序图
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+title 微信小程序认证时序图\nAuthController (bind + checkBind)
+
+actor "微信用户" as user
+participant "小程序前端\n(WXML)" as wx
+participant "AuthController\n/api/wx/student/auth" as auth
+participant "AuthenticationService" as authSvc
+participant "WxUtil" as wxutil
+participant "微信API\napi.weixin.qq.com" as wxapi
+participant "UserTokenService" as tokenSvc
+participant "UserTokenMapper" as tokenMap
+participant "t_user / t_user_token" as db
+
+== 首次绑定：POST /api/wx/student/auth/bind ==
+
+user -> wx : 打开小程序，点击"绑定账号"
+activate wx
+
+wx -> wx : wx.login() → 获取 code
+
+wx -> auth : POST /api/wx/student/auth/bind\n{ userName, password, code }
+activate auth
+
+auth -> authSvc : authUser(userName, password)
+activate authSvc
+authSvc --> auth : User 对象（验证通过）
+deactivate authSvc
+
+auth -> wxutil : getOpenId(appid, secret, code)
+activate wxutil
+wxutil -> wxapi : GET /sns/jscode2session\n?appid=&secret=&js_code=
+activate wxapi
+wxapi --> wxutil : { openid, session_key }
+deactivate wxapi
+note right: 若开发模式(secret为空)\n返回 "dev-" + userName
+wxutil --> auth : openid
+deactivate wxutil
+
+auth -> auth : user.setWxOpenId(openid)
+
+auth -> tokenSvc : bind(user)
+activate tokenSvc
+tokenSvc -> tokenMap : UPDATE t_user SET wx_open_id=?\nWHERE id=?
+tokenMap -> db : 更新用户表
+tokenSvc -> tokenMap : INSERT t_user_token\n(token=UUID, userId, endTime)
+tokenMap -> db : 写入令牌
+tokenSvc --> auth : token 字符串
+deactivate tokenSvc
+
+auth --> wx : { code: 1, response: token }
+deactivate auth
+
+wx -> wx : wx.setStorageSync("token", token)
+wx --> user : 绑定成功，进入首页
+deactivate wx
+
+== 后续登录：POST /api/wx/student/auth/checkBind ==
+
+user -> wx : 再次打开小程序
+activate wx
+
+wx -> wx : wx.login() → 获取 code
+
+wx -> auth : POST /api/wx/student/auth/checkBind\n{ code }
+activate auth
+
+auth -> wxutil : getOpenId(appid, secret, code)
+activate wxutil
+wxutil -> wxapi : GET /sns/jscode2session
+wxapi --> wxutil : { openid }
+deactivate wxapi
+wxutil --> auth : openid
+deactivate wxutil
+
+auth -> tokenSvc : checkBind(openid)
+activate tokenSvc
+tokenSvc -> tokenMap : SELECT * FROM t_user_token\nWHERE wx_open_id=?
+
+alt 已绑定
+  tokenMap -> db : 查到 UserToken
+  tokenSvc -> tokenSvc : 创建新 token (刷新过期时间)
+  tokenSvc -> tokenMap : INSERT t_user_token
+  tokenSvc --> auth : token 字符串
+else 未绑定
+  tokenSvc --> auth : null
+end
+deactivate tokenSvc
+
+alt 已绑定
+  auth --> wx : { code: 1, response: token }
+else 未绑定
+  auth --> wx : { code: 2, message: "用户未绑定" }
+  note right: 前端跳转到绑定页面
+end
+deactivate auth
+
+== 每次请求认证：TokenHandlerInterceptor ==
+
+wx -> auth : GET /api/wx/student/dashboard/index\nHeader: token
+note right
+  TokenHandlerInterceptor:
+  1. 从 header 读取 token
+  2. 查 UserToken 表
+  3. 检查 endTime 是否过期
+  4. 未过期 → WxContext.setUser(user)
+  5. 过期 → 返回 AccessTokenError
+end note
+
+@enduml

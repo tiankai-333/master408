@@ -19,9 +19,7 @@ Page({
     var h = now.getHours()
     var g = h >= 6 && h < 12 ? '早上好 ☀️' : h >= 12 && h < 14 ? '中午好 🌤' : h >= 14 && h < 18 ? '下午好 🌅' : '晚上好 🌙'
     this.setData({ selectedDate: this.formatDate(now), greeting: g })
-    this.loadUserStats()
     this.buildWeek(0)
-    this.loadMonthData()
   },
 
   onShow: function () {
@@ -41,8 +39,14 @@ Page({
   loadUserStats: function () {
     var _this = this
     app.formPost('/api/wx/student/user/stats', {}).then(function (res) {
-      if (res.code === 1) _this.setData({ userStats: res.response })
-    }).catch(function () {})
+      if (res.code === 1) {
+        _this.setData({ userStats: res.response })
+      } else if (res.code !== 401) {
+        wx.showToast({ title: res.message || '加载统计失败', icon: 'none', duration: 2000 })
+      }
+    }).catch(function (e) {
+      app.message(e, 'error')
+    })
   },
 
   // ====== Week calendar ======
@@ -96,8 +100,11 @@ Page({
         _this.setData({ monthData: map })
         _this.updateStudyDots()
         _this.updateDayDetail()
+      } else if (res.code !== 401) {
+        wx.showToast({ title: res.message || '加载日历失败', icon: 'none', duration: 2000 })
       }
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error('[calendar] failed:', err)
       _this.setData({ monthData: {} })
     })
   },
@@ -135,6 +142,15 @@ Page({
   goPage: function (e) {
     var url = e.currentTarget.dataset.url
     if (url) wx.navigateTo({ url: url })
+  },
+
+  copyLink: function (e) {
+    wx.setClipboardData({
+      data: e.currentTarget.dataset.url,
+      success: function () {
+        wx.showToast({ title: '已复制', icon: 'success' })
+      }
+    })
   },
 
   goTab: function (e) {

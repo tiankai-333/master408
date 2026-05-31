@@ -15,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/test")
+@org.springframework.context.annotation.Profile("dev")
 public class TestController {
 
     private final UserService userService;

@@ -1,77 +1,93 @@
 <view class="exam-page">
+  <!-- 倒计时 -->
   <view class="view-wrap">
     <view class="exam-count-down">{{remainTimeStr}}</view>
   </view>
-  <view class="view-wrap-hidden">
+  <view class="view-wrap-hidden"></view>
+
+  <!-- 进度指示 -->
+  <view class="exam-progress-bar" wx:if="{{form.titleItems}}">
+    <text class="exam-progress-text">{{answeredCount || 0}}/{{totalQuestions || 0}}</text>
+    <view class="exam-progress-track">
+      <view class="exam-progress-fill" style="width: {{totalQuestions ? (answeredCount / totalQuestions * 100) : 0}}%"></view>
+    </view>
   </view>
+  <view class="progress-placeholder"></view>
 
   <view>
-    <view class="exam-name-title">
-      <h1>{{form.name}}</h1>
-    </view>
+    <view class="exam-name-title">{{form.name}}</view>
     <form bindsubmit='formSubmit'>
       <i-panel title="{{titleItem.name}}" wx:for="{{form.titleItems}}" wx:for-item="titleItem" wx:key="{{titleItem.name}}" i-class="exam-panel-title">
         <i-cell-group i-class="exam-cell">
           <i-cell wx:for="{{titleItem.questionItems}}" wx:key="{{titleItem.id}}" wx:for-item="questionItem">
 
-            <view wx:if="{{questionItem.questionType === 1}}">
-              <rich-text nodes="{{questionItem.itemOrder}}. {{questionItem.title}}" />
-              <radio-group class="radio-group" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}">
-                <label class="radio" wx:for="{{questionItem.items}}" wx:key="{{questionItem.prefix}}" wx:for-item="radioItem" class="exam-radio-item-label">
-                  <radio color="#2d8cf0" value="{{radioItem.prefix}}" checked="{{radioItem.checked}}" class="exam-item-left" />
-                  <rich-text nodes="{{radioItem.prefix}}. {{radioItem.content}}" class="exam-item-left" />
+            <!-- 单选题 -->
+            <view wx:if="{{questionItem.questionType === 1}}" class="exam-question-block">
+              <view class="exam-question-title"><text class="exam-question-num">{{questionItem.itemOrder}}. </text><rich-text nodes="{{questionItem.title}}" /></view>
+              <radio-group class="exam-option-group" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}" bindchange="onAnswerChange">
+                <label class="exam-option-label" wx:for="{{questionItem.items}}" wx:key="{{radioItem.prefix}}" wx:for-item="radioItem">
+                  <radio color="#6366F1" value="{{radioItem.prefix}}" checked="{{radioItem.checked}}" />
+                  <rich-text nodes="{{radioItem.prefix}}. {{radioItem.content}}" class="exam-option-content" />
                 </label>
               </radio-group>
             </view>
-            <view wx:elif="{{questionItem.questionType === 2}}">
-              <rich-text nodes="{{questionItem.itemOrder}}. {{questionItem.title}}" class="exam-item-left" style="line-height:35px" />
-              <checkbox-group class="exam-item-left" style="margin-left:10px" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}">
-                <label wx:for="{{questionItem.items}}" wx:key="{{questionItem.prefix}}" wx:for-item="radioItem" class="exam-radio-item-label">
-                  <checkbox color="#2d8cf0" value="{{radioItem.prefix}}" checked="{{radioItem.checked}}" class="exam-item-left" />
-                  <rich-text nodes="{{radioItem.prefix}}. {{radioItem.content}}" class="exam-item-left" />
+
+            <!-- 多选题 -->
+            <view wx:elif="{{questionItem.questionType === 2}}" class="exam-question-block">
+              <view class="exam-question-title"><text class="exam-question-num">{{questionItem.itemOrder}}. </text><rich-text nodes="{{questionItem.title}}" /></view>
+              <checkbox-group class="exam-option-group" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}" bindchange="onAnswerChange">
+                <label class="exam-option-label" wx:for="{{questionItem.items}}" wx:key="{{radioItem.prefix}}" wx:for-item="radioItem">
+                  <checkbox color="#6366F1" value="{{radioItem.prefix}}" checked="{{radioItem.checked}}" />
+                  <rich-text nodes="{{radioItem.prefix}}. {{radioItem.content}}" class="exam-option-content" />
                 </label>
               </checkbox-group>
             </view>
-            <view wx:elif="{{questionItem.questionType === 3}}">
-              <rich-text nodes="{{questionItem.itemOrder}}. {{questionItem.title}}" class="exam-item-left" style="line-height:35px" />
-              <radio-group class="radio-group" class="exam-item-left" style="margin-left:10px" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}">
-                <label class="radio" wx:for="{{questionItem.items}}" wx:key="{{questionItem.prefix}}" wx:for-item="radioItem" class="exam-radio-item-label">
-                  <radio color="#2d8cf0" value="{{radioItem.prefix}}" checked="{{radioItem.checked}}" class="exam-item-left" />
-                  <rich-text nodes="{{radioItem.content}}" class="exam-item-left" />
+
+            <!-- 判断题 -->
+            <view wx:elif="{{questionItem.questionType === 3}}" class="exam-question-block">
+              <view class="exam-question-title"><text class="exam-question-num">{{questionItem.itemOrder}}. </text><rich-text nodes="{{questionItem.title}}" /></view>
+              <radio-group class="exam-option-group" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}" bindchange="onAnswerChange">
+                <label class="exam-option-label" wx:for="{{questionItem.items}}" wx:key="{{radioItem.prefix}}" wx:for-item="radioItem">
+                  <radio color="#6366F1" value="{{radioItem.prefix}}" checked="{{radioItem.checked}}" />
+                  <rich-text nodes="{{radioItem.content}}" class="exam-option-content" />
                 </label>
               </radio-group>
             </view>
-            <view wx:elif="{{questionItem.questionType === 4}}">
-              <rich-text nodes="{{questionItem.itemOrder}}. {{questionItem.title}}" />
-              <view class="exam-input-contain" wx:for="{{questionItem.items}}" wx:key="{{questionItem.prefix}}" wx:for-item="inputItem" wx:for-index="idx">
+
+            <!-- 填空题 -->
+            <view wx:elif="{{questionItem.questionType === 4}}" class="exam-question-block">
+              <view class="exam-question-title"><text class="exam-question-num">{{questionItem.itemOrder}}. </text><rich-text nodes="{{questionItem.title}}" /></view>
+              <view class="exam-input-contain" wx:for="{{questionItem.items}}" wx:key="{{inputItem.prefix}}" wx:for-item="inputItem" wx:for-index="idx">
                 <view class="exam-input-contain-label">{{inputItem.prefix}}</view>
-                <input class="exam-input-contain-content" maxlength="-1" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}_{{idx}}" />
+                <input class="exam-input-contain-content" maxlength="-1" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}_{{idx}}" bindinput="onAnswerChange" />
               </view>
             </view>
-            <view wx:else>
-              <rich-text nodes="{{questionItem.itemOrder}}. {{questionItem.title}}" />
+
+            <!-- 简答题 -->
+            <view wx:else class="exam-question-block">
+              <view class="exam-question-title"><text class="exam-question-num">{{questionItem.itemOrder}}. </text><rich-text nodes="{{questionItem.title}}" /></view>
               <view class="exam-textarea-contain">
-                <textarea placeholder="答案" maxlength="-1" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}"></textarea>
+                <textarea placeholder="请输入答案..." maxlength="-1" name="{{questionItem.itemOrder}}_{{questionItem.id}}_{{questionItem.questionType}}" bindinput="onAnswerChange"></textarea>
               </view>
             </view>
           </i-cell>
         </i-cell-group>
       </i-panel>
 
-      <view>
-        <button class="i-btn  i-btn-primary i-btn-square" form-type='submit'>提交</button>
+      <view class="exam-submit-area">
+        <button class="exam-submit-btn" form-type='submit' disabled="{{submitting}}">提交试卷</button>
       </view>
 
       <i-action-sheet visible="true" visible="{{timeOutShow}}" mask-closable="{{ false }}">
-        <view slot="header" style="padding: 16px">
-          <view class="exam-timeout-title">考试试卷结束，请提交试卷！</view>
-          <button class="i-btn  i-btn-primary i-btn-square" form-type='submit'>提交</button>
+        <view slot="header" style="padding: 32rpx">
+          <view class="exam-timeout-title">考试时间结束，请提交试卷！</view>
+          <button class="exam-submit-btn" form-type='submit'>提交试卷</button>
         </view>
       </i-action-sheet>
     </form>
 
     <i-modal title="考试结果" visible="{{modalShow}}" bind:ok="returnRecord" bind:cancel="returnRecord">
-      <view>得分：{{result}}</view>
+      <view class="exam-result-score">{{result}}</view>
     </i-modal>
 
     <i-spin size="large" fix wx:if="{{ spinShow }}"></i-spin>

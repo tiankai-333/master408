@@ -29,10 +29,10 @@
       </view>
       <view class="quick-arrow">›</view>
     </view>
-    <view class="quick-item" bind:tap="openPage" data-url="/pages/my/message/list/index">
+    <view class="quick-item" bind:tap="openPage" data-url="/pages/my/ai-keys/index">
       <view class="quick-content">
-        <view class="quick-title">消息</view>
-        <view class="quick-desc">接收学习提醒和通知</view>
+        <view class="quick-title">密钥信息</view>
+        <view class="quick-desc">查看公共和私人 AI 密钥</view>
       </view>
       <view class="quick-arrow">›</view>
     </view>

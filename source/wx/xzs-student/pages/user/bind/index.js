@@ -1,47 +1,49 @@
-const app = getApp()
+var app = getApp()
 Page({
   data: {
     spinShow: false,
     userName: '',
     password: '',
+    submitting: false
   },
   formSubmit: function(e) {
-    let _this = this
-    _this.setData({
-      spinShow: true
-    });
+    var _this = this
+    if (_this.data.submitting) return
+    var form = e.detail.value
+    if (!form.userName || !form.userName.trim()) {
+      app.message('请输入用户名', 'error')
+      return
+    }
+    if (!form.password || !form.password.trim()) {
+      app.message('请输入密码', 'error')
+      return
+    }
+    _this.setData({ spinShow: true, submitting: true })
     wx.login({
-      success(wxres) {
+      success: function(wxres) {
         if (wxres.code) {
-          e.detail.value.code = wxres.code
-          app.formPost('/api/wx/student/auth/bind', e.detail.value)
-            .then(res => {
-              _this.setData({
-                spinShow: false
-              });
+          form.code = wxres.code
+          app.formPost('/api/wx/student/auth/bind', form)
+            .then(function(res) {
+              _this.setData({ spinShow: false, submitting: false })
               if (res.code == 1) {
                 wx.setStorageSync('token', res.response)
-                wx.reLaunch({
-                  url: '/pages/index/index',
-                });
+                wx.switchTab({ url: '/pages/index/index' })
               } else {
                 app.message(res.message, 'error')
               }
-            }).catch(e => {
-              _this.setData({
-                spinShow: false
-              });
+            }).catch(function(e) {
+              _this.setData({ spinShow: false, submitting: false })
               app.message(e, 'error')
             })
         } else {
-          app.message(res.errMsg, 'error')
+          _this.setData({ spinShow: false, submitting: false })
+          app.message(wxres.errMsg, 'error')
         }
       }
     })
   },
-  register: function(e) {
-    wx.navigateTo({
-      url: "../register/index"
-    })
+  register: function() {
+    wx.navigateTo({ url: '../register/index' })
   }
 })

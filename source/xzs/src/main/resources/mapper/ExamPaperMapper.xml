@@ -330,4 +330,19 @@
     </foreach>
   </update>
 
+  <select id="countByCreateUserAndSubjectAndKeyword" resultType="long">
+    SELECT COUNT(*) FROM t_exam_paper
+    WHERE deleted = 0
+      AND name LIKE '%练习%'
+    <if test="createUser != null">
+      AND create_user = #{createUser}
+    </if>
+    <if test="subjectId != null">
+      AND subject_id = #{subjectId}
+    </if>
+    <if test="keyword != null">
+      AND name LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+  </select>
+
 </mapper>
